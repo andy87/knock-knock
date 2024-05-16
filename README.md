@@ -1,4 +1,4 @@
-# api_requester
+# curl Facade
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
