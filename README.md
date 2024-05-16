@@ -17,7 +17,7 @@ $knockKnock = new KnockKnock([
 ```php
 $knockKnock = KnockKnock::getInstance([
     KnockKnock::HOST => 'https://api.url',
-    KnockKnock::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
+    KnockKnock::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_FORM,
 ]);
 ```
 `getInstance( array $knockKnockConfig = [] ): static`
@@ -26,20 +26,21 @@ $knockKnock = KnockKnock::getInstance([
 Доступны set/get методы для взаимодействия с отдельными свойствам,
 которые в дальнейшем будут передаваться запросам исполняемым `$knockKnock` объектом
 ```php
-$knockKnock->setConfigAuthorization('token', KnockKnock::AUTH_BEARER );
-$knockKnock->setConfigHeaders([ 'api-secret' => 'secretKey12']);
-$knockKnock->setConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
+$knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
+$knockKnock->useConfigHeaders(['api-secret' => 'secretKey12']);
+$knockKnock->useConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
 ```
+
 Доступна цепочка вызовов:
 ```php
 $knockKnock
-    ->setConfigAuthorization('token', KnockKnock::AUTH_BEARER )
-    ->setConfigHeaders([ 'api-secret' => 'secretKey23'])
-    ->setConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
+    ->getConfigAuthorization('token', KnockKnock::TOKEN_BASIC )
+    ->getConfigHeaders([ 'api-secret' => 'secretKey23'])
+    ->getConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
 
 $bearer = $knockKnock->getConfigAuthorization(); // string
 ```
-`setConfigAuthorization( string $token, string $method = self::AUTH_BASIC ): static`
+`setConfigAuthorization( string $token, string $method = self::TOKEN_BASIC ): static`
 
 Все подобные методы возвращают `static` объект / экземпляр класса `KnockKnock`
 
@@ -48,16 +49,16 @@ $bearer = $knockKnock->getConfigAuthorization(); // string
 Установить обработчики событий
 ```php
 $knockKnock->setupCallback([
-    KnockKnock::EVENT_AFTER_CONSTRUCT => function( static $static ) {
+    KnockKnock::EVENT_AFTER_CONSTRUCT => fn( static $static ) {
         // Действия после создания объекта
     },
-    KnockKnock::EVENT_AFTER_CREATE_REQUEST => function( static $static ) {
+    KnockKnock::EVENT_AFTER_CREATE_REQUEST => fn( static $static ) {
         // Действия после создания объекта запроса
     },
-    KnockKnock::EVENT_BEFORE_SEND => function( KnockRequest $knockRequest ) {
+    KnockKnock::EVENT_BEFORE_SEND => fn( KnockRequest $knockRequest ) {
         // Действия перед отправкой запроса
     },
-    KnockKnock::EVENT_AFTER_SEND => function( KnockResponse $knockResponse ) {
+    KnockKnock::EVENT_AFTER_SEND => fn( KnockResponse $knockResponse ) {
         // Действия после отправки запроса и получения ответа
     }
 ]);
@@ -140,7 +141,7 @@ $knockKnock->setRequest( $knockRequest, [
     KnockKnock::HOST => 'https://api.url',
     KnockKnock::BEARER => 'token-bearer-2',
     KnockKnock::HEADERS => [
-        'api-secret' => 'secret-key-2'
+        'api-secret' => 'secretKey78'
     ],
 ]);
 ```
@@ -151,8 +152,8 @@ $knockKnock->setRequest( $knockRequest, [
 Конструктор KnockResponse
 ```php
 $knockResponse = $knockKnock->constructKnockResponse([
-    'id' => 12345,
-    'name' => 'Test'
+    'id' => 806034,
+    'name' => 'and_y87'
 ]);
 ```
 `constructKnockResponse( array $paramsKnockResponse, int $httpCode = 200 ): KnockResponse`
