@@ -2,6 +2,8 @@
 
 namespace andy87\knock_knock\core;
 
+use andy87\knock_knock\helpers\KnockContentType;
+
 /**
  * Class KnockRequest
  *
@@ -332,5 +334,22 @@ class KnockRequest
     public function getCurlParams(): array
     {
         return $this->curlParams;
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams(): array
+    {
+        return [
+            self::METHOD => $this->getMethod(),
+            self::CONTENT_TYPE => $this->getContentType(),
+            self::HEADERS => $this->getHeaders(),
+            self::DATA => $this->getData(),
+            self::CURL_OPTIONS => $this->getCurlOptions(),
+            self::CURL_INFO => $this->getCurlInfo(),
+            self::PROTOCOL => $this->getProtocol(),
+            self::HOST => $this->getHost()
+        ];
     }
 }

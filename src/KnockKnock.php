@@ -2,6 +2,8 @@
 
 namespace andy87\knock_knock;
 
+use andy87\knock_knock\helpers\KnockContentType;
+use andy87\knock_knock\helpers\KnockMethod;
 use Exception;
 use andy87\knock_knock\core\KnockRequest;
 use andy87\knock_knock\core\KnockResponse;
@@ -14,7 +16,7 @@ use andy87\knock_knock\core\KnockResponse;
  * Fix not used:
  * - @see KnockKnock::getInstance();
  * - @see KnockKnock::constructKnockRequest();
- * - @see KnockKnock::setRequest();
+ * - @see KnockKnock::setupRequest();
  * - @see KnockKnock::send();
  * - @see KnockKnock::getResponseOnSendRequest();
  * - @see KnockKnock::event();
@@ -23,6 +25,15 @@ use andy87\knock_knock\core\KnockResponse;
  * - @see KnockKnock::useAuthorization();
  * - @see KnockKnock::useHeaders();
  * - @see KnockKnock::useContentType();
+ *
+ * - @see KnockKnock::get();
+ * - @see KnockKnock::post();
+ * - @see KnockKnock::put();
+ * - @see KnockKnock::delete();
+ * - @see KnockKnock::patch();
+ * - @see KnockKnock::options();
+ * - @see KnockKnock::head();
+ * - @see KnockKnock::trace();
  *
  * - @see KnockKnock::TOKEN_BEARER;
  */
@@ -137,7 +148,7 @@ class KnockKnock
      *
      * @return $this
      */
-    public function setRequest( KnockRequest $knockRequest, array $options = [] ): self
+    public function setupRequest(KnockRequest $knockRequest, array $options = [] ): self
     {
         if ( count( $options ) )
         {
@@ -160,6 +171,8 @@ class KnockKnock
     {
         if ( $this->knockRequest )
         {
+            $this->setupRequest( $this->knockRequest, $this->commonKnockRequest->getParams() );
+
             $this->event( self::EVENT_BEFORE_SEND, $this->knockRequest );
 
             return (count($fakeKnockResponseParams))
@@ -179,6 +192,8 @@ class KnockKnock
     {
         $ch = curl_init();
 
+        $this->setupPostFields();
+
         $curlParams = $this->knockRequest->getCurlParams();
 
         curl_setopt_array( $ch, $curlParams[KnockRequest::CURL_OPTIONS] );
@@ -191,7 +206,7 @@ class KnockKnock
             KnockResponse::CONTENT => $response,
             KnockResponse::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE )
         ];
-        
+
         $knockResponse = $this->constructKnockResponse( $knockResponseParams, $this->knockRequest );
 
         curl_close( $ch );
@@ -312,5 +327,172 @@ class KnockKnock
         $this->commonKnockRequest->setContentType( $ContentType );
 
         return $this;
+    }
+
+
+    /**
+     * @param string $endpoint
+     * @param mixed $data
+     * @param string $method
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    private function commonMethod( string $endpoint, $data, string $method ): KnockResponse
+    {
+        if ( !$this->knockRequest )
+        {
+            $params = ( $this->commonKnockRequest ) ? $this->commonKnockRequest->getParams() : [];
+
+            $this->knockRequest = $this->constructKnockRequest( $endpoint, $params );
+        }
+
+        if ($data)
+        {
+            if ( $method === KnockMethod::GET )
+            {
+                $endpoint .= '?' . http_build_query( $data );
+
+            } else {
+
+                $this->knockRequest->setData( $data );
+            }
+        }
+
+        $this->knockRequest = $this->constructKnockRequest( $endpoint, $this->knockRequest->getParams() );
+
+        $this->setupRequest( $this->knockRequest, [ KnockRequest::METHOD => $method ] );
+
+        return $this->send();
+    }
+
+    /**
+     * @param string $endpoint
+     * @param array $params
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function get( string $endpoint, array $params = [] ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $params, KnockMethod::GET );
+    }
+
+    /**
+     * @param ?mixed $data
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function post( $endpoint, $data = null ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $data, KnockMethod::POST );
+    }
+
+    /**
+     * @param string $endpoint
+     * @param ?mixed $data
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function put( string $endpoint, $data = null ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $data, KnockMethod::PUT );
+    }
+
+    /**
+     * @param string $endpoint
+     * @param ?mixed $data
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function delete( string $endpoint, $data = null ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $data, KnockMethod::DELETE );
+    }
+
+    /**
+     * @param string $endpoint
+     * @param ?mixed $data
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function patch( string $endpoint, $data = null ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $data, KnockMethod::PATCH );
+    }
+
+    /**
+     * @param string $endpoint
+     * @param ?mixed $data
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function options( string $endpoint, $data = null ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $data, KnockMethod::OPTIONS );
+    }
+
+    /**
+     * @param string $endpoint
+     * @param ?mixed $data
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function head( string $endpoint, $data = null ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $data, KnockMethod::HEAD );
+    }
+
+    /**
+     * @param string $endpoint
+     * @param ?mixed $data
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function trace( string $endpoint, $data = null ): KnockResponse
+    {
+        return $this->commonMethod( $endpoint, $data, KnockMethod::TRACE );
+    }
+
+    /**
+     * @return void
+     */
+    private function setupPostFields()
+    {
+        if ( $this->knockRequest->getMethod() !== KnockMethod::GET )
+        {
+            if ( count( $this->knockRequest->getData()) )
+            {
+                switch( $this->knockRequest->getContentType() )
+                {
+                    case KnockContentType::JSON:
+                        $this->knockRequest->addCurlOptions( CURLOPT_POSTFIELDS, json_encode( $this->knockRequest->getData() ) );
+                        break;
+
+                    case KnockContentType::FORM:
+                    case KnockContentType::MULTIPART:
+                    case KnockContentType::XML:
+                    case KnockContentType::TEXT:
+                    default:
+                        $this->knockRequest->addCurlOptions( CURLOPT_POSTFIELDS, $this->knockRequest->getData() );
+                }
+            }
+        }
     }
 }
