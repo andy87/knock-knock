@@ -1,4 +1,4 @@
-# curl Facade
+# KnockKnock
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
