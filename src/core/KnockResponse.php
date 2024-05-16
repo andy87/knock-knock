@@ -31,8 +31,8 @@ class KnockResponse
 
 
 
-    /** @var string  */
-    private string $content;
+    /** @var  */
+    private $content;
 
     /** @var int  */
     private int $httpCode;
@@ -79,19 +79,19 @@ class KnockResponse
     }
 
     /**
-     * @param string $content
+     * @param $content
      *
      * @return void
      */
-    public function setContent( string $content )
+    public function setContent( $content )
     {
         $this->content = $content;
     }
 
     /**
-     * @return string
+     * @return mixed
      */
-    public function getContent(): string
+    public function getContent()
     {
         return $this->content;
     }
