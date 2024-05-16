@@ -9,22 +9,23 @@ PHP Фасад\Адаптер для отправки запросов чере�
 Нативный вариант
 ```php
 $knockKnock = new KnockKnock([
-    KnockKnock::HOST => 'https://api.url',
-    KnockKnock::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
+    KnockRequest::HOST => 'domain.zone',
+    KnockRequest::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
 ]);
 ```
 вариант Singleton
 ```php
 $knockKnock = KnockKnock::getInstance([
-    KnockKnock::HOST => 'https://api.url',
-    KnockKnock::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_FORM,
-]);
+    KnockRequest::HOST => 'domain.zone',
+    KnockRequest::PROTOCOL => 'wss',
+    KnockRequest::HEADER => KnockRequest::CONTENT_TYPE_FORM,
+])->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
 ```
 `getInstance( array $knockKnockConfig = [] ): static`
 
-## Установка отдельных настроек конфигурации компонента
-Доступны set/get методы для взаимодействия с отдельными свойствам,
-которые в дальнейшем будут передаваться запросам исполняемым `$knockKnock` объектом
+## Использование настроек для параметров запроса
+Доступно 3 отдельных метода для взаимодействия с некоторыми, отдельными, свойствами,
+которые в дальнейшем будут передаваться запросам отправляемыми объектом `$knockKnock` 
 ```php
 $knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
 $knockKnock->useConfigHeaders(['api-secret' => 'secretKey12']);
@@ -34,11 +35,11 @@ $knockKnock->useConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
 Доступна цепочка вызовов:
 ```php
 $knockKnock
-    ->getConfigAuthorization('token', KnockKnock::TOKEN_BASIC )
-    ->getConfigHeaders([ 'api-secret' => 'secretKey23'])
-    ->getConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
+    ->useAuthorization('token', KnockKnock::TOKEN_BASIC )
+    ->useConfigHeaders(['api-secret' => 'secretKey23'])
+    ->useConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
 
-$bearer = $knockKnock->getConfigAuthorization(); // string
+$bearer = $knockKnock->getAuthorization(); // string
 ```
 `setConfigAuthorization( string $token, string $method = self::TOKEN_BASIC ): static`
 
@@ -49,16 +50,16 @@ $bearer = $knockKnock->getConfigAuthorization(); // string
 Установить обработчики событий
 ```php
 $knockKnock->setupCallback([
-    KnockKnock::EVENT_AFTER_CONSTRUCT => fn( static $static ) {
+    KnockKnock::EVENT_AFTER_CONSTRUCT => fn( static $knockKnock ) => {
         // Действия после создания объекта
     },
-    KnockKnock::EVENT_AFTER_CREATE_REQUEST => fn( static $static ) {
+    KnockKnock::EVENT_AFTER_CREATE_REQUEST => fn( static $knockKnock ) => {
         // Действия после создания объекта запроса
     },
-    KnockKnock::EVENT_BEFORE_SEND => fn( KnockRequest $knockRequest ) {
+    KnockKnock::EVENT_BEFORE_SEND => fn(  static $knockKnock, KnockRequest $knockRequest ) => {
         // Действия перед отправкой запроса
     },
-    KnockKnock::EVENT_AFTER_SEND => fn( KnockResponse $knockResponse ) {
+    KnockKnock::EVENT_AFTER_SEND => fn( static $knockKnock, KnockResponse $knockResponse ) => {
         // Действия после отправки запроса и получения ответа
     }
 ]);
@@ -138,7 +139,7 @@ $method = $knockRequest->getMethod(); // string
 
 ```php
 $knockKnock->setRequest( $knockRequest, [
-    KnockKnock::HOST => 'https://api.url',
+    KnockRequest::HOST => 'domain.zone',
     KnockKnock::BEARER => 'token-bearer-2',
     KnockKnock::HEADERS => [
         'api-secret' => 'secretKey78'
@@ -149,7 +150,7 @@ $knockKnock->setRequest( $knockRequest, [
 
 ## KnockResponse: Ответ
 
-Конструктор KnockResponse
+Конструктор KnockResponse с вызовом callback функции, если она установлена
 ```php
 $knockResponse = $knockKnock->constructKnockResponse([
     'id' => 806034,
@@ -160,7 +161,7 @@ $knockResponse = $knockKnock->constructKnockResponse([
 
 ## KnockResponse: Получением ответа при отправке запроса
 
-Получение ответа с отправкой запроса - отдельным вызовом 
+Получение ответа с отправкой запроса и вызовом callback функции, если она установлена
 ```php
 $knockKnock->setRequest( $knockRequest );
 $knockResponse = $knockKnock->send();
@@ -175,7 +176,7 @@ $knockResponse = $knockKnock->setRequest( $knockRequest )->send(); // return Kno
 
 ## Отправка запроса с фэйковым ответом
 
-Цепочка вызовов, возвращает подготовленный ответ.
+Цепочка вызовов, возвращает подготовленный ответ и вызывает callback функцию, если она установлена
 ```php
 // параметры возвращаемого ответа
 $prepareFakeKnockResponseParams = [
@@ -192,6 +193,7 @@ $knockResponse = $knockKnock->setRequest( $knockRequest )->send( $prepareFakeKno
 
 ## Подмена данных в ответе
 
+В полученном ответе подменяются данные
 ```php
 $knockResponse = $knockKnock->setRequest( $knockRequest )->send();
 
@@ -204,6 +206,7 @@ $knockResponse
 
 ## Извлечение полезных данных из запроса
 
+Получение массива с данными ответа
 ```php
 // Получение опций запроса (  KnockRequest::CURL_OPTIONS )
 $curlOptions =  $knockResponse->get( KnockResponse::CURL_OPTIONS ); // return array
@@ -215,7 +218,7 @@ $curlInfo =  $knockResponse->get( KnockResponse::CURL_INFO ); // return array
 
 # Custom реализация
 
-Custom реализация Базового класса
+Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
 class KnockKnockYandex implements KnockKnockInterface
 {
@@ -280,23 +283,25 @@ $knockKnockYandex = KnockKnockYandex::getInstanse([
     KnockKnock::LOGGER => new YandexLogger(),
 ]);
 
-$knockResponse = $knockKnockYandex->setRequest('profile', [
+$knockResponse = $knockKnockYandex->setRequest('profile', [ 
     KnockRequest::METHOD => KnockMethod::PATCH,
     KnockRequest::DATA => [ 'city' => 'Moscow' ],
-])->send();
+]); // Логирование `afterCreateRequest`
+
+$knockResponse = $knockKnockYandex->send(); // Логирование `afterSend`
 
 ```
 
 # Расширения
 
-Работают через "магию"
+Расширения работают через "магию", поэтому лучше описывать их в анотациях класса
 
 Реализация расширения
 ```php
 /**
- * @method static checkHeader( KnockKnock $knockKnock )
+ * @method static setupCorrectHost( KnockKnock $knockKnock )
  */
-class CustomKnockKnock extends KnockKnock
+class VkontakteKnockKnock extends KnockKnock
 {
     /** @var callable[] */
     private array $extensions = [];
@@ -305,9 +310,17 @@ class CustomKnockKnock extends KnockKnock
 
     public function init()
     {
-        $this->addExtension( 'checkHeader', fn( $this ) => {
-            if ( str_contains($this->host,'yandex') ) {
-                $this->headers[] = ['Host' => 'client.ru']
+        $this->addExtension( 'setupCorrectHost', fn( $knockKnock ) => 
+        {
+            switch ($knockKnock->host)
+            {
+                case 'vk.com':
+                    $knockKnock->useHeaders(['Host' => 'client.ru']);
+                    break;
+
+                case 'api.vk.com':
+                    $knockKnock->useAuthorization('myToken', KnockKnock::TOKEN_BEARER );
+                    break;
             }
         });
     }
@@ -316,13 +329,13 @@ class CustomKnockKnock extends KnockKnock
 
 Использование расширения
 ```php
-$knockKnock = CustomKnockKnock::getInstance([
-    KnockKnock::HOST => 'https://api.yandex.ru/',
+$vkontakteKnockKnock = VkontakteKnockKnock::getInstance([
+    KnockRequest::HOST => 'api.vk.com',
 ]);
 
-$knockKnock->checkHeader();
+$vkontakteKnockKnock->setupCorrectHost();
 
-$knockResponse = $knockKnock->setRequest('profile', [
+$knockResponse = $vkontakteKnockKnock->setRequest('profile', [
     KnockRequest::METHOD => KnockMethod::PATCH,
     KnockRequest::DATA => [ 'homepage' => 'www.andy87.ru' ],
 ])->send();
