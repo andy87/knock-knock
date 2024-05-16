@@ -2,6 +2,8 @@
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
+![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
+
 ```php
 
 use andy87\api_requester\ApiRequester;
