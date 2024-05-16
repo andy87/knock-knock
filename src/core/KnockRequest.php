@@ -11,6 +11,7 @@ namespace andy87\knock_knock\core;
  * - @see KnockRequest::getUrl();
  * - @see KnockRequest::getContentType();
  * - @see KnockRequest::getHeaders();
+ * - @see KnockRequest::addCurlOptions();
  * - @see KnockRequest::getCurlOptions();
  * - @see KnockRequest::getCurlInfo();
  * - @see KnockRequest::getData();
@@ -223,6 +224,19 @@ class KnockRequest
     public function setCurlOptions( array $options ): self
     {
         $this->curlParams[self::CURL_OPTIONS] = $options;
+
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     *
+     * @return $this
+     */
+    public function addCurlOptions( string $key, string  $value ): self
+    {
+        $this->curlParams[self::CURL_OPTIONS][$key] = $value;
 
         return $this;
     }

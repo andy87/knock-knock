@@ -6,6 +6,16 @@ namespace andy87\knock_knock\helpers;
  * Class KnockMethod
  *
  * @package andy87\knock_knock\query
+ *
+ * Fix not used:
+ * - @see KnockMethod::GET;
+ * - @see KnockMethod::POST;
+ * - @see KnockMethod::PUT;
+ * - @see KnockMethod::DELETE;
+ * - @see KnockMethod::PATCH;
+ * - @see KnockMethod::OPTIONS;
+ * - @see KnockMethod::HEAD;
+ * - @see KnockMethod::TRACE;
  */
 class KnockMethod
 {

@@ -120,14 +120,11 @@ class KnockKnock
      */
     public function constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse
     {
-        $knockResponse = new KnockResponse();
-
-        $knockResponse->setHttpCode( $KnockResponseParams[KnockResponse::HTTP_CODE] ?? KnockResponse::OK );
-        $knockResponse->setContent( $KnockResponseParams[KnockResponse::CONTENT] ?? '' );
-
-        if ($knockRequest) {
-            $knockResponse->setRequest( $knockRequest );
-        }
+        $knockResponse = new KnockResponse(
+            $KnockResponseParams[KnockResponse::CONTENT] ?? null,
+            $KnockResponseParams[KnockResponse::HTTP_CODE] ?? KnockResponse::OK,
+                $knockRequest
+        );
 
         $this->event( self::EVENT_CONSTRUCT_RESPONSE, $knockResponse );
 
@@ -186,9 +183,16 @@ class KnockKnock
 
         curl_setopt_array( $ch, $curlParams[KnockRequest::CURL_OPTIONS] );
 
-        $knockResponse = new KnockResponse( $ch, $this->knockRequest );
+        $response = curl_exec( $ch );
 
-        $this->event( self::EVENT_CONSTRUCT_RESPONSE, $knockResponse );
+        $this->knockRequest->setCurlInfo( curl_getinfo( $ch ) );
+
+        $knockResponseParams = [
+            KnockResponse::CONTENT => $response,
+            KnockResponse::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE )
+        ];
+        
+        $knockResponse = $this->constructKnockResponse( $knockResponseParams, $this->knockRequest );
 
         curl_close( $ch );
 

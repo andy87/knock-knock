@@ -13,6 +13,8 @@ use Exception;
  * - @see KnockResponse::getRequest();
  * - @see KnockResponse::getHttpCode();
  * - @see KnockResponse::getContent();
+ *
+ * - @see KnockResponse::ERROR;
  */
 class KnockResponse
 {
@@ -42,26 +44,21 @@ class KnockResponse
     /**
      * KnockResponse constructor.
      *
-     * @param ?resource $ch
+     * @param $content
+     * @param int $httpCode
+     * @param KnockRequest $knockRequest
      *
      * @throws Exception
      */
-    public function __construct( $ch = null, ?KnockRequest $knockRequest = null )
+    public function __construct( $content, int $httpCode, KnockRequest $knockRequest )
     {
-        if ( $ch )
-        {
-            $this->setHttpCode( curl_getinfo( $ch, CURLINFO_HTTP_CODE ) );
+        $this->setContent( $content );
 
-            $this->setContent( curl_exec( $ch ) );
-        }
+        $this->setHttpCode( $httpCode );
 
-        if ( $knockRequest )
-        {
-            $knockRequest->setCurlInfo( curl_getinfo( $ch ) );
-
-            $this->setRequest($knockRequest);
-        }
+        $this->setRequest( $knockRequest );
     }
+
 
     /**
      * @param int $httpCode
