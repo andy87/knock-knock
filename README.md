@@ -20,7 +20,7 @@ $knockKnock = KnockKnock::getInstance([
     KnockKnock::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
 ]);
 ```
-getInstance( array $knockKnockConfig = [] ); // return static
+`getInstance( array $knockKnockConfig = [] ): static`
 
 ## Установка отдельных настроек конфигурации компонента
 Доступны set/get методы для взаимодействия с отдельными свойствам,
@@ -33,13 +33,13 @@ $knockKnock->setConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
 Доступна цепочка вызовов:
 ```php
 $knockKnock
-    ->setConfigAuthorization('token', KnockKnock::AUTH_BEARER );
-    ->setConfigHeaders([ 'api-secret' => 'secretKey23']);
+    ->setConfigAuthorization('token', KnockKnock::AUTH_BEARER )
+    ->setConfigHeaders([ 'api-secret' => 'secretKey23'])
     ->setConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
 
 $bearer = $knockKnock->getConfigAuthorization(); // string
 ```
-setConfigAuthorization( string $token, string $method = self::AUTH_BASIC )
+`setConfigAuthorization( string $token, string $method = self::AUTH_BASIC ): static`
 
 Все подобные методы возвращают `static` объект / экземпляр класса `KnockKnock`
 
@@ -62,27 +62,28 @@ $knockKnock->setupCallback([
     }
 ]);
 ```
-setupCallback( array $callbacks ); // return static
+`setupCallback( array $callbacks ): static`
 
 # KnockRequest: Создание запроса
 
 Нативное создание объекта / экземпляра класса с данными конкретного запроса
 ```php
 $knockRequest = new KnockRequest( 'info/me', [
-        KnockRequest::METHOD => KnockMethod::POST,
-        KnockRequest::DATA => [ 'client_id' => 34 ],
-        KnockRequest::HEADERS => [ 'api-secret-key' => 'secretKey34' ],
-        KnockRequest::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
-        KnockRequest::CURL_INFO => [
-            CURLINFO_CONTENT_TYPE,
-            CURLINFO_HEADER_SIZE,
-            CURLINFO_TOTAL_TIME
-        ],
-        KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
-    ]);
+    KnockRequest::METHOD => KnockMethod::POST,
+    KnockRequest::DATA => [ 'client_id' => 34 ],
+    KnockRequest::HEADERS => [ 'api-secret-key' => 'secretKey34' ],
+    KnockRequest::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
+    KnockRequest::CURL_INFO => [
+        CURLINFO_CONTENT_TYPE,
+        CURLINFO_HEADER_SIZE,
+        CURLINFO_TOTAL_TIME
+    ],
+    KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
+]);
 ```
 
-Доступно создание объекта / экземпляра класса с данными конкретного запроса - через метод фасада
+Доступно создание объекта / экземпляра класса с данными конкретного запроса - через метод фасада,
+с вызовом callback функции, если она установлена
 ```php
 $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
     KnockRequest::METHOD => KnockMethod::POST,
@@ -97,7 +98,7 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
     KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
 ]);
 ```
-constructKnockRequest( string $url, array $paramsKnockRequest = [] ); // return KnockRequest
+`constructKnockRequest( string $url, array $paramsKnockRequest = [] ): KnockRequest`
 
 ## Изменение общих настроек компонента на частные 
 Если надо выполнить запрос, с другими параметрами
@@ -107,7 +108,7 @@ $knockRequest = $knock
     ->setupTempHeaders([ 'api-secret' => 'secretKey56'])
     ->constructKnockRequest('info/me',[
         KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
-    ]); // return KnockRequest
+    ]);
 ```
 
 ### Назначение/Изменение отдельных параметров запроса (set/get)
@@ -128,8 +129,6 @@ $knockRequest->setCurlInfo([
 ]);
 $knockRequest->setContentType(KnockContentType::JSON);
 
-$knockKnock->setRequest( $knockRequest );
-
 $method = $knockRequest->getMethod(); // string
 // ... аналогичным образом доступны и другие подобные методы для получения свойств запроса
 ```
@@ -145,6 +144,7 @@ $knockKnock->setRequest( $knockRequest, [
     ],
 ]);
 ```
+`setRequest( KnockRequest $knockRequest, array $tempParamsKnockKnock = [] ): static`
 
 ## KnockResponse: Ответ
 
@@ -155,21 +155,22 @@ $knockResponse = $knockKnock->constructKnockResponse([
     'name' => 'Test'
 ]);
 ```
-constructKnockResponse( array $paramsKnockResponse, int $httpCode = 200 ); // return KnockResponse
+`constructKnockResponse( array $paramsKnockResponse, int $httpCode = 200 ): KnockResponse`
 
 ## KnockResponse: Получением ответа при отправке запроса
 
 Получение ответа с отправкой запроса - отдельным вызовом 
 ```php
 $knockKnock->setRequest( $knockRequest );
-$knockResponse = $knockKnock->send(); // return KnockResponse
+$knockResponse = $knockKnock->send();
 ```
+`send( array $prepareKnockResponseParams = [] ): KnockResponse`
+возвращает объект/экземпляр класса KnockResponse
+
 Получение ответа с отправкой запроса - цепочкой вызовов
 ```php
 $knockResponse = $knockKnock->setRequest( $knockRequest )->send(); // return KnockResponse
 ```
-send( array $prepareKnockResponseParams = [] ); // return KnockResponse
-возвращает объект/экземпляр класса KnockResponse
 
 ## Отправка запроса с фэйковым ответом
 
@@ -184,21 +185,20 @@ $prepareFakeKnockResponseParams = [
     ],
 ];
 
-$knockResponse = $knockKnock->setRequest( $knockRequest )->send( $prepareFakeKnockResponseParams ); // return KnockResponse
+$knockResponse = $knockKnock->setRequest( $knockRequest )->send( $prepareFakeKnockResponseParams );
 ```
-объект `KnockResponse` будет содержать данные переданные в аргументе `$prepareFakeKnockResponseParams`
-
+объект `$knockResponse` будет содержать данные переданные в аргументе `$prepareFakeKnockResponseParams`
 
 ## Подмена данных в ответе
 
 ```php
-$knockResponse = $knockKnock->setRequest( $knockRequest )->send(); // return KnockResponse
+$knockResponse = $knockKnock->setRequest( $knockRequest )->send();
 
 $knockResponse
     ->replace(KnockResponse::HTTP_CODE, 200)
     ->replace(KnockResponse::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}');
 ```
-replace( string $property, mixed $value )
+`replace( string $property, mixed $value ): static`
 
 
 ## Извлечение полезных данных из запроса
