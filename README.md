@@ -16,10 +16,10 @@ $apiRequester = new ApiRequester([
 ]);
 
 $apiRequester->callback([
-    ApiRequester::BEFORE_SEND => function( Request $request ) {
+    ApiRequester::EVENT_BEFORE_SEND => function( Request $request ) {
         // Действия перед отправкой запроса
     },
-    ApiRequester::AFTER_SEND => function( Response $response ) {
+    ApiRequester::EVENT_AFTER_SEND => function( Response $response ) {
         // Действия после отправки запроса
     }
 ]);
