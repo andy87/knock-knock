@@ -14,6 +14,7 @@ use Exception;
  * - @see KnockResponse::getHttpCode();
  * - @see KnockResponse::getContent();
  * - @see KnockResponse::get();
+ * - @see KnockResponse::replace();
  *
  * - @see KnockResponse::ERROR;
  */
@@ -65,9 +66,16 @@ class KnockResponse
      * @param int $httpCode
      *
      * @return void
+     *
+     * @throws Exception
      */
     public function setHttpCode( int $httpCode )
     {
+        if ( $this->httpCode )
+        {
+            throw new Exception('Request is already set');
+        }
+
         $this->httpCode = $httpCode;
     }
 
@@ -83,9 +91,16 @@ class KnockResponse
      * @param $content
      *
      * @return void
+     *
+     * @throws Exception
      */
     public function setContent( $content )
     {
+        if ( $this->content )
+        {
+            throw new Exception('Content is already set');
+        }
+
         $this->content = $content;
     }
 
@@ -97,13 +112,6 @@ class KnockResponse
         return $this->content;
     }
 
-    /**
-     * @return KnockRequest
-     */
-    public function getRequest(): KnockRequest
-    {
-        return $this->knockRequest;
-    }
 
     /**
      * @param KnockRequest $knockRequest
@@ -118,6 +126,41 @@ class KnockResponse
         }
 
         $this->knockRequest = $knockRequest;
+    }
+
+    /**
+     * @return KnockRequest
+     */
+    public function getRequest(): KnockRequest
+    {
+        return $this->knockRequest;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     */
+    public function replace( string $key, $value ): KnockResponse
+    {
+        switch ( $key )
+        {
+            case self::HTTP_CODE:
+                $this->setHttpCode( $value );
+                break;
+
+            case self::CONTENT:
+                $this->setContent( $value );
+                break;
+
+            default:
+                throw new Exception('Bad key');
+        }
+
+        return $this;
     }
 
     /**
