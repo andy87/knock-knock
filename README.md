@@ -27,16 +27,16 @@ $knockKnock = KnockKnock::getInstance([
 
 
 ## Настройка параметров запросов
-Доступны отдельные методы для настройки некоторых, отдельных, свойств,
+Доступны несколько уникальных методов для настройки некоторых, свойств,
 которые в дальнейшем будут передаваться всем запросам отправляемыми объектом `$knockKnock`
 
 Все подобные методы возвращают `static` объект / экземпляр класса `KnockKnock`
 
 Отдельными вызовами.
 ```php
-$knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
-$knockKnock->useConfigHeaders(['api-secret' => 'secretKey12']);
-$knockKnock->useConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
+$knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER ); // задаёт/переустанавливает использование токена
+$knockKnock->useConfigHeaders(['api-secret' => 'secretKey12']); // задаёт/переустанавливает заголовки
+$knockKnock->useConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART); // задаёт/переустанавливает тип контента
 ```
 
 Цепочка вызовов:
@@ -113,7 +113,7 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
     KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
 ]);
 ```
-`constructKnockRequest( string $url, array $paramsKnockRequest = [] ): KnockRequest`
+`constructKnockRequest( string $url, array $knockRequestConfig = [] ): KnockRequest`
 
 ### Назначение/Изменение/Получение отдельных параметров запроса (set/get)
 

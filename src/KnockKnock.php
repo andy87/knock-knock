@@ -106,13 +106,13 @@ class KnockKnock
 
     /**
      * @param string $endpoint
-     * @param array $params
+     * @param array $knockRequestConfig
      *
      * @return KnockRequest
      */
-    public function constructKnockRequest( string  $endpoint, array $params = [] ): KnockRequest
+    public function constructKnockRequest( string $endpoint, array $knockRequestConfig = [] ): KnockRequest
     {
-        $params = array_merge( (array) $this->commonKnockRequest, $params );
+        $params = array_merge( $knockRequestConfig, $this->commonKnockRequest->getParams() );
 
         $this->knockRequest = new KnockRequest( $endpoint, $params );
 
