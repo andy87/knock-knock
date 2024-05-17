@@ -35,16 +35,16 @@ $knockKnock = KnockKnock::getInstance([
 Отдельными вызовами.
 ```php
 $knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER ); // задаёт/переустанавливает использование токена
-$knockKnock->useConfigHeaders(['api-secret' => 'secretKey12']); // задаёт/переустанавливает заголовки
-$knockKnock->useConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART); // задаёт/переустанавливает тип контента
+$knockKnock->useHeaders(['api-secret' => 'secretKey12']); // задаёт/переустанавливает заголовки
+$knockKnock->useContentType( KnockRequest::CONTENT_TYPE_MULTIPART ); // задаёт/переустанавливает тип контента
 ```
 
 Цепочка вызовов:
 ```php
 $knockKnock
     ->useAuthorization('token', KnockKnock::TOKEN_BASIC )
-    ->useConfigHeaders(['api-secret' => 'secretKey23'])
-    ->useConfigContentType(KnockRequest::CONTENT_TYPE_MULTIPART);
+    ->useHeaders(['api-secret' => 'secretKey23'])
+    ->useContentType( KnockRequest::CONTENT_TYPE_MULTIPART );
 
 $bearer = $knockKnock->getAuthorization(); // string
 ```
@@ -59,7 +59,7 @@ $bearer = $knockKnock->getAuthorization(); // string
  - после получения ответа
 
 ```php
-$knockKnock->setupCallback([
+$knockKnock->setupEventHandlers([
     KnockKnock::EVENT_AFTER_CONSTRUCT => fn( static $knockKnock ) => {
         // создание объекта knockKnock
     },
@@ -77,7 +77,7 @@ $knockKnock->setupCallback([
     }
 ]);
 ```
-`setupCallback( array $callbacks ): self`
+`setupEventHandlers( array $callbacks ): self`
 
 
 # KnockRequest, Запрос
@@ -134,7 +134,7 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 ```php
 $knockRequest = $knockKnock->constructKnockRequest('info/me');
 
-$knockRequest->setMethod(KnockMethod::GET);
+$knockRequest->setMethod( KnockMethod::GET );
 $knockRequest->setData(['client_id' => 67]);
 $knockRequest->setHeaders(['api-secret-key' => 'secretKey67']);
 $knockRequest->setCurlOptions([
@@ -146,7 +146,7 @@ $knockRequest->setCurlInfo([
     CURLINFO_HEADER_SIZE,
     CURLINFO_TOTAL_TIME
 ]);
-$knockRequest->setContentType(KnockContentType::JSON);
+$knockRequest->setContentType( KnockContentType::JSON );
 
 $protocol = $knockRequest->getPrococol(); // string
 $host = $knockRequest->getHost(); // string
@@ -231,8 +231,8 @@ $knockResponse
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 
 $knockResponse
-    ->replace(KnockResponse::HTTP_CODE, 200)
-    ->replace(KnockResponse::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}');
+    ->replace( KnockResponse::HTTP_CODE, 200 )
+    ->replace( KnockResponse::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}' );
 ```
 
 ## Данные запроса из ответа
@@ -350,7 +350,7 @@ class VkontakteKnockKnock extends KnockKnock
                     break;
 
                 case 'api.vk.com':
-                    $knockKnock->useAuthorization('myToken', KnockKnock::TOKEN_BEARER );
+                    $knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
                     break;
             }
         });

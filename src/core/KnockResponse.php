@@ -2,7 +2,9 @@
 
 namespace andy87\knock_knock\core;
 
+use andy87\knock_knock\interfaces\KnockRequestInterface;
 use Exception;
+use andy87\knock_knock\interfaces\KnockResponseInterface;
 
 /**
  * Class KnockRequest
@@ -15,10 +17,11 @@ use Exception;
  * - @see KnockResponse::getContent();
  * - @see KnockResponse::get();
  * - @see KnockResponse::replace();
+ * - @see KnockResponse::getTrace();
  *
  * - @see KnockResponse::ERROR;
  */
-class KnockResponse
+class KnockResponse implements KnockResponseInterface
 {
     /** @var int  */
     public const OK = 200;
@@ -65,11 +68,11 @@ class KnockResponse
     /**
      * @param int $httpCode
      *
-     * @return void
+     * @return self
      *
      * @throws Exception
      */
-    public function setHttpCode( int $httpCode )
+    public function setHttpCode( int $httpCode ): self
     {
         if ( $this->httpCode )
         {
@@ -77,6 +80,8 @@ class KnockResponse
         }
 
         $this->httpCode = $httpCode;
+
+        return $this;
     }
 
     /**
@@ -88,13 +93,13 @@ class KnockResponse
     }
 
     /**
-     * @param $content
+     * @param mixed $content
      *
      * @return void
      *
      * @throws Exception
      */
-    public function setContent( $content )
+    public function setContent( $content ): self
     {
         if ( $this->content )
         {
@@ -102,6 +107,8 @@ class KnockResponse
         }
 
         $this->content = $content;
+
+        return $this;
     }
 
     /**
@@ -116,9 +123,11 @@ class KnockResponse
     /**
      * @param KnockRequest $knockRequest
      *
+     * @return KnockResponse
+     *
      * @throws Exception
      */
-    public function setRequest( KnockRequest $knockRequest )
+    public function setRequest( KnockRequest $knockRequest ): self
     {
         if ( $this->knockRequest )
         {
@@ -126,6 +135,8 @@ class KnockResponse
         }
 
         $this->knockRequest = $knockRequest;
+
+        return $this;
     }
 
     /**
@@ -173,7 +184,7 @@ class KnockResponse
     {
         $resp = null;
 
-        $access = [ KnockRequest::CURL_OPTIONS, KnockRequest::CURL_INFO ];
+        $access = [ KnockRequestInterface::CURL_OPTIONS, KnockRequestInterface::CURL_INFO ];
 
         if ( in_array( $key, $access ) )
         {
@@ -181,12 +192,12 @@ class KnockResponse
 
             switch ( $key )
             {
-                case KnockRequest::CURL_OPTIONS:
-                    $resp = $curlParams[KnockRequest::CURL_OPTIONS];
+                case KnockRequestInterface::CURL_OPTIONS:
+                    $resp = $curlParams[KnockRequestInterface::CURL_OPTIONS];
                     break;
 
-                case KnockRequest::CURL_INFO:
-                    $resp = $curlParams[KnockRequest::CURL_INFO];
+                case KnockRequestInterface::CURL_INFO:
+                    $resp = $curlParams[KnockRequestInterface::CURL_INFO];
                     break;
             }
 
@@ -194,5 +205,13 @@ class KnockResponse
         }
 
         throw new Exception('Bad key');
+    }
+
+    /**
+     * Получение Trace лог истории вызовов методов
+     */
+    public function getTrace(): array
+    {
+        return debug_backtrace();
     }
 }
