@@ -2,7 +2,12 @@
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
-![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
+---
+
+> [!NOTE]
+> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
+
+---
 
 # KnockKnock
 Получение объекта/экземпляра класса и его настройка
@@ -119,17 +124,17 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 
 Таблица set/get методов для взаимодействия с отдельными свойствами запроса
 
-| Параметр | Сеттер                                | Геттер |
-| --- |---------------------------------------| --- |
-| Протокол | setProtocol( string $protocol )       | getProtocol(): string |
-| Хост | setHost( string $host )               | getHost(): string |
-| URL | setUrl( string $url )                 | getUrl(): string |
-| Метод | setMethod( string $method )           | getMethod(): string |
-| Заголовки | setHeaders( array $headers )          | getHeaders(): array |
-| Тип контента | setContentType( string $contentType ) | getContentType(): string |
-| Данные | setData( mixed $data )                | getData(): mixed |
-| Опции cURL | setCurlOptions( array $curlOptions )  | getCurlOptions(): array |
-| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array |
+| Параметр | Сеттер | Геттер | Информация |
+| --- | --- | --- | --- |
+| Протокол | setProtocol( string $protocol )       | getProtocol(): string | [протоколы](https://curl.se/docs/protdocs.htm) |
+| Хост | setHost( string $host )               | getHost(): string | --- |
+| URL | setUrl( string $url )                 | getUrl(): string | --- |
+| Метод | setMethod( string $method )           | getMethod(): string | [методы](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) |
+| Заголовки | setHeaders( array $headers )          | getHeaders(): array | [загловки](https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP) |
+| Тип контента | setContentType( string $contentType ) | getContentType(): string | [Тип контента]() |
+| Данные | setData( mixed $data )                | getData(): mixed | --- |
+| Опции cURL | setCurlOptions( array $curlOptions )  | getCurlOptions(): array | [Опции cURL](https://www.php.net/manual/ru/function.curl-setopt.php) |
+| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array | [Информация cURL](https://www.php.net/manual/ru/function.curl-getinfo.php) |
 
 ```php
 $knockRequest = $knockKnock->constructKnockRequest('info/me');
