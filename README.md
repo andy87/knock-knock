@@ -362,25 +362,27 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 
 # Расширение функционала
 
-Расширения работают через "магию", поэтому лучше описывать их в анотациях класса
+TODO:ПЕРЕПИМСЫВАЮ НА ПРИМЕР С ПОДСТАВНОВКОЙ token исходя из хоста
+
+ Расширения работают через "магию", поэтому лучше описывать их в анотациях класса
 
 Реализация расширений
 ```php
 /**
- * @method static setupCorrectHost( KnockKnock $knockKnock )
+ * @method static setupCorrectAuth( KnockKnock $knockKnock )
  */
 class VkontakteKnockKnock extends KnockKnock
 {
     public function init()
     {
-        $this->addExtension( 'setupCorrectHost', fn( KnockKnock $knockKnock ) => 
+        $this->addExtension( 'setupCorrectAuth', fn( KnockKnock $knockKnock ) => 
         {
             $this->setupCorrectHostHandler($knockKnock);
         });
     }
     
     
-    private function setupCorrectHost(KnockKnock $knockKnock)
+    private function setupCorrectAuth(KnockKnock $knockKnock)
     {
          switch ($knockKnock->host)
             {
