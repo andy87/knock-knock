@@ -12,7 +12,7 @@ PHP Фасад\Адаптер для отправки запросов чере�
 # KnockKnock
 Получение объекта/экземпляра класса и его настройка
 
-### Нативный 
+### Нативный
 ```php
 $knockKnock = new KnockKnock([
     KnockRequest::HOST => 'some.domain',
@@ -57,11 +57,11 @@ $bearer = $knockKnock->getAuthorization(); // string
 
 # Обработчики событий
 Задать обработчики событий
- - после создания объекта knockKnock
- - после создания объекта запроса
- - перед отправкой запроса
- - после создания объекта ответа
- - после получения ответа
+- после создания объекта knockKnock
+- после создания объекта запроса
+- перед отправкой запроса
+- после создания объекта ответа
+- после получения ответа
 
 ```php
 $knockKnock->setupEventHandlers([
@@ -160,7 +160,7 @@ $host = $knockRequest->getHost(); // string
 
 ### Микс параметров создаваемого запроса с данными переданными опционально
 
-Можно создать запрос, на основе уже созданного объекта 
+Можно создать запрос, на основе уже созданного объекта
 и дополнительным аргументом передать уникальные собственные параметры.
 ```php
 $knockKnock->setupRequest( $knockRequest, [
@@ -184,7 +184,7 @@ $knockResponse = $knockKnock->constructKnockResponse([
 ], $knockRequest );
 ```
 `constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse`
- 
+
 ## KnockResponse: Отправка запроса и получение ответа
 
 Получение ответа отправленного запроса и вызов callback функции, если она установлена
@@ -229,7 +229,7 @@ $knockResponse
     ->setHttpCode(200)
     ->setContent('{"id" => 8060345, "nickName" => "and_y87"}');
 ```
-Если данные уже установлены, вывозится `Exception`, для замены используется `replace`
+Если данные уже установлены, выбрасывается `Exception`, для замены используется `replace`
 
 Подменяются данные
 ```php
@@ -256,59 +256,61 @@ $curlInfo =  $knockResponse->get( KnockResponse::CURL_INFO ); // return array
 
 Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
-class KnockKnockYandex implements KnockKnockInterface
+class KnockKnockYandex extends KnockKnock
 {
-    private const AFTER_CREATE_REQUEST = 'afterCreateRequest';
     private const LOGGER = 'logger';
 
 
-
     private string $host = 'https://api.yandex.ru/'
+
     private string $contentType = KnockContentType::JSON
 
     private YandexLogger $logger;
 
 
 
-    public function init()
+    /**
+     * @return void
+     */
+    public function init(): void
     {
         $this->event[self::AFTER_CREATE_REQUEST] = fn( KnockRequest $knockRequest ) => 
         {
-            $this->addYandexLog([
-                'url' => $knockRequest->getUrl(),
-                'method' => $knockRequest->getMethod(),
-                'data' => $knockRequest->getData(),
-                'headers' => $knockRequest->getHeaders(),
-            ]);
+            $this->addYandexLog( $this->getLogDataByRequest( $knockRequest ) );
         };
 
         $this->event[self::EVENT_AFTER_SEND] = fn( KnockResponse $knockResponse ) => 
         {
             $knockRequest = $knockResponse->getRequest();
 
-            $this->addYandexLog([
-                'url' => $knockRequest->getUrl(),
-                'method' => $knockRequest->getMethod(),
-                'data' => $knockRequest->getData(),
-                'headers' => $knockRequest->getHeaders(),
-            ]);
+            $this->addYandexLog( $this->getLogDataByRequest( $knockRequest ) );
         };
     }
-
-    public function createRequest( string $url, array $requestParams ): KnockRequest
+    
+    /**
+      * @param KnockRequest $knockRequest
+      * 
+      * @return array
+      */
+    private function getLogDataByRequest( KnockRequest $knockRequest ): array
     {
-        $knockRequest = new KnockRequest( $url, $requestParams );
-
-        $this->event( self::AFTER_CREATE_REQUEST, $knockRequest );
-
-        return $knockRequest;
+        return [
+            'url' => $knockRequest->getUrl(),
+            'method' => $knockRequest->getMethod(),
+            'data' => $knockRequest->getData(),
+            'headers' => $knockRequest->getHeaders(),
+        ];
     }
 
-    private function addYandexLog( array $params ) 
+    /**
+     * @param array $params
+     * 
+     * @return void
+     */
+    private function addYandexLog( array $params ): bool
     {
-        $logger->log($params);
+        return $logger->log($params);
     }
-
 }
 
 ```
@@ -316,7 +318,7 @@ class KnockKnockYandex implements KnockKnockInterface
 ```php
 
 $knockKnockYandex = KnockKnockYandex::getInstanse([
-    KnockKnock::LOGGER => new YandexLogger(),
+    KnockKnockYandex::LOGGER => new YandexLogger(),
 ]);
 
 $knockResponse = $knockKnockYandex->setupRequest('profile', [ 
