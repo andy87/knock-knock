@@ -126,15 +126,15 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 
 | Параметр | Сеттер | Геттер | Информация |
 | --- | --- | --- | --- |
-| Протокол | setProtocol( string $protocol )       | getProtocol(): string | [протоколы](https://curl.se/docs/protdocs.html) |
+| Протокол | setProtocol( string $protocol )       | getProtocol(): string | ![протоколы](https://curl.se/docs/protdocs.html) |
 | Хост | setHost( string $host )               | getHost(): string | --- |
 | URL | setUrl( string $url )                 | getUrl(): string | --- |
-| Метод | setMethod( string $method )           | getMethod(): string | [методы](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) |
-| Заголовки | setHeaders( array $headers )          | getHeaders(): array | [загловки](https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP) |
-| Тип контента | setContentType( string $contentType ) | getContentType(): string | [Тип контента]() |
+| Метод | setMethod( string $method )           | getMethod(): string | ![методы](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) |
+| Заголовки | setHeaders( array $headers )          | getHeaders(): array | ![загловки](https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP) |
+| Тип контента | setContentType( string $contentType ) | getContentType(): string | ![Тип контента](https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2) |
 | Данные | setData( mixed $data )                | getData(): mixed | --- |
-| Опции cURL | setCurlOptions( array $curlOptions )  | getCurlOptions(): array | [Опции cURL](https://www.php.net/manual/ru/function.curl-setopt.php) |
-| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array | [Информация cURL](https://www.php.net/manual/ru/function.curl-getinfo.php) |
+| Опции cURL | setCurlOptions( array $curlOptions )  | getCurlOptions(): array | ![Опции cURL](https://www.php.net/manual/ru/function.curl-setopt.php) |
+| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array | ![Информация cURL](https://www.php.net/manual/ru/function.curl-getinfo.php) |
 
 ```php
 $knockRequest = $knockKnock->constructKnockRequest('info/me');
