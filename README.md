@@ -4,24 +4,24 @@ PHP Фасад\Адаптер для отправки запросов чере�
 
 ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
 
-# Knock: Получение объекта/экземпляра класса для использования
+# Knock: Получение объекта/экземпляра класса и его настройка
 
 Нативный вариант
 ```php
 $knockKnock = new KnockKnock([
-    KnockRequest::HOST => 'domain.zone',
-    KnockRequest::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
+    KnockRequest::HOST => 'some.domain',
+    KnockRequest::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_FORM,
 ]);
 ```
 вариант Singleton
 ```php
 $knockKnock = KnockKnock::getInstance([
     KnockRequest::HOST => 'domain.zone',
-    KnockRequest::PROTOCOL => 'wss',
-    KnockRequest::HEADER => KnockRequest::CONTENT_TYPE_FORM,
+    KnockRequest::PROTOCOL => 'http',
+    KnockRequest::HEADER => KnockRequest::CONTENT_TYPE_JSON,
 ])->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
 ```
-`getInstance( array $knockKnockConfig = [] ): static`
+`getInstance( array $knockKnockConfig = [] ): self`
 
 ## Использование настроек для параметров запроса
 Доступно 3 отдельных метода для взаимодействия с некоторыми, отдельными, свойствами,
@@ -41,7 +41,7 @@ $knockKnock
 
 $bearer = $knockKnock->getAuthorization(); // string
 ```
-`setConfigAuthorization( string $token, string $method = self::TOKEN_BASIC ): static`
+`setConfigAuthorization( string $token, string $method = self::TOKEN_BASIC ): self`
 
 Все подобные методы возвращают `static` объект / экземпляр класса `KnockKnock`
 
@@ -64,7 +64,7 @@ $knockKnock->setupCallback([
     }
 ]);
 ```
-`setupCallback( array $callbacks ): static`
+`setupCallback( array $callbacks ): self`
 
 # KnockRequest: Создание запроса
 
@@ -105,9 +105,7 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 ## Изменение общих настроек компонента на частные 
 Если надо выполнить запрос, с другими параметрами
 ```php
-$knockRequest = $knock
-    ->setupTempAuthorization('token', KnockKnock::AUTH_BEARER )
-    ->setupTempHeaders([ 'api-secret' => 'secretKey56'])
+$knockRequest = $knockKnock
     ->constructKnockRequest('info/me',[
         KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
     ]);
@@ -146,7 +144,7 @@ $knockKnock->setRequest( $knockRequest, [
     ],
 ]);
 ```
-`setRequest( KnockRequest $knockRequest, array $tempParamsKnockKnock = [] ): static`
+`setRequest( KnockRequest $knockRequest, array $tempParamsKnockKnock = [] ): self`
 
 ## KnockResponse: Ответ
 
@@ -198,10 +196,10 @@ $knockResponse = $knockKnock->setRequest( $knockRequest )->send( $prepareFakeKno
 $knockResponse = $knockKnock->setRequest( $knockRequest )->send();
 
 $knockResponse
-    ->replace(KnockResponse::HTTP_CODE, 200)
-    ->replace(KnockResponse::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}');
+    ->setHttpCode(200)
+    ->setContent('{"id" => 8060345, "nickName" => "and_y87"}');
 ```
-`replace( string $property, mixed $value ): static`
+`replace( string $property, mixed $value ): self`
 
 
 ## Извлечение полезных данных из запроса

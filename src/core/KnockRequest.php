@@ -2,24 +2,13 @@
 
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\helpers\KnockContentType;
-
 /**
  * Class KnockRequest
  *
  * @package andy87\knock_knock\query
  *
  * Fix not used:
- * - @see KnockRequest::getUrl();
- * - @see KnockRequest::getContentType();
- * - @see KnockRequest::getHeaders();
- * - @see KnockRequest::addCurlOptions();
- * - @see KnockRequest::getCurlOptions();
- * - @see KnockRequest::getCurlInfo();
- * - @see KnockRequest::getData();
- * - @see KnockRequest::getProtocol();
- * - @see KnockRequest::getHost();
- * - @see KnockRequest::getMethod();
+
  */
 class KnockRequest
 {
@@ -28,6 +17,9 @@ class KnockRequest
     /** @var string  */
     public const PROTOCOL = 'protocol';
 
+
+    /** @var string  */
+    public const URL = 'url';
 
     /** @var string  */
     public const METHOD = 'method';
@@ -98,8 +90,20 @@ class KnockRequest
     {
         foreach ( $params as $param => $value )
         {
-           switch ($param)
-           {
+            switch ($param)
+            {
+                case self::PROTOCOL:
+                   $this->setProtocol($value);
+                   break;
+
+                case self::HOST:
+                   $this->setHost($value);
+                   break;
+
+                case self::URL:
+                    $this->url = $value;
+                    break;
+
                 case self::METHOD:
                     $this->setMethod($value);
                     break;
@@ -122,14 +126,6 @@ class KnockRequest
 
                 case self::CURL_INFO:
                     $this->setCurlInfo($value);
-                    break;
-
-                case self::PROTOCOL:
-                    $this->setProtocol($value);
-                    break;
-
-                case self::HOST:
-                    $this->setHost($value);
                     break;
            }
         }
@@ -342,6 +338,7 @@ class KnockRequest
     public function getParams(): array
     {
         return [
+            self::URL => $this->getUrl(),
             self::METHOD => $this->getMethod(),
             self::CONTENT_TYPE => $this->getContentType(),
             self::HEADERS => $this->getHeaders(),

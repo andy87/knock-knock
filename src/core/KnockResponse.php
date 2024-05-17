@@ -13,6 +13,7 @@ use Exception;
  * - @see KnockResponse::getRequest();
  * - @see KnockResponse::getHttpCode();
  * - @see KnockResponse::getContent();
+ * - @see KnockResponse::get();
  *
  * - @see KnockResponse::ERROR;
  */
@@ -117,5 +118,38 @@ class KnockResponse
         }
 
         $this->knockRequest = $knockRequest;
+    }
+
+    /**
+     * @param string $key
+     * @return array
+     *
+     * @throws Exception
+     */
+    public function get( string $key ): array
+    {
+        $resp = null;
+
+        $access = [ KnockRequest::CURL_OPTIONS, KnockRequest::CURL_INFO ];
+
+        if ( in_array( $key, $access ) )
+        {
+            $curlParams = $this->knockRequest->getCurlParams();
+
+            switch ( $key )
+            {
+                case KnockRequest::CURL_OPTIONS:
+                    $resp = $curlParams[KnockRequest::CURL_OPTIONS];
+                    break;
+
+                case KnockRequest::CURL_INFO:
+                    $resp = $curlParams[KnockRequest::CURL_INFO];
+                    break;
+            }
+
+            if ( $resp ) return $resp;
+        }
+
+        throw new Exception('Bad key');
     }
 }
