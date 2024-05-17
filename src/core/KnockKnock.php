@@ -17,6 +17,8 @@ use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface }
  * - @see KnockKnock::setupEventHandlers();
  * - @see KnockKnock::on();
  * - @see KnockKnock::off();
+ * - @see KnockKnock::addExtension();
+ * - @see KnockKnock::removeExtension();
  */
 class KnockKnock implements KnockKnockInterface
 {
@@ -39,6 +41,9 @@ class KnockKnock implements KnockKnockInterface
         self::EVENT_AFTER_SEND => null,
     ];
 
+    /** @var callable[] */
+    protected array $extensions = [];
+
 
 
     /**
@@ -49,6 +54,24 @@ class KnockKnock implements KnockKnockInterface
     public function __construct( array $commonKnockRequestParams )
     {
         $this->commonKnockRequest = new KnockRequest( '/', $commonKnockRequestParams );
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     */
+    public function __call( $name, $arguments )
+    {
+        if ( isset( $this->extensions[$name] ) )
+        {
+            return $this->extensions[$name]( ...$arguments );
+        }
+
+        throw new Exception( "Method $name not found" );
     }
 
 
@@ -251,6 +274,44 @@ class KnockKnock implements KnockKnockInterface
         if ( isset( $this->callbacks[$event] ) && $this->callbacks[$event] )
         {
             $this->callbacks[$event] = null;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    // === Extensions ===
+
+    /**
+     * @param string $name
+     * @param callable $callback
+     *
+     * @return bool
+     */
+    public function addExtension( string $name, callable $callback ): bool
+    {
+        if ( !isset( $this->extensions[$name] ) )
+        {
+            $this->extensions[$name] = $callback;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function removeExtension( string $name ): bool
+    {
+        if ( isset( $this->extensions[$name] ) )
+        {
+            unset( $this->extensions[$name] );
 
             return true;
         }

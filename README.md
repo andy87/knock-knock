@@ -341,16 +341,18 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
  */
 class VkontakteKnockKnock extends KnockKnock
 {
-    /** @var callable[] */
-    private array $extensions = [];
-
-
-
     public function init()
     {
-        $this->addExtension( 'setupCorrectHost', fn( $knockKnock ) => 
+        $this->addExtension( 'setupCorrectHost', fn( KnockKnock $knockKnock ) => 
         {
-            switch ($knockKnock->host)
+            $this->setupCorrectHostHandler($knockKnock);
+        });
+    }
+    
+    
+    private function setupCorrectHost(KnockKnock $knockKnock)
+    {
+         switch ($knockKnock->host)
             {
                 case 'vk.com':
                     $knockKnock->useHeaders(['Host' => 'client.ru']);
@@ -360,7 +362,6 @@ class VkontakteKnockKnock extends KnockKnock
                     $knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
                     break;
             }
-        });
     }
 }
 ```
