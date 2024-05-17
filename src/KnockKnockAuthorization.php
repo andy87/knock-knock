@@ -17,7 +17,7 @@ use andy87\knock_knock\core\KnockKnock;
  * - @see KnockKnockAuthorization::useHeaders();
  * - @see KnockKnockAuthorization::useContentType();
  */
-class KnockKnockAuthorization extends KnockKnock
+class KnockKnockAuthorization extends KnockKnockOctopus
 {
     /** @var string  */
     public const TOKEN_BEARER = 'Bearer';
