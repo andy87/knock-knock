@@ -126,7 +126,7 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 
 | Параметр | Сеттер | Геттер | Информация |
 | --- | --- | --- | --- |
-| Протокол | setProtocol( string $protocol )       | getProtocol(): string | [протоколы](https://curl.se/docs/protdocs.htm) |
+| Протокол | setProtocol( string $protocol )       | getProtocol(): string | [протоколы](https://curl.se/docs/protdocs.html) |
 | Хост | setHost( string $host )               | getHost(): string | --- |
 | URL | setUrl( string $url )                 | getUrl(): string | --- |
 | Метод | setMethod( string $method )           | getMethod(): string | [методы](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods) |
