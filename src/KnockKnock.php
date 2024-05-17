@@ -148,7 +148,7 @@ class KnockKnock
      *
      * @return $this
      */
-    public function setupRequest(KnockRequest $knockRequest, array $options = [] ): self
+    public function setupRequest( KnockRequest $knockRequest, array $options = [] ): self
     {
         if ( count( $options ) )
         {

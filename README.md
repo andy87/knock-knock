@@ -136,7 +136,7 @@ $method = $knockRequest->getMethod(); // string
 ### Обновление свойств созданного запроса, данными переданными опционально
 
 ```php
-$knockKnock->setRequest( $knockRequest, [
+$knockKnock->setupRequest( $knockRequest, [
     KnockRequest::HOST => 'domain.zone',
     KnockKnock::BEARER => 'token-bearer-2',
     KnockKnock::HEADERS => [
@@ -144,7 +144,7 @@ $knockKnock->setRequest( $knockRequest, [
     ],
 ]);
 ```
-`setRequest( KnockRequest $knockRequest, array $tempParamsKnockKnock = [] ): self`
+`setupRequest( KnockRequest $knockRequest, array $options = [] ): self`
 
 ## KnockResponse: Ответ
 
@@ -155,13 +155,13 @@ $knockResponse = $knockKnock->constructKnockResponse([
     'name' => 'and_y87'
 ]);
 ```
-`constructKnockResponse( array $paramsKnockResponse, int $httpCode = 200 ): KnockResponse`
+`constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse`
 
 ## KnockResponse: Получением ответа при отправке запроса
 
-Получение ответа с отправкой запроса и вызовом callback функции, если она установлена
+Получение ответа отправленного запроса и вызовом callback функции, если она установлена
 ```php
-$knockKnock->setRequest( $knockRequest );
+$knockKnock->setupRequest( $knockRequest );
 $knockResponse = $knockKnock->send();
 ```
 `send( array $prepareKnockResponseParams = [] ): KnockResponse`
@@ -185,7 +185,7 @@ $prepareFakeKnockResponseParams = [
     ],
 ];
 
-$knockResponse = $knockKnock->setRequest( $knockRequest )->send( $prepareFakeKnockResponseParams );
+$knockResponse = $knockKnock->setupRequest( $knockRequest )->send( $prepareFakeKnockResponseParams );
 ```
 объект `$knockResponse` будет содержать данные переданные в аргументе `$prepareFakeKnockResponseParams`
 
@@ -193,14 +193,12 @@ $knockResponse = $knockKnock->setRequest( $knockRequest )->send( $prepareFakeKno
 
 В полученном ответе подменяются данные
 ```php
-$knockResponse = $knockKnock->setRequest( $knockRequest )->send();
+$knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 
 $knockResponse
     ->setHttpCode(200)
     ->setContent('{"id" => 8060345, "nickName" => "and_y87"}');
 ```
-`replace( string $property, mixed $value ): self`
-
 
 ## Извлечение полезных данных из запроса
 
@@ -281,7 +279,7 @@ $knockKnockYandex = KnockKnockYandex::getInstanse([
     KnockKnock::LOGGER => new YandexLogger(),
 ]);
 
-$knockResponse = $knockKnockYandex->setRequest('profile', [ 
+$knockResponse = $knockKnockYandex->setupRequest('profile', [ 
     KnockRequest::METHOD => KnockMethod::PATCH,
     KnockRequest::DATA => [ 'city' => 'Moscow' ],
 ]); // Логирование `afterCreateRequest`
