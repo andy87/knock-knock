@@ -30,7 +30,7 @@ class KnockKnock implements KnockKnockInterface
     protected ?KnockRequest $commonKnockRequest = null;
 
     /** @var ?KnockRequest $knockRequest */
-    public ?KnockRequest $knockRequest = null;
+    protected ?KnockRequest $knockRequest = null;
 
 
     /** @var callable[] */
