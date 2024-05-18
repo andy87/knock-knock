@@ -1,4 +1,4 @@
-# KnockKnockAuthorization
+# KnockKnockSecurity
 
 PHP Фасад для класса `KnockKnock` отправляющего запросы через ext cURL
 
