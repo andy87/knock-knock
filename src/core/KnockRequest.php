@@ -83,6 +83,7 @@ class KnockRequest implements KnockRequestInterface
     private function setEndpoint(string $endpoint ): void
     {
         $this->updateUrl();
+
         $this->setParamsWithConditionCompleted( self::ENDPOINT, $endpoint );
     }
 
@@ -103,9 +104,9 @@ class KnockRequest implements KnockRequestInterface
      */
     private function updateUrl(): void
     {
-        $address = $this->host . '/' . $this->endpoint;
+        $address = str_replace( ['//','///'], '/', $this->host . '/' . $this->endpoint );
 
-        $this->url = $this->protocol . '://' . str_replace( ['//','///'], '/', $address );
+        $this->url = "$this->protocol://$address";
     }
 
     /**
@@ -132,7 +133,11 @@ class KnockRequest implements KnockRequestInterface
      */
     public function setProtocol( string $protocol ): self
     {
-        return $this->setParamsWithConditionCompleted( self::PROTOCOL, $protocol);
+        $this->setParamsWithConditionCompleted( self::PROTOCOL, $protocol);
+
+        $this->updateUrl();
+
+        return $this;
     }
 
     /**
@@ -159,7 +164,11 @@ class KnockRequest implements KnockRequestInterface
      */
     public function setHost( string $host ): self
     {
-        return $this->setParamsWithConditionCompleted( self::HOST, $host);
+        $this->setParamsWithConditionCompleted( self::HOST, $host);
+
+        $this->updateUrl();
+
+        return $this;
     }
 
     /**
@@ -453,7 +462,7 @@ class KnockRequest implements KnockRequestInterface
         return [
             self::PROTOCOL => $this->getProtocol(),
             self::HOST => $this->getHost(),
-            self::ENDPOINT => $this->getMethod(),
+            self::ENDPOINT => $this->getEndpoint(),
             self::URL => $this->getUrl(),
             self::METHOD => $this->getMethod(),
             self::CONTENT_TYPE => $this->getContentType(),

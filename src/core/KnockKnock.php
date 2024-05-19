@@ -394,6 +394,8 @@ class KnockKnock implements KnockKnockInterface
      * @param KnockRequest $knockRequest
      *
      * @return KnockRequest
+     *
+     * @throws Exception
      */
     private function setupPostFields( KnockRequest $knockRequest ): KnockRequest
     {
