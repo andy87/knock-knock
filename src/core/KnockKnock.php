@@ -3,8 +3,8 @@
 namespace andy87\knock_knock\core;
 
 use Exception;
-use andy87\knock_knock\helpers\{ KnockMethod, KnockContentType };
-use andy87\knock_knock\interfaces\{KnockKnockInterface, KnockRequestInterface, KnockResponseInterface};
+use andy87\knock_knock\lib\{ LibKnockMethod, LibKnockContentType };
+use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, KnockResponseInterface };
 
 /**
  * Class KnockKnock
@@ -406,7 +406,7 @@ class KnockKnock implements KnockKnockInterface
      */
     private function setupPostFields( KnockRequest $knockRequest ): KnockRequest
     {
-        if ( $knockRequest->getMethod() !== KnockMethod::GET )
+        if ( $knockRequest->getMethod() !== LibKnockMethod::GET )
         {
             $data = $knockRequest->getData();
 
@@ -414,14 +414,14 @@ class KnockKnock implements KnockKnockInterface
             {
                 switch( $knockRequest->getContentType() )
                 {
-                    case KnockContentType::JSON:
+                    case LibKnockContentType::JSON:
                         $knockRequest->addCurlOptions( CURLOPT_POSTFIELDS, json_encode( $data ) );
                         break;
 
-                    case KnockContentType::FORM:
-                    case KnockContentType::MULTIPART:
-                    case KnockContentType::XML:
-                    case KnockContentType::TEXT:
+                    case LibKnockContentType::FORM:
+                    case LibKnockContentType::MULTIPART:
+                    case LibKnockContentType::XML:
+                    case LibKnockContentType::TEXT:
                     default:
                     $knockRequest->addCurlOptions( CURLOPT_POSTFIELDS, $data );
                 }

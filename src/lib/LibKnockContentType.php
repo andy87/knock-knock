@@ -1,6 +1,6 @@
 <?php
 
-namespace andy87\knock_knock\helpers;
+namespace andy87\knock_knock\lib;
 
 /**
  * Class KnockContentType
@@ -8,28 +8,23 @@ namespace andy87\knock_knock\helpers;
  * @package andy87\knock_knock\query
  *
  * Fix not used:
- * - @see KnockContentType::JSON;
- * - @see KnockContentType::XML;
- * - @see KnockContentType::FORM;
- * - @see KnockContentType::MULTIPART;
- * - @see KnockContentType::TEXT;
- * - @see KnockContentType::HTML;
- * - @see KnockContentType::JAVASCRIPT;
- * - @see KnockContentType::CSS;
- * - @see KnockContentType::CSV;
- * - @see KnockContentType::PDF;
- * - @see KnockContentType::ZIP;
- * - @see KnockContentType::GZIP;
- * - @see KnockContentType::TAR;
- * - @see KnockContentType::RAR;
- * - @see KnockContentType::SEVEN_ZIP;
- * - @see KnockContentType::IMAGE;
- * - @see KnockContentType::AUDIO;
- * - @see KnockContentType::VIDEO;
- * - @see KnockContentType::FONT;
- * - @see KnockContentType::ANY;
+ * - @see LibKnockContentType::HTML;
+ * - @see LibKnockContentType::JAVASCRIPT;
+ * - @see LibKnockContentType::CSS;
+ * - @see LibKnockContentType::CSV;
+ * - @see LibKnockContentType::PDF;
+ * - @see LibKnockContentType::ZIP;
+ * - @see LibKnockContentType::GZIP;
+ * - @see LibKnockContentType::TAR;
+ * - @see LibKnockContentType::RAR;
+ * - @see LibKnockContentType::SEVEN_ZIP;
+ * - @see LibKnockContentType::IMAGE;
+ * - @see LibKnockContentType::AUDIO;
+ * - @see LibKnockContentType::VIDEO;
+ * - @see LibKnockContentType::FONT;
+ * - @see LibKnockContentType::ANY;
  */
-class KnockContentType
+class LibKnockContentType
 {
     public const JSON = 'application/json';
     public const XML = 'application/xml';

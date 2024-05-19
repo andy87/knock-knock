@@ -3,9 +3,9 @@
 namespace andy87\knock_knock;
 
 use Exception;
-use andy87\knock_knock\helpers\KnockMethod;
+use andy87\knock_knock\lib\LibKnockMethod;
 use andy87\knock_knock\interfaces\KnockRequestInterface;
-use andy87\knock_knock\core\{KnockKnock, KnockResponse };
+use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
 
 /**
  * Class KnockOctopus
@@ -38,7 +38,7 @@ class KnockKnockOctopus extends KnockKnock
             $endpoint .= '?' . http_build_query( $params );
         }
 
-        return $this->commonMethod( $endpoint, $params, KnockMethod::GET );
+        return $this->commonMethod( $endpoint, $params, LibKnockMethod::GET );
     }
 
     /**
@@ -51,7 +51,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function post( $endpoint, $data = null ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, KnockMethod::POST );
+        return $this->commonMethod( $endpoint, $data, LibKnockMethod::POST );
     }
 
     /**
@@ -64,7 +64,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function put( string $endpoint, $data = null ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, KnockMethod::PUT );
+        return $this->commonMethod( $endpoint, $data, LibKnockMethod::PUT );
     }
 
     /**
@@ -77,7 +77,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function delete( string $endpoint, $data = null ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, KnockMethod::DELETE );
+        return $this->commonMethod( $endpoint, $data, LibKnockMethod::DELETE );
     }
 
     /**
@@ -90,7 +90,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function patch( string $endpoint, $data = null ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, KnockMethod::PATCH );
+        return $this->commonMethod( $endpoint, $data, LibKnockMethod::PATCH );
     }
 
     /**
@@ -103,7 +103,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function options( string $endpoint, $data = null ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, KnockMethod::OPTIONS );
+        return $this->commonMethod( $endpoint, $data, LibKnockMethod::OPTIONS );
     }
 
     /**
@@ -116,7 +116,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function head( string $endpoint, $data = null ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, KnockMethod::HEAD );
+        return $this->commonMethod( $endpoint, $data, LibKnockMethod::HEAD );
     }
 
     /**
@@ -129,7 +129,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function trace( string $endpoint, $data = null ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, KnockMethod::TRACE );
+        return $this->commonMethod( $endpoint, $data, LibKnockMethod::TRACE );
     }
 
 
@@ -151,7 +151,7 @@ class KnockKnockOctopus extends KnockKnock
         {
             $knockRequestParams = [];
 
-            if ($method !== KnockMethod::GET && count($data) ) {
+            if ($method !== LibKnockMethod::GET && count($data) ) {
                 $knockRequestParams[KnockRequestInterface::DATA] = $data;
             }
 

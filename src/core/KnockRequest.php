@@ -2,8 +2,8 @@
 
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\interfaces\KnockRequestInterface;
 use Exception;
+use andy87\knock_knock\interfaces\KnockRequestInterface;
 
 /**
  * Class KnockRequest
@@ -14,9 +14,6 @@ class KnockRequest implements KnockRequestInterface
 {
     /** @var int $status Статус запроса */
     public int $status = self::STATUS_PREPARE;
-
-    /** @var string $url Адрес запроса */
-    private string $url;
 
 
     /** @var string $protocol Протокол */
@@ -82,8 +79,6 @@ class KnockRequest implements KnockRequestInterface
      */
     public function setEndpoint(string $endpoint ): void
     {
-        $this->updateUrl();
-
         $this->setParamsWithConditionCompleted( self::ENDPOINT, $endpoint );
     }
 
@@ -97,17 +92,6 @@ class KnockRequest implements KnockRequestInterface
         return $this->endpoint;
     }
 
-    /**
-     * Обновление URL
-     *
-     * @return void
-     */
-    private function updateUrl(): void
-    {
-        $address = str_replace( ['//','///'], '/', $this->host . '/' . $this->endpoint );
-
-        $this->url = "$this->protocol://$address";
-    }
 
     /**
      * Получение URL
@@ -116,7 +100,9 @@ class KnockRequest implements KnockRequestInterface
      */
     public function getUrl(): string
     {
-        return $this->url;
+        $address = str_replace( ['//','///'], '/', $this->host . '/' . $this->endpoint );
+
+        return "$this->protocol://$address";
     }
 
 
@@ -133,11 +119,7 @@ class KnockRequest implements KnockRequestInterface
      */
     public function setProtocol( string $protocol ): self
     {
-        $this->setParamsWithConditionCompleted( self::PROTOCOL, $protocol);
-
-        $this->updateUrl();
-
-        return $this;
+        return $this->setParamsWithConditionCompleted( self::PROTOCOL, $protocol);
     }
 
     /**
@@ -164,11 +146,7 @@ class KnockRequest implements KnockRequestInterface
      */
     public function setHost( string $host ): self
     {
-        $this->setParamsWithConditionCompleted( self::HOST, $host);
-
-        $this->updateUrl();
-
-        return $this;
+        return $this->setParamsWithConditionCompleted( self::HOST, $host);
     }
 
     /**

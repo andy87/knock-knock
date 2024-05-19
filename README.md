@@ -301,19 +301,31 @@ class KnockKnockYandex extends KnockKnock
      */
     public function init(): void
     {
-        $this->event[self::AFTER_CREATE_REQUEST] = fn( KnockRequest $knockRequest ) => 
-        {
-            $this->addYandexLog( $this->getLogDataByRequest( $knockRequest ) );
-        };
-
-        $this->event[self::EVENT_AFTER_SEND] = fn( KnockResponse $knockResponse ) => 
-        {
-            $knockRequest = $knockResponse->getRequest();
-
-            $this->addYandexLog( $this->getLogDataByRequest( $knockRequest ) );
-        };
+        $this->setupYandexLoggerEventHandlers();
     }
     
+    /**
+     * @param array $callbacks
+     * 
+     * @return self
+     */
+    private function setupYandexLoggerEventHandlers( array $callbacks ): self
+    {
+        $this->on( self::AFTER_CREATE_REQUEST, fn( KnockRequest $knockRequest ) => 
+        {
+            $logData = $this->getLogDataByRequest( $knockRequest );
+
+            $this->addYandexLog( $logData );
+        };
+
+        $this->on(self::EVENT_AFTER_SEND, fn( KnockResponse $knockResponse ) => 
+        {
+            $logData = $this->getLogDataByRequest( $knockResponse->request );
+
+            $this->addYandexLog( $logData );
+        };
+    }
+
     /**
       * @param KnockRequest $knockRequest
       * 
@@ -321,22 +333,17 @@ class KnockKnockYandex extends KnockKnock
       */
     private function getLogDataByRequest( KnockRequest $knockRequest ): array
     {
-        return [
-            'url' => $knockRequest->getUrl(),
-            'method' => $knockRequest->getMethod(),
-            'data' => $knockRequest->getData(),
-            'headers' => $knockRequest->getHeaders(),
-        ];
+        return $knockRequest->getParams();
     }
 
     /**
-     * @param array $params
+     * @param array $logData
      * 
      * @return void
      */
-    private function addYandexLog( array $params ): bool
+    private function addYandexLog( array $logData ): bool
     {
-        return $logger->log($params);
+        return $logger->log( $logData );
     }
 }
 
@@ -370,6 +377,9 @@ TODO:ПЕРЕПИМСЫВАЮ НА ПРИМЕР С ПОДСТАВНОВКОЙ to
  */
 class VkontakteKnockKnock extends KnockKnock
 {
+    /**
+     * @return void
+     */
     public function init()
     {
         $this->addExtension( 'setupCorrectAuth', fn( KnockKnock $knockKnock ) => 
@@ -377,8 +387,12 @@ class VkontakteKnockKnock extends KnockKnock
             $this->setupCorrectHostHandler($knockKnock);
         });
     }
-    
-    
+
+    /**
+     * @param KnockKnock $knockKnock
+     * 
+     * @return void
+     */
     private function setupCorrectAuth(KnockKnock $knockKnock)
     {
          switch ($knockKnock->host)
