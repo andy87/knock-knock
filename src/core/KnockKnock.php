@@ -201,6 +201,8 @@ class KnockKnock implements KnockKnockInterface
      */
     public function getResponseOnSendCurlRequest( KnockRequest $knockRequest ): KnockResponse
     {
+        $knockRequest->setStatusProcessing();
+
         $ch = curl_init();
 
         $knockRequest = $this->setupPostFields( $knockRequest );
@@ -221,6 +223,8 @@ class KnockKnock implements KnockKnockInterface
         $knockResponse = $this->constructResponse( $knockResponseParams, $knockRequest );
 
         curl_close( $ch );
+
+        $knockRequest->setStatusComplete();
 
         $this->event( self::EVENT_AFTER_SEND, $knockResponse );
 
@@ -336,13 +340,19 @@ class KnockKnock implements KnockKnockInterface
      */
     private function sendRequest( KnockRequest $knockRequest, array $fakeKnockResponseParams = [] ): KnockResponse
     {
+        $knockRequest->setStatusProcessing();
+
         $this->setupRequest( $knockRequest, $this->commonKnockRequest->getParams() );
 
         $this->event( self::EVENT_BEFORE_SEND, $this->knockRequest );
 
-        return (count($fakeKnockResponseParams))
+        $knockResponse = (count($fakeKnockResponseParams))
             ? $this->constructResponse( $fakeKnockResponseParams, $this->knockRequest )
             : $this->getResponseOnSendCurlRequest( $this->knockRequest );
+
+        $knockRequest->setStatusComplete();
+
+        return $knockResponse;
     }
 
     /**

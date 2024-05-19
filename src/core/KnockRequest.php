@@ -12,6 +12,11 @@ use Exception;
  */
 class KnockRequest implements KnockRequestInterface
 {
+    /** @var int $status Статус запроса */
+    public int $status = self::STATUS_PREPARE;
+
+
+
     /** @var string $protocol */
     private string $protocol;
     /** @var string $host */
@@ -38,8 +43,7 @@ class KnockRequest implements KnockRequestInterface
     ];
 
 
-    /** @var bool $isCompleted Устанавливается TRUE после получения ответа */
-    public bool $isCompleted = false;
+
 
 
 
@@ -300,6 +304,28 @@ class KnockRequest implements KnockRequestInterface
     // --- Params ---
 
     /**
+     * Маркировка запроса как выполненного
+     *
+     * @return void
+     */
+    public function setStatusProcessing()
+    {
+        $this->status = self::STATUS_PROCESSING;
+    }
+
+    /**
+     * Маркировка запроса как выполненного
+     *
+     * @return void
+     */
+    public function setStatusComplete()
+    {
+        $this->status = self::STATUS_COMPLETE;
+    }
+
+    /**
+     * Получение параметров запроса
+     *
      * @return array
      */
     public function getParams(): array
@@ -348,52 +374,50 @@ class KnockRequest implements KnockRequestInterface
      */
     private function setParamsWithConditionCompleted(string $param, $value )
     {
-        if ( $this->isCompleted )
-        {
-            switch ($param)
-            {
-                case self::PROTOCOL:
-                    $this->setProtocol($value);
-                    break;
-
-                case self::HOST:
-                    $this->setHost($value);
-                    break;
-
-                case self::URL:
-                    $this->url = $value;
-                    break;
-
-                case self::METHOD:
-                    $this->setMethod($value);
-                    break;
-
-                case self::CONTENT_TYPE:
-                    $this->setContentType($value);
-                    break;
-
-                case self::HEADERS:
-                    $this->setHeaders($value);
-                    break;
-
-                case self::DATA:
-                    $this->setData($value);
-                    break;
-
-                case self::CURL_OPTIONS:
-                    $this->setCurlOptions($value);
-                    break;
-
-                case self::CURL_INFO:
-                    $this->setCurlInfo($value);
-                    break;
-
-                default:
-                    throw new Exception('Unknown param');
-            }
+        if ( $this->isCompleted ) {
+            throw new Exception('Request is completed');
         }
 
-        throw new Exception('Request is not completed');
-    }
+        switch ($param)
+        {
+            case self::PROTOCOL:
+                $this->setProtocol($value);
+                break;
 
+            case self::HOST:
+                $this->setHost($value);
+                break;
+
+            case self::URL:
+                $this->url = $value;
+                break;
+
+            case self::METHOD:
+                $this->setMethod($value);
+                break;
+
+            case self::CONTENT_TYPE:
+                $this->setContentType($value);
+                break;
+
+            case self::HEADERS:
+                $this->setHeaders($value);
+                break;
+
+            case self::DATA:
+                $this->setData($value);
+                break;
+
+            case self::CURL_OPTIONS:
+                $this->setCurlOptions($value);
+                break;
+
+            case self::CURL_INFO:
+                $this->setCurlInfo($value);
+                break;
+
+            default:
+                throw new Exception('Unknown param');
+        }
+    }
 }

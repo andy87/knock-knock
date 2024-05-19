@@ -9,6 +9,15 @@ namespace andy87\knock_knock\interfaces;
  */
 interface KnockRequestInterface
 {
+    /** @var int  */
+    public const STATUS_PREPARE = 0;
+    /** @var int  */
+    public const STATUS_PROCESSING = 1;
+    /** @var int  */
+    public const STATUS_COMPLETE = 2;
+
+
+
     /** @var string  */
     public const HOST = 'host';
 
