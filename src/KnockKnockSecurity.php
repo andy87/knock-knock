@@ -10,14 +10,14 @@ use andy87\knock_knock\core\KnockKnock;
  * @package andy87\knock_knock
  *
  * Fix not used:
- * - @see KnockKnockAuthorization::TOKEN_BEARER;
- * - @see KnockKnockAuthorization::TOKEN_BASIC;
+ * - @see KnockKnockSecurity::TOKEN_BEARER;
+ * - @see KnockKnockSecurity::TOKEN_BASIC;
  *
- * - @see KnockKnockAuthorization::useAuthorization();
- * - @see KnockKnockAuthorization::useHeaders();
- * - @see KnockKnockAuthorization::useContentType();
+ * - @see KnockKnockSecurity::useAuthorization();
+ * - @see KnockKnockSecurity::useHeaders();
+ * - @see KnockKnockSecurity::useContentType();
  */
-class KnockKnockAuthorization extends KnockKnockOctopus
+class KnockKnockSecurity extends KnockKnockOctopus
 {
     /** @var string  */
     public const TOKEN_BEARER = 'Bearer';

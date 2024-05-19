@@ -17,7 +17,7 @@ PHP Фасад\Адаптер для отправки запросов чере�
 # Расширения
 
 
-## [KnockKnockOctopus](KnockKnockOctopus.md)
+## [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
 Предоставляет доступ к "простым" методам отправки запросов через ext cURL
 
 Доступные методы:
@@ -35,7 +35,7 @@ $knockKnockOctopus->post( '/new', [
 
 ```
 
-## [KnockKnockAuthorization](KnockKnockAuthorization.md)
+## [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
 
 Класс предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
 
