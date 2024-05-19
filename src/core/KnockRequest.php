@@ -80,7 +80,7 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      */
-    private function setEndpoint(string $endpoint ): void
+    public function setEndpoint(string $endpoint ): void
     {
         $this->updateUrl();
 
