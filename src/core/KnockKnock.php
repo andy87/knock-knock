@@ -55,7 +55,14 @@ class KnockKnock implements KnockKnockInterface
     public function __construct( array $commonKnockRequestParams )
     {
         $this->commonKnockRequest = new KnockRequest( '/', $commonKnockRequestParams );
+
+        $this->init();
     }
+
+    /**
+     * @return void
+     */
+    public function init(): void {}
 
     /**
      * @param $name
