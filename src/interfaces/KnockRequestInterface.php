@@ -19,18 +19,22 @@ interface KnockRequestInterface
 
 
     /** @var string  */
+    public const URL = 'url';
+    /** @var string  */
     public const HOST = 'host';
 
     /** @var string  */
     public const PROTOCOL = 'protocol';
     /** @var string  */
-    public const URL = 'url';
+    public const ENDPOINT = 'endpoint';
     /** @var string  */
     public const METHOD = 'method';
     /** @var string  */
     public const CONTENT_TYPE = 'contentType';
     /** @var string  */
     public const DATA = 'data';
+    /** @var string  */
+    public const POST_FIELD = 'postField';
     /** @var string  */
     public const HEADERS = 'headers';
     /** @var string  */
@@ -141,9 +145,11 @@ interface KnockRequestInterface
     public function addCurlOptions( string $key, string $value ): self;
 
     /**
+     * @param ?string $key
+     *
      * @return array
      */
-    public function getCurlOptions(): array;
+    public function getCurlOptions( string $key = null ): ?array;
 
     /**
      * @param array $curlInfo
