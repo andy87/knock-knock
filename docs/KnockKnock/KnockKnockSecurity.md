@@ -14,13 +14,13 @@ PHP Фасад для класса `KnockKnock` отправляющего за�
 Расширяет класс [KnockKnock](../../README.md) и предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
 
 ```php
-$KnockKnockAuthorization = new KnockKnockAuthorization([
+$KnockKnockAuthorization = new KnockKnockSecurity([
     KnockRequest::HOST => 'https://api.example.com',
 ]);
 
 // Настройка параметров запроса по умолчанию
 $KnockKnockAuthorization
-    ->useAuthorization( 'token', KnockKnockAuthorization::TOKEN_BEARER )
+    ->useAuthorization( 'token', KnockKnockSecurity::TOKEN_BEARER )
     ->useHeaders( [ 'X-Api-Key' => 'key' ] )
     ->useContentType( 'application/json' );
 
