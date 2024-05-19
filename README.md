@@ -1,21 +1,5 @@
-# KnockKnock
-
-PHP Фасад\Адаптер для отправки запросов через ext cURL
-
-Возможности:
-- Настройка параметров запросов
-- Обработчики событий
-
----
-
-> [!NOTE]
-> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
-
----
-
 
 # Расширения
-
 
 ## [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
 Предоставляет доступ к "простым" методам отправки запросов через ext cURL
@@ -39,8 +23,21 @@ $knockKnockOctopus->post( '/new', [
 
 Класс предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
 
-
 # KnockKnock
+
+PHP Фасад\Адаптер для отправки запросов через ext cURL
+
+Возможности:
+- Настройка параметров запросов
+- Обработчики событий
+
+---
+
+> [!NOTE]
+> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
+
+---
+
 Получение объекта/экземпляра класса и его настройка
 ### Нативный
 ```php
