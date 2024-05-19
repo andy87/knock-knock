@@ -4,7 +4,7 @@ namespace andy87\knock_knock\core;
 
 use Exception;
 use andy87\knock_knock\helpers\{ KnockMethod, KnockContentType };
-use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface };
+use andy87\knock_knock\interfaces\{KnockKnockInterface, KnockRequestInterface, KnockResponseInterface};
 
 /**
  * Class KnockKnock
@@ -45,11 +45,12 @@ class KnockKnock implements KnockKnockInterface
     protected array $extensions = [];
 
 
-
     /**
      * KnockKnock constructor.
      *
      * @param array $commonKnockRequestParams
+     *
+     * @throws Exception
      */
     public function __construct( array $commonKnockRequestParams )
     {
@@ -101,6 +102,8 @@ class KnockKnock implements KnockKnockInterface
      * @param array $knockRequestConfig
      *
      * @return KnockRequest
+     *
+     * @throws Exception
      */
     public function constructRequest( string $endpoint, array $knockRequestConfig = [] ): KnockRequest
     {
@@ -124,8 +127,8 @@ class KnockKnock implements KnockKnockInterface
     public function constructResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse
     {
         $knockResponse = new KnockResponse(
-            $KnockResponseParams[KnockResponse::CONTENT] ?? null,
-            $KnockResponseParams[KnockResponse::HTTP_CODE] ?? KnockResponse::OK,
+            $KnockResponseParams[KnockResponseInterface::CONTENT] ?? null,
+            $KnockResponseParams[KnockResponseInterface::HTTP_CODE] ?? KnockResponseInterface::OK,
                 $knockRequest
         );
 
@@ -211,8 +214,8 @@ class KnockKnock implements KnockKnockInterface
         $knockRequest->setCurlInfo( curl_getinfo( $ch ) );
 
         $knockResponseParams = [
-            KnockResponse::CONTENT => $response,
-            KnockResponse::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE )
+            KnockResponseInterface::CONTENT => $response,
+            KnockResponseInterface::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE )
         ];
 
         $knockResponse = $this->constructResponse( $knockResponseParams, $knockRequest );

@@ -2,12 +2,13 @@
 
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\interfaces\KnockRequestInterface;/**
+use andy87\knock_knock\interfaces\KnockRequestInterface;
+use Exception;
+
+/**
  * Class KnockRequest
  *
  * @package andy87\knock_knock\query
- *
- * Fix not used:
  */
 class KnockRequest implements KnockRequestInterface
 {
@@ -37,19 +38,41 @@ class KnockRequest implements KnockRequestInterface
     ];
 
 
+    /** @var bool $isCompleted Устанавливается TRUE после получения ответа */
+    public bool $isCompleted = false;
+
+
 
     /**
      *
      * @param string $url
      * @param array $params
+     *
+     * @throws Exception
      */
     public function __construct( string $url , array $params = [] )
     {
-        $this->url = $url;
+        $this->setUrl( $url );
 
-        $this->setupParams($params);
+        $this->setupParamsFromArray($params);
     }
 
+
+
+    // === Setters & Getters ===
+
+
+    // --- Url ---
+
+    /**
+     * @param string $url
+     *
+     * @return void
+     */
+    private function setUrl( string $url ): void
+    {
+        $this->url = $url;
+    }
 
     /**
      * @return string
@@ -58,10 +81,6 @@ class KnockRequest implements KnockRequestInterface
     {
         return $this->url;
     }
-
-
-
-    // === Setters & Getters ===
 
 
     // --- Protocol ---
@@ -278,12 +297,16 @@ class KnockRequest implements KnockRequestInterface
     }
 
 
+    // --- Params ---
+
     /**
      * @return array
      */
     public function getParams(): array
     {
         return [
+            self::PROTOCOL => $this->getProtocol(),
+            self::HOST => $this->getHost(),
             self::URL => $this->getUrl(),
             self::METHOD => $this->getMethod(),
             self::CONTENT_TYPE => $this->getContentType(),
@@ -291,8 +314,7 @@ class KnockRequest implements KnockRequestInterface
             self::DATA => $this->getData(),
             self::CURL_OPTIONS => $this->getCurlOptions(),
             self::CURL_INFO => $this->getCurlInfo(),
-            self::PROTOCOL => $this->getProtocol(),
-            self::HOST => $this->getHost()
+
         ];
     }
 
@@ -301,13 +323,32 @@ class KnockRequest implements KnockRequestInterface
     // === Private ===
 
     /**
+     * Заполнение параметров запроса из массива данных
+     *
      * @param array $params
      *
      * @return void
+     *
+     * @throws Exception
      */
-    private function setupParams( array $params )
+    private function setupParamsFromArray(array $params )
     {
-        foreach ( $params as $param => $value )
+        foreach ( $params as $param => $value ) {
+            $this->setParamsWithConditionCompleted( $param, $value );
+        }
+    }
+
+    /**
+     * Заполнение параметра запроса при условии, что запрос ещё не выполнялся
+     *
+     * @param string $param
+     * @param $value
+     *
+     * @throws Exception
+     */
+    private function setParamsWithConditionCompleted(string $param, $value )
+    {
+        if ( $this->isCompleted )
         {
             switch ($param)
             {
@@ -346,7 +387,13 @@ class KnockRequest implements KnockRequestInterface
                 case self::CURL_INFO:
                     $this->setCurlInfo($value);
                     break;
+
+                default:
+                    throw new Exception('Unknown param');
             }
         }
+
+        throw new Exception('Request is not completed');
     }
+
 }

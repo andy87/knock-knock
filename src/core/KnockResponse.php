@@ -2,48 +2,36 @@
 
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\interfaces\KnockRequestInterface;
 use Exception;
-use andy87\knock_knock\interfaces\KnockResponseInterface;
+use andy87\knock_knock\interfaces\{ KnockRequestInterface, KnockResponseInterface };
 
 /**
  * Class KnockRequest
  *
  * @package andy87\knock_knock\query
  *
- * Fix not used:
- * - @see KnockResponse::getRequest();
- * - @see KnockResponse::getHttpCode();
- * - @see KnockResponse::getContent();
- * - @see KnockResponse::get();
- * - @see KnockResponse::replace();
- * - @see KnockResponse::getTrace();
+ * @property-read KnockRequest $request
+ * @property-read int $httpCode
+ * @property-read mixed $content
+ * @property-read array $trace
+ * @property-read array $curlOptions
+ * @property-read array $curlInfo
  *
- * - @see KnockResponse::ERROR;
+ * Fix not used:
+ * - @see KnockResponse::replace();
  */
 class KnockResponse implements KnockResponseInterface
 {
-    /** @var int  */
-    public const OK = 200;
-    /** @var int  */
-    public const ERROR = 500;
+    /** @var mixed $data */
+    private $data;
 
-
-    /** @var string  */
-    public const CONTENT = 'content';
-    /** @var string  */
-    public const HTTP_CODE = 'httpCode';
-
-
-
-    /** @var  */
-    private $content;
-
-    /** @var int  */
+    /** @var int $httpCode */
     private int $httpCode;
 
-    /** @var ?KnockRequest  */
+
+    /** @var ?KnockRequest $knockRequest */
     private ?KnockRequest $knockRequest = null;
+
 
 
     /**
@@ -57,13 +45,48 @@ class KnockResponse implements KnockResponseInterface
      */
     public function __construct( $content, int $httpCode, KnockRequest $knockRequest )
     {
-        $this->setContent( $content );
+        $this->setData( $content );
 
         $this->setHttpCode( $httpCode );
 
         $this->setRequest( $knockRequest );
     }
 
+    /**
+     * @param $name
+     *
+     * @return KnockRequest|array|int|mixed|void
+     *
+     * @throws Exception
+     */
+    public function __get($name)
+    {
+        switch ($name)
+        {
+            case self::REQUEST:
+                return $this->getRequest();
+
+            case self::HTTP_CODE:
+                return $this->getHttpCode();
+
+            case self::CONTENT:
+                return $this->getContent();
+
+            case self::TRACE:
+                return $this->getTrace();
+
+            case KnockRequestInterface::CURL_OPTIONS:
+            case KnockRequestInterface::CURL_INFO:
+                return $this->get($name);
+
+            default:
+                throw new Exception("Property `$name`not found on: " . __CLASS__);
+        }
+    }
+
+
+
+    // === PUBLIC ===
 
     /**
      * @param int $httpCode
@@ -87,64 +110,28 @@ class KnockResponse implements KnockResponseInterface
     /**
      * @return int
      */
-    public function getHttpCode(): int
+    private function getHttpCode(): int
     {
         return $this->httpCode;
     }
 
     /**
-     * @param mixed $content
+     * @param mixed $data
      *
      * @return void
      *
      * @throws Exception
      */
-    public function setContent( $content ): self
+    public function setData( $data ): self
     {
-        if ( $this->content )
+        if ( $this->data )
         {
             throw new Exception('Content is already set');
         }
 
-        $this->content = $content;
+        $this->data = $data;
 
         return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-
-    /**
-     * @param KnockRequest $knockRequest
-     *
-     * @return KnockResponse
-     *
-     * @throws Exception
-     */
-    public function setRequest( KnockRequest $knockRequest ): self
-    {
-        if ( $this->knockRequest )
-        {
-            throw new Exception('Request is already set');
-        }
-
-        $this->knockRequest = $knockRequest;
-
-        return $this;
-    }
-
-    /**
-     * @return KnockRequest
-     */
-    public function getRequest(): KnockRequest
-    {
-        return $this->knockRequest;
     }
 
     /**
@@ -164,7 +151,7 @@ class KnockResponse implements KnockResponseInterface
                 break;
 
             case self::CONTENT:
-                $this->setContent( $value );
+                $this->setData( $value );
                 break;
 
             default:
@@ -207,10 +194,47 @@ class KnockResponse implements KnockResponseInterface
         throw new Exception('Bad key');
     }
 
+
+
+    // === PRIVATE ===
+
+    /**
+     * @return mixed
+     */
+    private function getContent()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param KnockRequest $knockRequest
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    private function setRequest( KnockRequest $knockRequest ): void
+    {
+        if ( $this->knockRequest )
+        {
+            throw new Exception('Request is already set');
+        }
+
+        $this->knockRequest = $knockRequest;
+    }
+
+    /**
+     * @return KnockRequest
+     */
+    private function getRequest(): KnockRequest
+    {
+        return $this->knockRequest;
+    }
+
     /**
      * Получение Trace лог истории вызовов методов
      */
-    public function getTrace(): array
+    private function getTrace(): array
     {
         return debug_backtrace();
     }
