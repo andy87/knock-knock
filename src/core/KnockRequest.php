@@ -9,9 +9,21 @@ use andy87\knock_knock\interfaces\KnockRequestInterface;
  * Class KnockRequest
  *
  * @package andy87\knock_knock\query
+ *
+ * Fix not used:
+ * - @see KnockRequest::getStatusLabel()
  */
 class KnockRequest implements KnockRequestInterface
 {
+    /** @var array */
+    public const STATUS_LABELS = [
+        self::STATUS_PREPARE => 'новый запрос',
+        self::STATUS_PROCESSING => 'запрос отправляется',
+        self::STATUS_COMPLETE => 'ответ получен'
+    ];
+
+
+
     /** @var int $status Статус запроса */
     public int $status = self::STATUS_PREPARE;
 
@@ -408,7 +420,7 @@ class KnockRequest implements KnockRequestInterface
     }
 
 
-    // --- Params ---
+    // --- Status ---
 
     /**
      * Маркировка запроса как выполненного
@@ -429,6 +441,9 @@ class KnockRequest implements KnockRequestInterface
     {
         $this->status = self::STATUS_COMPLETE;
     }
+
+
+    // --- Common ---
 
     /**
      * Получение параметров запроса
@@ -452,6 +467,21 @@ class KnockRequest implements KnockRequestInterface
         ];
     }
 
+    /**
+     * @param string $key
+     *
+     * @return string
+     *
+     * @throws Exception
+     */
+    public function getStatusLabel( string $key ): string
+    {
+        if ( isset(self::STATUS_LABELS[$key]) ) {
+            return self::STATUS_LABELS[$key];
+        }
+
+        throw new Exception('Unknown status');
+    }
 
 
     // === Private ===
