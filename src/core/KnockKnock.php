@@ -35,6 +35,7 @@ class KnockKnock implements KnockKnockInterface
 
     /** @var callable[] */
     protected array $callbacks = [
+        self::EVENT_AFTER_INIT => null,
         self::EVENT_CONSTRUCT_REQUEST => null,
         self::EVENT_BEFORE_SEND => null,
         self::EVENT_CONSTRUCT_RESPONSE => null,
@@ -43,6 +44,7 @@ class KnockKnock implements KnockKnockInterface
 
     /** @var callable[] */
     protected array $extensions = [];
+
 
 
     /**
@@ -57,12 +59,9 @@ class KnockKnock implements KnockKnockInterface
         $this->commonKnockRequest = new KnockRequest( '/', $commonKnockRequestParams );
 
         $this->init();
-    }
 
-    /**
-     * @return void
-     */
-    public function init(): void {}
+        $this->event( self::EVENT_AFTER_INIT, $this );
+    }
 
     /**
      * @param $name
@@ -82,7 +81,6 @@ class KnockKnock implements KnockKnockInterface
         throw new Exception( "Method $name not found" );
     }
 
-
     /**
      * @param array $commonKnockRequestParams
      *
@@ -100,6 +98,12 @@ class KnockKnock implements KnockKnockInterface
         return static::$instance;
     }
 
+    /**
+     * Пользовательские инструкции инициализации
+     *
+     * @return void
+     */
+    public function init(): void {}
 
 
     // === Construct ===
@@ -114,7 +118,7 @@ class KnockKnock implements KnockKnockInterface
      */
     public function constructRequest( string $endpoint, array $knockRequestConfig = [] ): KnockRequest
     {
-        $params = array_merge( $knockRequestConfig, $this->commonKnockRequest->getParams() );
+        $params = array_merge( $knockRequestConfig, $this->getCommonObjectRequest()->getParams() );
 
         $knockRequest = new KnockRequest( $endpoint, $params );
 
@@ -240,7 +244,7 @@ class KnockKnock implements KnockKnockInterface
 
 
 
-    // === Поведения === Behavior === Callbacks ===
+    // === Поведения === Event === Behavior === Callbacks ===
 
     /**
      * @param string $event
@@ -296,6 +300,7 @@ class KnockKnock implements KnockKnockInterface
     }
 
 
+
     // === Extensions ===
 
     /**
@@ -333,6 +338,14 @@ class KnockKnock implements KnockKnockInterface
         return false;
     }
 
+    /**
+     * @return KnockRequest
+     */
+    public function getCommonObjectRequest(): KnockRequest
+    {
+        return $this->commonKnockRequest;
+    }
+
 
 
     // === Private ===
@@ -349,7 +362,7 @@ class KnockKnock implements KnockKnockInterface
     {
         $knockRequest->setStatusProcessing();
 
-        $this->setupRequest( $knockRequest, $this->commonKnockRequest->getParams() );
+        $this->setupRequest( $knockRequest, $this->getCommonObjectRequest()->getParams() );
 
         $this->event( self::EVENT_BEFORE_SEND, $this->knockRequest );
 

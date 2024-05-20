@@ -13,6 +13,7 @@ use andy87\knock_knock\core\KnockResponse;
 interface KnockKnockInterface
 {
     /** @var string  */
+    public const EVENT_AFTER_INIT = 'afterInit';
     public const EVENT_CONSTRUCT_REQUEST = 'constructRequest';
     /** @var string  */
     public const EVENT_BEFORE_SEND = 'beforeSend';

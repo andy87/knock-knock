@@ -3,6 +3,7 @@
 namespace andy87\knock_knock;
 
 use andy87\knock_knock\core\KnockKnock;
+use Exception;
 
 /**
  * Class KnockAuthorization
@@ -25,16 +26,17 @@ class KnockKnockSecurity extends KnockKnockOctopus
     public const TOKEN_BASIC = 'Basic';
 
 
-
     /**
      * @param string $token
      * @param string $authType
      *
      * @return $this
+     *
+     * @throws Exception
      */
     public function useAuthorization( string $token, string $authType ): KnockKnock
     {
-        $this->commonKnockRequest->addHeaders( 'Authorization', "$authType $token" );
+        $this->getCommonObjectRequest()->addHeaders( 'Authorization', "$authType $token" );
 
         return $this;
     }
@@ -43,12 +45,14 @@ class KnockKnockSecurity extends KnockKnockOctopus
      * @param array $headers
      *
      * @return $this
+     *
+     * @throws Exception
      */
     public function useHeaders( array $headers ): KnockKnock
     {
-        $headers = array_merge( $this->commonKnockRequest->getHeaders(), $headers );
+        $headers = array_merge( $this->getCommonObjectRequest()->getHeaders(), $headers );
 
-        $this->commonKnockRequest->setHeaders( $headers );
+        $this->getCommonObjectRequest()->setHeaders( $headers );
 
         return $this;
     }
@@ -57,10 +61,12 @@ class KnockKnockSecurity extends KnockKnockOctopus
      * @param string $ContentType
      *
      * @return $this
+     *
+     * @throws Exception
      */
     public function useContentType( string $ContentType ): KnockKnock
     {
-        $this->commonKnockRequest->setContentType( $ContentType );
+        $this->getCommonObjectRequest()->setContentType( $ContentType );
 
         return $this;
     }
