@@ -108,13 +108,18 @@ class KnockRequest implements KnockRequestInterface
     /**
      * Получение URL
      *
-     * @return string
+     * @return ?string
      */
-    public function getUrl(): string
+    public function getUrl(): ?string
     {
-        $address = str_replace( ['//','///'], '/', $this->host . '/' . $this->endpoint );
+        if ( $this->host && $this->endpoint )
+        {
+            $address = str_replace( ['//','///'], '/', $this->host . '/' . $this->endpoint );
 
-        return "$this->protocol://$address";
+            return "$this->protocol://$address";
+        }
+
+        return null;
     }
 
 
@@ -137,11 +142,11 @@ class KnockRequest implements KnockRequestInterface
     /**
      * Получение протокола
      *
-     * @return string
+     * @return ?string
      */
-    public function getProtocol(): string
+    public function getProtocol(): ?string
     {
-        return $this->protocol;
+        return $this->protocol ?? null;
     }
 
 
@@ -164,11 +169,11 @@ class KnockRequest implements KnockRequestInterface
     /**
      * Получение хоста
      *
-     * @return string
+     * @return ?string
      */
-    public function getHost(): string
+    public function getHost(): ?string
     {
-        return $this->host;
+        return $this->host ?? null;
     }
 
 
@@ -191,11 +196,11 @@ class KnockRequest implements KnockRequestInterface
     /**
      * Получение метода запроса
      *
-     * @return string
+     * @return ?string
      */
-    public function getMethod(): string
+    public function getMethod(): ?string
     {
-        return $this->method;
+        return $this->method ?? null;
     }
 
 
@@ -218,11 +223,11 @@ class KnockRequest implements KnockRequestInterface
     /**
      * Получение типа контента
      *
-     * @return string
+     * @return ?string
      */
-    public function getContentType(): string
+    public function getContentType(): ?string
     {
-        return $this->contentType;
+        return $this->contentType ?? null;
     }
 
 

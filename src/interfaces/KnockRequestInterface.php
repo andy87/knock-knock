@@ -52,9 +52,9 @@ interface KnockRequestInterface
     public function setProtocol( string $protocol ): self;
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getProtocol(): string;
+    public function getProtocol(): ?string;
 
     /**
      * @param string $host
@@ -64,14 +64,14 @@ interface KnockRequestInterface
     public function setHost( string $host ): self;
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getHost(): string;
+    public function getHost(): ?string;
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getUrl(): string;
+    public function getUrl(): ?string;
 
     /**
      * @param string $method
@@ -81,9 +81,9 @@ interface KnockRequestInterface
     public function setMethod( string $method ): self;
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getMethod(): string;
+    public function getMethod(): ?string;
 
     /**
      * @param string $contentType
@@ -93,9 +93,9 @@ interface KnockRequestInterface
     public function setContentType( string $contentType ): self;
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getContentType(): string;
+    public function getContentType(): ?string;
 
     /**
      * @param $data
