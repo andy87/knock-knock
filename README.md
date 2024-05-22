@@ -1,14 +1,11 @@
 
----
-> [!NOTE]  
-> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
----
-
-
 ## Расширения на основе базового класа
 
 ### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
-Предоставляет доступ к базовому функционалу через методы с простой реализации отправки запросов и минимальными настройками 
+
+<p align="center"><a href="docs/KnockKnock/KnockKnockOctopus.md"><img src="assets/docs/KnockKnockOctopus_320.png" height="200" width="auto" alt="KnockKnock php curl facade"/></a></p>
+
+Класс с функционалом простой реализации отправки запросов и минимальными настройками
 
 #### Доступные методы.
 
@@ -16,10 +13,10 @@
 |-------|--------|-------|---------|----------|--------|-----------|---------|
 
 #### Каждый метод принимает два аргумента:
-| Аргумент  | Тип    | Обязательный | Описание                      |
-|-----------|--------|--------------|-------------------------------|
-| $endpoint | string | Да           | URL запроса ( без хоста)      |
-| $params   | array  | Нет          | Данные запроса в виде массива |
+| Аргумент  |   Тип   | Обязательный  | Описание                       |
+|:----------|:-------:|:-------------:|:-------------------------------|
+| $endpoint | string  |      Да       | URL запроса (без хоста)        |
+| $params   |  array  |      Нет      | Данные запроса в виде массива  |
 _P.S. host задаётся в конструкторе_
 
 #### Простой пример использования
@@ -37,35 +34,49 @@ $knockKnockOctopus->post( '/new', [
 
 ### [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
 
-Класс предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
+<p align="center"><a href="docs/KnockKnock/KnockKnockSecurity.md"><img src="assets/docs/KnockKnockSecurity_280.png" height="128" width="auto" alt="KnockKnock php curl facade"/></a></p>
+
+Класс с функционалом для быстрой настройки авторизации.
 
 ___
 
 # KnockKnock
+
+<p align="center"><img src="assets/docs/KnockKnockLogo_256.png" width="164" height="auto" alt="KnockKnock php curl facade"/></p>
 
 ## Базовый класс: _KnockKnock_
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
 Возможности:
-- Настройка параметров запросов
-- Обработчики событий
+ - Настройка параметров запросов
+   - см. `Полный список констант`
+ - Обработчики событий
+   - см. `Список событий`
+
+## ВАЖНЫЙ МОМЕНТ!
+`CURL_OPTIONS` по умолчанию пустые! В большинстве случаев требуется задать необходимые настройки для получения валидных ответов.  
+см. пример ниже.
 
 
 Получение объекта/экземпляра класса и его настройка
 ### Нативный
 ```php
 $knockKnock = new KnockKnock('host',[
-    KnockRequest::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_FORM,
+     KnockRequestInterface::SETUP_CURL_OPTIONS => [
+        CURLOPT_HEADER => false,
+        CURLOPT_RETURNTRANSFER => true
+    ]
 ]);
 ```
 
 ### Singleton
 ```php
 $knockKnock = KnockKnock::getInstance('host',[
-    KnockRequest::PROTOCOL => 'http',
-    KnockRequest::HEADER => KnockRequest::CONTENT_TYPE_JSON,
-])->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
+        KnockRequest::SETUP_PROTOCO => KnockRequest::PROTOCOL_HTTP,
+        KnockRequest::SETUP_CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
+    ])
+    ->disableSSL();
 ```
 Оба вызова вернут объект/экземпляр класса `KnockKnock` и принимают на вход два аргумента:
 - `string $host` - хост
@@ -287,6 +298,27 @@ $curlOptions =  $knockResponse->get( KnockResponse::CURL_OPTIONS ); // return ar
 $curlInfo =  $knockResponse->get( KnockResponse::CURL_INFO ); // return array
 
 ```
+
+## Функциональная часть
+
+### SSL
+В объектах `KnockKnock` & `KnockRequest` имеется функционал включения/отключения SSL верификации.  
+
+`KnockKnock` - для всех запросов
+```php
+$knockKnock->disableSSL();
+$knockKnock->enableSSL();
+```
+
+`KnockRequest` - для конкретного запроса
+```php
+$knockRequest->disableSSL();
+$knockRequest->enableSSL();
+
+```
+
+
+
 ___
 
 # Custom реализация
@@ -373,3 +405,8 @@ $knockResponse = $knockKnockYandex->setupRequest('profile', [
 $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend`
 
 ```
+
+---
+> [!Альфа версия]  
+> Возможно наличие багов
+---

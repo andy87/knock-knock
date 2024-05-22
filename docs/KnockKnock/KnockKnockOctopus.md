@@ -2,13 +2,6 @@
 
 PHP Фасад для класса `KnockKnock` отправляющего запросы через ext cURL
 
----
-
-> [!NOTE]
-> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
-
----
-
 # KnockKnockOctopus
 
 Расширяет класс [KnockKnock](../../README.md) и предоставляет доступ к "простым" методам отправки запросов через ext cURL
@@ -90,3 +83,8 @@ $knockKnockResponse = $knockKnockOctopus
 ```php
 $knockKnockResponse = $knockKnockOctopus->trace( '/post' );
 ```
+
+---
+> [!Альфа версия]  
+> Возможно наличие багов
+---

@@ -2,16 +2,9 @@
 
 PHP Фасад для класса `KnockKnock` отправляющего запросы через ext cURL
 
----
-
-> [!NOTE]
-> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
-
----
-
 # KnockKnockSecurity
 
-Расширяет класс [KnockKnockOctopus](KnockKnockOctopus.md) и предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
+Расширяет класс [KnockKnockOctopus](KnockKnockOctopus.md) и предоставляет доступ к функционалу для простой и быстрой реализации авторизации и другим полезным методам.
 
 ```php
 $KnockKnockAuthorization = new KnockKnockSecurity([
@@ -46,3 +39,8 @@ $KnockResponse = $KnockKnockAuthorization
 $category_id = $KnockResponse->content['id'];
 
 ```
+
+---
+> [!Альфа версия]  
+> Возможно наличие багов
+---
