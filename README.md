@@ -1,5 +1,30 @@
+# Вводная
 
-## Расширения на основе базового класа
+Репозиторий содержит 3 класса для реализации cURL оправки запроса, которые применяют паттерн Фасад.  
+Цель: сделать простой и лёгкий в настройке пакет для реализации разных API на его основе.  
+
+# Установка.
+
+## Git
+
+В файл вашего проекта `composer.json` добавьте:  
+ в раздел `require`  строку `"andy87/knockknock": "dev-main"`  
+ в раздел `repositories`  
+```
+{
+    "type": "vcs",
+    "url": "https://github.com/andy87/KnockKnock"
+}
+```
+Выполните команду: `composer update`.  
+Возможно придётся так же добавить в корень данных `composer.json`  
+`"minimum-stability": "dev"`
+
+## Composer
+
+> скоро
+
+# Расширения на основе базового класа
 
 ### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
 
