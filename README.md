@@ -48,18 +48,23 @@ ___
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
-Возможности:
+Возможности/фичи:
  - Настройка параметров запросов
    - см. `Полный список констант`
  - Обработчики событий
    - см. `Список событий`
+ - доступна возможность использовать Singleton
+ - применяется инкапсуляция
+ - защита данных от перезаписи
 
-## ВАЖНЫЙ МОМЕНТ!
+### ВАЖНЫЙ МОМЕНТ!
 `CURL_OPTIONS` по умолчанию пустые! В большинстве случаев требуется задать необходимые настройки для получения валидных ответов.  
 см. пример ниже.
 
+В классах применяется инкапсуляция, поэтому для доступа к свойствам компонентов необходимо использовать сеттеры и геттеры.
 
-Получение объекта/экземпляра класса и его настройка
+## Получение объекта/экземпляра класса и его настройка
+
 ### Нативный
 ```php
 $knockKnock = new KnockKnock('host',[
@@ -136,7 +141,7 @@ $knockKnock->setupEventHandlers([
 Нативное создание объекта / экземпляра класса с данными для конкретного запроса
 ```php
 $knockRequest = new KnockRequest( 'info/me', [
-    KnockRequest::METHOD => KnockMethod::POST,
+    KnockRequest::METHOD => LibKnockMethod::POST,
     KnockRequest::DATA => [ 'client_id' => 34 ],
     KnockRequest::HEADERS => [ 'api-secret-key' => 'secretKey34' ],
     KnockRequest::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
@@ -145,14 +150,14 @@ $knockRequest = new KnockRequest( 'info/me', [
         CURLINFO_HEADER_SIZE,
         CURLINFO_TOTAL_TIME
     ],
-    KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
+    KnockRequest::CONTENT_TYPE => LibKnockContentType::FORM_DATA,
 ]);
 ```
 
 Доступно создание - через метод фасада (с вызовом callback функции )
 ```php
 $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
-    KnockRequest::METHOD => KnockMethod::POST,
+    KnockRequest::METHOD => LibKnockMethod::POST,
     KnockRequest::DATA => [ 'client_id' => 45 ],
     KnockRequest::HEADERS => [ 'api-secret-key' => 'secretKey45' ],
     KnockRequest::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
@@ -161,7 +166,7 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
         CURLINFO_HEADER_SIZE,
         CURLINFO_TOTAL_TIME
     ],
-    KnockRequest::CONTENT_TYPE => KnockContentType::FORM_DATA,
+    KnockRequest::CONTENT_TYPE => LibKnockContentType::FORM_DATA,
 ]);
 ```
 `constructKnockRequest( string $url, array $knockRequestConfig = [] ): KnockRequest`
@@ -185,7 +190,7 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 ```php
 $knockRequest = $knockKnock->constructKnockRequest('info/me');
 
-$knockRequest->setMethod( KnockMethod::GET );
+$knockRequest->setMethod( LibKnockMethod::GET );
 $knockRequest->setData(['client_id' => 67]);
 $knockRequest->setHeaders(['api-secret-key' => 'secretKey67']);
 $knockRequest->setCurlOptions([
@@ -197,7 +202,7 @@ $knockRequest->setCurlInfo([
     CURLINFO_HEADER_SIZE,
     CURLINFO_TOTAL_TIME
 ]);
-$knockRequest->setContentType( KnockContentType::JSON );
+$knockRequest->setContentType( LibKnockContentType::JSON );
 
 $protocol = $knockRequest->getPrococol(); // string
 $host = $knockRequest->getHost(); // string
@@ -211,7 +216,6 @@ $host = $knockRequest->getHost(); // string
 ```php
 $knockKnock->setupRequest( $knockRequest, [
     KnockRequest::HOST => 'domain.zone',
-    KnockKnock::BEARER => 'token-bearer-2',
     KnockKnock::HEADERS => [
         'api-secret' => 'secretKey78'
     ],
@@ -223,26 +227,29 @@ $knockKnock->setupRequest( $knockRequest, [
 
 ## Ответ: _KnockResponse_ 
 
-Конструктор KnockResponse с вызовом callback функции, если она установлена
+Конструктор `KnockResponse` с вызовом callback функции, если она установлена
 ```php
 $knockResponse = $knockKnock->constructKnockResponse([
-    'id' => 806034,
-    'name' => 'and_y87'
+    KnockResponse::CONTENT => [
+        'id' => 806034,
+        'name' => 'and_y87'
+    ],
+    KnockResponse::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE ),
 ], $knockRequest );
 ```
 `constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse`
 
 ## KnockResponse: Отправка запроса и получение ответа
 
-Получение ответа отправленного запроса и вызов callback функции, если она установлена
+Отправить запрос, получить ответ и вызвать все callback функции, если они установлены
 ```php
 $knockKnock->setupRequest( $knockRequest );
 $knockResponse = $knockKnock->send();
 ```
-`send( array $prepareKnockResponseParams = [] ): KnockResponse`
-возвращает объект/экземпляр класса KnockResponse
+`send( array $kafeResponse = [] ): KnockResponse`
+возвращает объект/экземпляр класса `KnockResponse`
 
-Получение ответа с отправкой запроса - цепочкой вызовов
+Пример получения ответа с отправкой запроса - цепочкой вызовов (субъективно - более красивый вариант)
 ```php
 $knockResponse = $knockKnock->setRequest( $knockRequest )->send(); // return KnockResponse
 ```
@@ -253,7 +260,7 @@ $knockResponse = $knockKnock->setRequest( $knockRequest )->send(); // return Kno
 Цепочка вызовов, возвращает подготовленный ответ и вызывает callback функцию, если она установлена
 ```php
 // параметры возвращаемого ответа
-$prepareFakeKnockResponseParams = [
+$fakeResponse = [
     KnockResponse::HTTP_CODE => 200,
     KnockResponse::CONTENT => [
         'id' => 806034,
@@ -261,14 +268,15 @@ $prepareFakeKnockResponseParams = [
     ],
 ];
 
-$knockResponse = $knockKnock->setupRequest( $knockRequest )->send( $prepareFakeKnockResponseParams );
+$knockResponse = $knockKnock->setupRequest( $knockRequest )->send( $fakeResponse );
 ```
-объект `$knockResponse` будет содержать данные переданные в аргументе `$prepareFakeKnockResponseParams`
+объект `$knockResponse` будет содержать данные переданные в аргументе `$fakeResponse`
 
 
 ## Данные в ответе
 
-Задаются данные
+В созданный объект `KnockResponse` можно задать данные.  
+
 ```php
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 
@@ -276,9 +284,10 @@ $knockResponse
     ->setHttpCode(200)
     ->setContent('{"id" => 8060345, "nickName" => "and_y87"}');
 ```
-Если данные уже установлены, выбрасывается `Exception`, для замены используется `replace`
+**Внимание!** Если данные в объекте уже существуют, повторно задать их нельзя выбрасывается `Exception`.  
+В случае необходимости заменить данные, используется вызов метода `replace( string $key, mixed $value )` см. далее
 
-Подменяются данные
+### Подменяются данные
 ```php
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 
@@ -287,9 +296,15 @@ $knockResponse
     ->replace( KnockResponse::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}' );
 ```
 
-## Данные запроса из ответа
+## Получение из ответа данных о запросе
 
-Получение массива с данными ответа
+Получение компонента запроса
+```php
+$knockRequest = $knockResponse->request
+```
+`request` - readOnly свойство
+
+Получение отдельных свойств значений используя константы
 ```php
 // Получение опций запроса (  KnockRequest::CURL_OPTIONS )
 $curlOptions =  $knockResponse->get( KnockResponse::CURL_OPTIONS ); // return array
@@ -332,7 +347,7 @@ class KnockKnockYandex extends KnockKnock
 
     private string $host = 'https://api.yandex.ru/'
 
-    private string $contentType = KnockContentType::JSON
+    private string $contentType = LibKnockContentType::JSON
 
     private YandexLogger $logger;
 
@@ -398,7 +413,7 @@ $knockKnockYandex = KnockKnockYandex::getInstanse([
 ]);
 
 $knockResponse = $knockKnockYandex->setupRequest('profile', [ 
-    KnockRequest::METHOD => KnockMethod::PATCH,
+    KnockRequest::METHOD => LibKnockMethod::PATCH,
     KnockRequest::DATA => [ 'city' => 'Moscow' ],
 ]); // Логирование `afterCreateRequest`
 
