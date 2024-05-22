@@ -3,6 +3,10 @@
 Репозиторий содержит 3 класса для реализации cURL оправки запроса, которые применяют паттерн Фасад.  
 Цель: сделать простой и лёгкий в настройке пакет для реализации разных API на его основе.  
 
+# Требования:
+ - php 8.0
+ - ext cURL
+
 # Установка.
 
 ## Git
@@ -262,7 +266,13 @@ $knockResponse = $knockKnock->constructKnockResponse([
     KnockResponse::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE ),
 ], $knockRequest );
 ```
-`constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse`
+`constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse`  
+ReadOnly свойства ответа:
+ - content
+ - httpCode
+ - request
+ - curlOptions
+ - curlInfo
 
 ## KnockResponse: Отправка запроса и получение ответа
 
@@ -277,8 +287,9 @@ $knockResponse = $knockKnock->send();
 Пример получения ответа с отправкой запроса - цепочкой вызовов (субъективно - более красивый вариант)
 ```php
 $knockResponse = $knockKnock->setRequest( $knockRequest )->send(); // return KnockResponse
-```
 
+$content = $knockResponse->content;
+```
 
 ## Отправка запроса с фэйковым ответом
 
@@ -300,8 +311,7 @@ $knockResponse = $knockKnock->setupRequest( $knockRequest )->send( $fakeResponse
 
 ## Данные в ответе
 
-В созданный объект `KnockResponse` можно задать данные.  
-
+В созданный объект `KnockResponse` разрешено задавать данные.
 ```php
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 
@@ -312,7 +322,7 @@ $knockResponse
 **Внимание!** Если данные в объекте уже существуют, повторно задать их нельзя выбрасывается `Exception`.  
 В случае необходимости заменить данные, используется вызов метода `replace( string $key, mixed $value )` см. далее
 
-### Подменяются данные
+### Подмена данных
 ```php
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 
