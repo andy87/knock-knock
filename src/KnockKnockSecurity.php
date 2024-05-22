@@ -1,4 +1,13 @@
-<?php
+<?php /**
+ * KnockKnockSecurity
+ *
+ * @author Andrey and_y87 Kidin
+ * @description Класс предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
+ *
+ * @date 2024-05-22
+ *
+ * @version 0.87
+ */
 
 namespace andy87\knock_knock;
 
@@ -33,10 +42,12 @@ class KnockKnockSecurity extends KnockKnockOctopus
      * @return $this
      *
      * @throws Exception
+     *
+     * @tag #security #authorization
      */
     public function useAuthorization( string $token, string $authType ): KnockKnock
     {
-        $this->getCommonObjectRequest()->addHeaders( 'Authorization', "$authType $token" );
+        $this->getCommonKnockRequest()->addHeaders( 'Authorization', "$authType $token" );
 
         return $this;
     }
@@ -47,12 +58,14 @@ class KnockKnockSecurity extends KnockKnockOctopus
      * @return $this
      *
      * @throws Exception
+     *
+     * @tag #security #headers
      */
     public function useHeaders( array $headers ): KnockKnock
     {
-        $headers = array_merge( $this->getCommonObjectRequest()->getHeaders(), $headers );
+        $headers = array_merge( $this->getCommonKnockRequest()->getHeaders(), $headers );
 
-        $this->getCommonObjectRequest()->setHeaders( $headers );
+        $this->getCommonKnockRequest()->setHeaders( $headers );
 
         return $this;
     }
@@ -63,10 +76,12 @@ class KnockKnockSecurity extends KnockKnockOctopus
      * @return $this
      *
      * @throws Exception
+     *
+     * @tag #security #content-type
      */
     public function useContentType( string $ContentType ): KnockKnock
     {
-        $this->getCommonObjectRequest()->setContentType( $ContentType );
+        $this->getCommonKnockRequest()->setContentType( $ContentType );
 
         return $this;
     }

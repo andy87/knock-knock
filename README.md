@@ -1,29 +1,49 @@
 
-# Расширения
+---
+> [!NOTE]  
+> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
+---
 
-## [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
-Предоставляет доступ к "простым" методам отправки запросов через ext cURL
 
-Доступные методы:
-- get()
-- post()
-- и т.д.
+## Расширения на основе базового класа
 
+### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
+Предоставляет доступ к базовому функционалу через методы с простой реализации отправки запросов и минимальными настройками 
+
+#### Доступные методы.
+
+| get() | post() | put() | patch() | delete() | head() | options() | trace() |
+|-------|--------|-------|---------|----------|--------|-----------|---------|
+
+#### Каждый метод принимает два аргумента:
+| Аргумент  | Тип    | Обязательный | Описание                      |
+|-----------|--------|--------------|-------------------------------|
+| $endpoint | string | Да           | URL запроса ( без хоста)      |
+| $params   | array  | Нет          | Данные запроса в виде массива |
+_P.S. host задаётся в конструкторе_
+
+#### Простой пример использования
 ```php
+//GET запрос
 $knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
 
+//POST запрос
 $knockKnockOctopus->post( '/new', [ 
     'name' => 'Новая новость',
     'content' => 'Текст новости' 
 ]);
-
 ```
+ <p align="center"> - - - - - </p>
 
-## [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
+### [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
 
 Класс предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
 
+___
+
 # KnockKnock
+
+## Базовый класс: _KnockKnock_
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
@@ -31,65 +51,47 @@ PHP Фасад\Адаптер для отправки запросов чере�
 - Настройка параметров запросов
 - Обработчики событий
 
----
-
-> [!NOTE]
-> ![IN PROGRESS](http://www.bc-energy.it/wp-content/uploads/2013/08/work-in-progress.png)
-
----
 
 Получение объекта/экземпляра класса и его настройка
 ### Нативный
 ```php
-$knockKnock = new KnockKnock([
-    KnockRequest::HOST => 'some.domain',
+$knockKnock = new KnockKnock('host',[
     KnockRequest::CONTENT_TYPE => KnockRequest::CONTENT_TYPE_FORM,
 ]);
 ```
 
 ### Singleton
 ```php
-$knockKnock = KnockKnock::getInstance([
-    KnockRequest::HOST => 'domain.zone',
+$knockKnock = KnockKnock::getInstance('host',[
     KnockRequest::PROTOCOL => 'http',
     KnockRequest::HEADER => KnockRequest::CONTENT_TYPE_JSON,
 ])->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
 ```
-`getInstance( array $knockKnockConfig = [] ): self`
+Оба вызова вернут объект/экземпляр класса `KnockKnock` и принимают на вход два аргумента:
+- `string $host` - хост
+- `array $knockKnockConfig` - массив с настройками, ключами которого являются константы класса `KnockRequest` имеющие префикс `SETUP_`.  
+#### Полный список констант:
+- `SETUP_PROTOCOL`
+- `SETUP_HOST`
+- `SETUP_URL`
+- `SETUP_METHOD`
+- `SETUP_HEADERS`
+- `SETUP_CONTENT_TYPE`
+- `SETUP_DATA`
+- `SETUP_CURL_OPTIONS`
+- `SETUP_CURL_INFO`
 
 
-## Настройка параметров запросов
-Доступны несколько уникальных методов для настройки некоторых, свойств,
-которые в дальнейшем будут передаваться всем запросам отправляемыми объектом `$knockKnock`
+## Обработчики событий
 
-Все подобные методы возвращают `static` объект / экземпляр класса `KnockKnock`
-
-Отдельными вызовами.
-```php
-$knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER ); // задаёт/переустанавливает использование токена
-$knockKnock->useHeaders(['api-secret' => 'secretKey12']); // задаёт/переустанавливает заголовки
-$knockKnock->useContentType( KnockRequest::CONTENT_TYPE_MULTIPART ); // задаёт/переустанавливает тип контента
-```
-
-Цепочка вызовов:
-```php
-$knockKnock
-    ->useAuthorization('token', KnockKnock::TOKEN_BASIC )
-    ->useHeaders(['api-secret' => 'secretKey23'])
-    ->useContentType( KnockRequest::CONTENT_TYPE_MULTIPART );
-
-$bearer = $knockKnock->getAuthorization(); // string
-```
-
-
-# Обработчики событий
-Задать обработчики событий
+### Список событий
 - после создания объекта knockKnock
 - после создания объекта запроса
 - перед отправкой запроса
 - после создания объекта ответа
 - после получения ответа
 
+##### Пример установки обработчиков событий
 ```php
 $knockKnock->setupEventHandlers([
     KnockKnock::EVENT_AFTER_CONSTRUCT => fn( static $knockKnock ) => {
@@ -109,10 +111,16 @@ $knockKnock->setupEventHandlers([
     }
 ]);
 ```
-`setupEventHandlers( array $callbacks ): self`
+Первый аргумент - ключ события, второй - callback функция.
 
+Все callback функции принимают первым аргументом объект/экземпляр класса `KnockKnock`.  
+Вторым аргументом передаётся объект/экземпляр класса в зависимости от события:
+- `KnockRequest` - для событий `EVENT_CREATE_REQUEST`, `EVENT_BEFORE_SEND`
+- `KnockResponse` - для событий `EVENT_CREATE_RESPONSE`, `EVENT_AFTER_SEND`
 
-# KnockRequest, Запрос
+ <p align="center"> - - - - - </p>
+
+# Запрос: _KnockRequest_
 
 Нативное создание объекта / экземпляра класса с данными для конкретного запроса
 ```php
@@ -151,17 +159,17 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 
 Таблица set/get методов для взаимодействия с отдельными свойствами запроса
 
-| Параметр | Сеттер | Геттер | Информация |
-| --- | --- | --- | --- |
-| Протокол | setProtocol( string $protocol )       | getProtocol(): string | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a> |
-| Хост | setHost( string $host )               | getHost(): string | --- |
-| URL | setUrl( string $url )                 | getUrl(): string | --- |
-| Метод | setMethod( string $method )           | getMethod(): string |  |<a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>
-| Заголовки | setHeaders( array $headers )          | getHeaders(): array | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">загловки</a> |
-| Тип контента | setContentType( string $contentType ) | getContentType(): string | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a> |
-| Данные | setData( mixed $data )                | getData(): mixed | --- |
-| Опции cURL | setCurlOptions( array $curlOptions )  | getCurlOptions(): array | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a> |
-| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a> |
+| Параметр        | Сеттер                                | Геттер                   | Информация                                                                                                                                                                  |
+|-----------------|---------------------------------------|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Протокол        | setProtocol( string $protocol )       | getProtocol(): string    | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a>                                                                                                  |
+| Хост            | setHost( string $host )               | getHost(): string        | ---                                                                                                                                                                         |
+| URL             | setUrl( string $url )                 | getUrl(): string         | ---                                                                                                                                                                         |
+| Метод           | setMethod( string $method )           | getMethod(): string      | <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>                                                                              |
+| Заголовки       | setHeaders( array $headers )          | getHeaders(): array      | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">загловки</a> |
+| Тип контента    | setContentType( string $contentType ) | getContentType(): string | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a>                           |
+| Данные          | setData( mixed $data )                | getData(): mixed         | ---                                                                                                                                                                         |
+| Опции cURL      | setCurlOptions( array $curlOptions )  | getCurlOptions(): array  | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a>                                                                             |
+| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array     | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                       |
 
 ```php
 $knockRequest = $knockKnock->constructKnockRequest('info/me');
@@ -200,8 +208,9 @@ $knockKnock->setupRequest( $knockRequest, [
 ```
 `setupRequest( KnockRequest $knockRequest, array $options = [] ): self`
 
+ <p align="center"> - - - - - </p>
 
-## KnockResponse: Ответ
+## Ответ: _KnockResponse_ 
 
 Конструктор KnockResponse с вызовом callback функции, если она установлена
 ```php
@@ -278,6 +287,7 @@ $curlOptions =  $knockResponse->get( KnockResponse::CURL_OPTIONS ); // return ar
 $curlInfo =  $knockResponse->get( KnockResponse::CURL_INFO ); // return array
 
 ```
+___
 
 # Custom реализация
 
@@ -348,7 +358,7 @@ class KnockKnockYandex extends KnockKnock
 }
 
 ```
-Пример использования custom реализации
+### Пример использования custom реализации
 ```php
 
 $knockKnockYandex = KnockKnockYandex::getInstanse([
@@ -361,65 +371,5 @@ $knockResponse = $knockKnockYandex->setupRequest('profile', [
 ]); // Логирование `afterCreateRequest`
 
 $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend`
-
-```
-
-# Расширение функционала
-
-TODO:ПЕРЕПИМСЫВАЮ НА ПРИМЕР С ПОДСТАВНОВКОЙ token исходя из хоста
-
- Расширения работают через "магию", поэтому лучше описывать их в анотациях класса
-
-Реализация расширений
-```php
-/**
- * @method static setupCorrectAuth( KnockKnock $knockKnock )
- */
-class VkontakteKnockKnock extends KnockKnock
-{
-    /**
-     * @return void
-     */
-    public function init()
-    {
-        $this->addExtension( 'setupCorrectAuth', fn( KnockKnock $knockKnock ) => 
-        {
-            $this->setupCorrectHostHandler($knockKnock);
-        });
-    }
-
-    /**
-     * @param KnockKnock $knockKnock
-     * 
-     * @return void
-     */
-    private function setupCorrectAuth(KnockKnock $knockKnock)
-    {
-         switch ($knockKnock->host)
-            {
-                case 'vk.com':
-                    $knockKnock->useHeaders(['Host' => 'client.ru']);
-                    break;
-
-                case 'api.vk.com':
-                    $knockKnock->useAuthorization( 'myToken', KnockKnock::TOKEN_BEARER );
-                    break;
-            }
-    }
-}
-```
-
-Использование расширения
-```php
-$vkontakteKnockKnock = VkontakteKnockKnock::getInstance([
-    KnockRequest::HOST => 'api.vk.com',
-]);
-
-$vkontakteKnockKnock->setupCorrectHost();
-
-$knockResponse = $vkontakteKnockKnock->setRequest('profile', [
-    KnockRequest::METHOD => KnockMethod::PATCH,
-    KnockRequest::DATA => [ 'homepage' => 'www.andy87.ru' ],
-])->send();
 
 ```

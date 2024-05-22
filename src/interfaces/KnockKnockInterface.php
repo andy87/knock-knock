@@ -23,6 +23,11 @@ interface KnockKnockInterface
     public const EVENT_AFTER_SEND = 'afterSend';
 
 
+    /**
+     * @param string $host
+     * @param array $commonKnockRequestParams
+     */
+    public function __construct( string $host, array $commonKnockRequestParams = [] );
 
     /**
      * @param array $commonKnockRequestParams
@@ -31,23 +36,22 @@ interface KnockKnockInterface
      */
     public static function getInstance( array $commonKnockRequestParams ): self;
 
-
     /**
+     * @param string $method
      * @param string $endpoint
      * @param array $knockRequestConfig
      *
      * @return KnockRequest
      */
-    public function constructRequest( string $endpoint, array $knockRequestConfig = [] ): KnockRequest;
+    public function constructRequest( string $method, string $endpoint, array $knockRequestConfig = [] ): KnockRequest;
 
     /**
-     * @param array $KnockResponseParams
+     * @param array $responseParams
      * @param ?KnockRequest $knockRequest
      *
      * @return KnockResponse
      */
-    public function constructResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse;
-
+    public function constructResponse( array $responseParams, ?KnockRequest $knockRequest = null ): KnockResponse;
 
     /**
      * @param KnockRequest $knockRequest
@@ -58,33 +62,25 @@ interface KnockKnockInterface
     public function setupRequest( KnockRequest $knockRequest, array $options = [] ): self;
 
     /**
-     * @param array $callbacks
-     *
-     * @return array
-     */
-    public function setupEventHandlers( array $callbacks ): array;
-
-
-    /**
-     * @param array $fakeKnockResponseParams
+     * @param array $fakeResponse
      *
      * @return KnockResponse
      */
-    public function send( array $fakeKnockResponseParams = [] ): KnockResponse;
-
+    public function send( array $fakeResponse = [] ): KnockResponse;
 
     /**
      * @param string $event
-     * @param $data
+     * @param callable $callbacks
+     *
+     * @return ?bool
+     */
+    public function on( string $event, callable $callbacks ): ?bool;
+
+    /**
+     * @param string $event
+     * @param mixed $data
      *
      * @return mixed
      */
-    public function event( string $event, $data );
-
-    /**
-     * @param KnockRequest $knockRequest
-     *
-     * @return KnockResponse
-     */
-    public function getResponseOnSendCurlRequest( KnockRequest $knockRequest ): KnockResponse;
+    public function event( string $event, mixed $data ): mixed;
 }

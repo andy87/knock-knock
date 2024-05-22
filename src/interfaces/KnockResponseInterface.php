@@ -32,11 +32,11 @@ interface KnockResponseInterface
 
 
     /**
-     * @param mixed $data
+     * @param string $data
      *
      * @return self
      */
-    public function setData( $data ): self;
+    public function setData( string $data ): self;
 
     /**
      * @param int $httpCode

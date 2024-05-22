@@ -19,28 +19,42 @@ interface KnockRequestInterface
 
 
     /** @var string  */
-    public const URL = 'url';
-    /** @var string  */
-    public const HOST = 'host';
+    public const SETUP_HOST = 'host';
 
     /** @var string  */
-    public const PROTOCOL = 'protocol';
+    public const SETUP_PROTOCOL = 'protocol';
     /** @var string  */
-    public const ENDPOINT = 'endpoint';
+    public const SETUP_ENDPOINT = 'endpoint';
     /** @var string  */
-    public const METHOD = 'method';
+    public const SETUP_METHOD = 'method';
     /** @var string  */
-    public const CONTENT_TYPE = 'contentType';
+    public const SETUP_CONTENT_TYPE = 'contentType';
     /** @var string  */
-    public const DATA = 'data';
+    public const SETUP_DATA = 'data';
     /** @var string  */
-    public const POST_FIELD = 'postField';
+    public const SETUP_POST_FIELD = 'postField';
     /** @var string  */
-    public const HEADERS = 'headers';
+    public const SETUP_HEADERS = 'headers';
     /** @var string  */
-    public const CURL_OPTIONS = 'curlOptions';
+    public const SETUP_CURL_OPTIONS = 'curlOptions';
     /** @var string  */
-    public const CURL_INFO = 'curlInfo';
+    public const SETUP_CURL_INFO = 'curlInfo';
+
+    /**
+     * @var array
+     */
+    public const SETUPS = [
+        self::SETUP_HOST,
+        self::SETUP_PROTOCOL,
+        self::SETUP_ENDPOINT,
+        self::SETUP_METHOD,
+        self::SETUP_CONTENT_TYPE,
+        self::SETUP_DATA,
+        self::SETUP_POST_FIELD,
+        self::SETUP_HEADERS,
+        self::SETUP_CURL_OPTIONS,
+        self::SETUP_CURL_INFO,
+    ];
 
 
 
@@ -107,7 +121,7 @@ interface KnockRequestInterface
     /**
      * @return mixed
      */
-    public function getData();
+    public function getData(): mixed;
 
     /**
      * @param array $headers
@@ -138,11 +152,11 @@ interface KnockRequestInterface
 
     /**
      * @param string $key
-     * @param string $value
+     * @param mixed $value
      *
      * @return self
      */
-    public function addCurlOptions( string $key, string $value ): self;
+    public function addCurlOptions( string $key, mixed $value ): self;
 
     /**
      * @param ?string $key

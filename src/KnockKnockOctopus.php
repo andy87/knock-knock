@@ -1,4 +1,13 @@
-<?php
+<?php /**
+ * KnockResponse
+ *
+ * @author Andrey and_y87 Kidin
+ * @description Предоставляет доступ к "простым" методам отправки запросов через ext cURL
+ *
+ * @date 2024-05-22
+ *
+ * @version 0.87
+ */
 
 namespace andy87\knock_knock;
 
@@ -25,12 +34,16 @@ use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
 class KnockKnockOctopus extends KnockKnock
 {
     /**
+     * Отправка GET запроса
+     *
      * @param string $endpoint
      * @param array $params
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #get
      */
     public function get( string $endpoint, array $params = [] ): KnockResponse
     {
@@ -38,98 +51,126 @@ class KnockKnockOctopus extends KnockKnock
             $endpoint .= '?' . http_build_query( $params );
         }
 
-        return $this->commonMethod( $endpoint, $params, LibKnockMethod::GET );
+        return $this->commonMethod( LibKnockMethod::GET, $endpoint, $params );
     }
 
     /**
+     * Отправка POST запроса
+     *
      * @param $endpoint
-     * @param ?mixed $data
+     * @param array $data
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #post
      */
-    public function post( $endpoint, $data = null ): KnockResponse
+    public function post( $endpoint, array $data = [] ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, LibKnockMethod::POST );
+        return $this->commonMethod( LibKnockMethod::POST, $endpoint, $data );
     }
 
     /**
+     * Отправка PUT запроса
+     *
      * @param string $endpoint
-     * @param ?mixed $data
+     * @param array $data
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #put
      */
-    public function put( string $endpoint, $data = null ): KnockResponse
+    public function put( string $endpoint, array $data = [] ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, LibKnockMethod::PUT );
+        return $this->commonMethod( LibKnockMethod::PUT, $endpoint, $data );
     }
 
     /**
+     * Отправка DELETE запроса
+     *
      * @param string $endpoint
-     * @param ?mixed $data
+     * @param array $data
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #delete
      */
-    public function delete( string $endpoint, $data = null ): KnockResponse
+    public function delete( string $endpoint, array $data = [] ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, LibKnockMethod::DELETE );
+        return $this->commonMethod( LibKnockMethod::DELETE, $endpoint, $data );
     }
 
     /**
+     * Отправка PATCH запроса
+     *
      * @param string $endpoint
-     * @param ?mixed $data
+     * @param array $data
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #patch
      */
-    public function patch( string $endpoint, $data = null ): KnockResponse
+    public function patch( string $endpoint, array $data = [] ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, LibKnockMethod::PATCH );
+        return $this->commonMethod( LibKnockMethod::PATCH, $endpoint, $data );
     }
 
     /**
+     * Отправка OPTIONS запроса
+     *
      * @param string $endpoint
-     * @param ?mixed $data
+     * @param array $data
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #options
      */
-    public function options( string $endpoint, $data = null ): KnockResponse
+    public function options( string $endpoint, array $data = [] ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, LibKnockMethod::OPTIONS );
+        return $this->commonMethod( LibKnockMethod::OPTIONS, $endpoint, $data );
     }
 
     /**
+     * Отправка HEAD запроса
+     *
      * @param string $endpoint
-     * @param ?mixed $data
+     * @param array $data
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #head
      */
-    public function head( string $endpoint, $data = null ): KnockResponse
+    public function head( string $endpoint, array $data = [] ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, LibKnockMethod::HEAD );
+        return $this->commonMethod( LibKnockMethod::HEAD, $endpoint, $data );
     }
 
     /**
+     * Отправка TRACE запроса
+     *
      * @param string $endpoint
-     * @param ?mixed $data
+     * @param array $data
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #trace
      */
-    public function trace( string $endpoint, $data = null ): KnockResponse
+    public function trace( string $endpoint, array $data = [] ): KnockResponse
     {
-        return $this->commonMethod( $endpoint, $data, LibKnockMethod::TRACE );
+        return $this->commonMethod( LibKnockMethod::TRACE, $endpoint, $data );
     }
 
 
@@ -137,31 +178,59 @@ class KnockKnockOctopus extends KnockKnock
     // === Private ===
 
     /**
-     * @param string $endpoint
-     * @param mixed $data
-     * @param string $method
+     * Общая логика для всех методов
+     *
+     * @param string $method Метод запроса
+     * @param string $endpoint Эндпоинт запроса
+     * @param array $data Данные запроса
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * @tag #octopus #request #common
      */
-    private function commonMethod( string $endpoint, $data, string $method ): KnockResponse
+    private function commonMethod( string $method, string $endpoint, array $data = [] ): KnockResponse
     {
-        if ( $this->knockRequest === null )
-        {
-            $knockRequestParams = [];
+        $this->validateRealKnockRequest( $method, $endpoint, $data );
 
-            if ($method !== LibKnockMethod::GET && count($data) ) {
-                $knockRequestParams[KnockRequestInterface::DATA] = $data;
+        return $this->send();
+    }
+
+    /**
+     * Проверка наличия объекта с данными запроса и его создание при отсутствии
+     *
+     * @param string $method Метод запроса
+     * @param string $endpoint Эндпоинт запроса
+     * @param array $data Данные запроса
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * @tag #octopus #request #setup
+     */
+    private function validateRealKnockRequest(string $method, string $endpoint, array $data = []): void
+    {
+        if ( $this->getRealKnockRequest() === null )
+        {
+            $knockRequestParams = [
+                KnockRequestInterface::SETUP_CURL_OPTIONS => [
+                    CURLOPT_HEADER => false,
+                    CURLOPT_RETURNTRANSFER => true
+                ]
+            ];
+
+            if ( $method !== LibKnockMethod::GET && count($data) ) {
+                $knockRequestParams[KnockRequestInterface::SETUP_DATA] = $data;
             }
 
-            $knockRequestParams[KnockRequestInterface::METHOD] = $method;
+            $knockRequestParams[KnockRequestInterface::SETUP_METHOD] = $method;
 
-            $knockRequest = $this->constructRequest( $endpoint, $knockRequestParams );
+            $knockRequest = $this->constructRequest( $method, $endpoint, $knockRequestParams );
 
             $this->setupRequest( $knockRequest );
         }
 
-        return $this->send();
     }
 }
