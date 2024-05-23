@@ -36,7 +36,8 @@
 
 Либо запустите
 
-`php composer.phar require --prefer-dist yiisoft/yii2-httpclient`
+`composer require --prefer-dist andy87/KnockKnock`
+`php composer.phar require --prefer-dist andy87/KnockKnock`
 
 Либо добавьте в раздел `require` вашего `composer.json` файла строку
 
