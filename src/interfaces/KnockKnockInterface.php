@@ -38,11 +38,12 @@ interface KnockKnockInterface
     public function __construct( string $host, array $commonKnockRequestParams = [] );
 
     /**
+     * @param string $host
      * @param array $commonKnockRequestParams
      *
      * @return self
      */
-    public static function getInstance( array $commonKnockRequestParams ): self;
+    public static function getInstance( string $host, array $commonKnockRequestParams ): self;
 
     /**
      * @param string $method

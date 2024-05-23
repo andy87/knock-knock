@@ -82,19 +82,20 @@ class KnockKnock implements KnockKnockInterface
     /**
      * Получение экземпляра класса, используя паттерн Singleton
      *
+     * @param string $host
      * @param array $commonKnockRequestParams
      *
      * @return self
      *
      * @tag #knockKnock #get #instance
      */
-    public static function getInstance( array $commonKnockRequestParams ): self
+    public static function getInstance( string $host, array $commonKnockRequestParams ): self
     {
         if ( static::$_instance === null )
         {
             $classname = static::class;
 
-            static::$_instance = new $classname( $commonKnockRequestParams );
+            static::$_instance = new $classname( $host, $commonKnockRequestParams );
         }
 
         return static::$_instance;

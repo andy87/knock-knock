@@ -75,7 +75,7 @@ PHP Фасад\Адаптер для отправки запросов чере�
 
 ### Нативный
 ```php
-$knockKnock = new KnockKnock('host',[
+$knockKnock = new KnockKnock( $_ENV['API_HOST'],[
      KnockRequestInterface::SETUP_CURL_OPTIONS => [
         CURLOPT_HEADER => false,
         CURLOPT_RETURNTRANSFER => true
@@ -85,7 +85,7 @@ $knockKnock = new KnockKnock('host',[
 
 ### Singleton
 ```php
-$knockKnock = KnockKnock::getInstance('host',[
+$knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'],[
         KnockRequest::SETUP_PROTOCO => KnockRequest::PROTOCOL_HTTP,
         KnockRequest::SETUP_CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
     ])
@@ -152,7 +152,7 @@ _use [andy87\knock_knock\core\KnockRequest](src/core/KnockRequest.php);_
 $knockRequest = new KnockRequest( 'info/me', [
     KnockRequest::METHOD => LibKnockMethod::POST,
     KnockRequest::DATA => [ 'client_id' => 34 ],
-    KnockRequest::HEADERS => [ 'api-secret-key' => 'secretKey34' ],
+    KnockRequest::HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
     KnockRequest::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
     KnockRequest::CURL_INFO => [
         CURLINFO_CONTENT_TYPE,
@@ -168,7 +168,7 @@ $knockRequest = new KnockRequest( 'info/me', [
 $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
     KnockRequest::METHOD => LibKnockMethod::POST,
     KnockRequest::DATA => [ 'client_id' => 45 ],
-    KnockRequest::HEADERS => [ 'api-secret-key' => 'secretKey45' ],
+    KnockRequest::HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
     KnockRequest::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
     KnockRequest::CURL_INFO => [
         CURLINFO_CONTENT_TYPE,
@@ -224,9 +224,9 @@ $host = $knockRequest->getHost(); // String
 и дополнительным аргументом передать уникальные собственные параметры.
 ```php
 $knockKnock->setupRequest( $knockRequest, [
-    KnockRequest::HOST => 'domain.zone',
+    KnockRequest::HOST => $_ENV['API_HOST'],
     KnockKnock::HEADERS => [
-        'api-secret' => 'secretKey78'
+        'api-secret' => $_ENV['API_SECRET_KEY']
     ],
 ]);
 ```
@@ -465,11 +465,11 @@ class KnockKnockYandex extends KnockKnock
 ### Пример использования custom реализации
 ```php
 
-$knockKnockYandex = KnockKnockYandex::getInstanсe([
+$knockKnockYandex = KnockKnockYandex::getInstanсe( $_ENV['API_HOST'], [
     KnockKnockYandex::LOGGER => new YandexLogger(),
 ]);
 
-$knockResponse = $knockKnockYandex->setupRequest('profile', [ 
+$knockResponse = $knockKnockYandex->setupRequest( 'profile', [ 
     KnockRequest::METHOD => LibKnockMethod::PATCH,
     KnockRequest::DATA => [ 'city' => 'Moscow' ],
 ]); // Логирование `afterCreateRequest`
@@ -480,7 +480,7 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 
 ## Лицензия
 
-andy87/KnockKnock выпущен под лицензией CC BY-SA 4.0  
+https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0  
 Для получения дополнительной информации смотрите http://creativecommons.org/licenses/by-sa/4.0/  
 Для не коммерческое использование - FREE  
 Для коммерческого использования -  с указанием авторства  

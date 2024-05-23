@@ -36,7 +36,7 @@ $KnockKnock->setupAuthorization( KnockKnockSecurity::TOKEN_BEARER, 'token' );
 #### Пример использования
 ```php
 $KnockKnock = new KnockKnockSecurity('https://api.example.com')
-    ->setupHeaders( [ 'X-Api-Key' => 'key' ] );
+    ->setupHeaders( [ 'X-Api-Key' => $_ENV['X_API_KEY'] ] );
 ```
 
 ### setupContentType()
@@ -85,7 +85,7 @@ $KnockResponseWithContentTypeJSON_2 = $KnockKnock->get( '/product' );
 ```php
 $KnockKnock = new KnockKnockSecurity('https://api.example.com',[
     KnockRequest::SETUP_HEADERS => [
-        'X-Api-Key' => 'headers from construct'
+        'X-Api-Key' => $_ENV['X_API_KEY']
     ]
 ]);
 
@@ -114,17 +114,18 @@ $knockKnockSecurity = new KnockKnockSecurity('https://api.example.com');
 // Настройка параметров запроса по умолчанию
 $knockKnockSecurity
     ->setupAuthorization( 'token', KnockKnockSecurity::TOKEN_BEARER )
-    ->setupHeaders( [ 'X-Api-Key' => 'key' ] )
+    ->setupHeaders( [ 'X-Api-Key' => $_ENV['X_API_KEY'] ] )
     ->setupContentType( LibKnockContentType::JSON );
 ```
 
-Наследование от `KnockKnock` позволяет использовать все методы для настроек,
+Наследование от `KnockKnock` позволяет использовать все методы для настроек запроса.  
+Пример использования:
 ```php
 $knockKnockSecurity
     ->disableSSL()
     ->setupAuthorization( 'token', KnockKnockSecurity::TOKEN_BEARER )
-    ->setupHeaders( [ 'X-Api-Key' => 'key' ] )
-    ->setupContentType( 'application/json' );
+    ->setupHeaders( [ 'X-Api-Key' => $_ENV['X_API_KEY'] ] )
+    ->setupContentType( 'application/json' )
     ->on( KnockKnock::EVENT_AFTER_SEND, fn( KnockKnock $knockKnock, KnockResponse $knockResponse ) => 
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
