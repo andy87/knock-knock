@@ -36,7 +36,7 @@
 
 Либо запустите
 
-`composer require --prefer-dist andy87/KnockKnock`
+`composer require --prefer-dist andy87/KnockKnock`  
 `php composer.phar require --prefer-dist andy87/KnockKnock`
 
 Либо добавьте в раздел `require` вашего `composer.json` файла строку
