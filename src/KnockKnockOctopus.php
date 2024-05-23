@@ -1,12 +1,11 @@
 <?php /**
- * KnockResponse
- *
+ * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Предоставляет доступ к "простым" методам отправки запросов через ext cURL
- *
- * @date 2024-05-22
- *
- * @version 0.87
+ * @homepage: https://github.com/andy87/KnockKnock
+ * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
+ * @date 2024-05-23
+ * @version 0.99a
  */
 
 namespace andy87\knock_knock;

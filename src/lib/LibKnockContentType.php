@@ -1,4 +1,12 @@
-<?php
+<?php /**
+ * @name: KnockKnock
+ * @author Andrey and_y87 Kidin
+ * @description Библиотека содержащая константы типов контента
+ * @homepage: https://github.com/andy87/KnockKnock
+ * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
+ * @date 2024-05-23
+ * @version 0.99a
+ */
 
 namespace andy87\knock_knock\lib;
 
