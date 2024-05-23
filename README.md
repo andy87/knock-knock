@@ -254,7 +254,7 @@ $knockKnock->setupRequest( $knockRequest, [
 
  <p style="text-align:center"> - - - - - </p>
 
-## Ответ: _KnockResponse_ 
+# Ответ: _KnockResponse_ 
 
 Конструктор `KnockResponse` с вызовом callback функции, если она установлена
 ```php
