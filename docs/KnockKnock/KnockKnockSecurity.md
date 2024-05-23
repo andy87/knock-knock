@@ -1,4 +1,5 @@
 # KnockKnockSecurity
+_[andy87\knock_knock\KnockKnockSecurity](../../src/KnockKnockSecurity.php);_
 
 PHP Фасад для класса `KnockKnock` отправляющего запросы через ext cURL.
 

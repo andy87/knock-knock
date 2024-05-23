@@ -1,4 +1,5 @@
 # KnockKnockOctopus
+_use [andy87\knock_knock\KnockKnockOctopus](../../src/KnockKnockOctopus.php);_
 
 PHP Фасад для класса `KnockKnock` отправляющего запросы через ext cURL
 

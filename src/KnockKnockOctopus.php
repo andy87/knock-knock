@@ -1,7 +1,7 @@
 <?php /**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
- * @description Предоставляет доступ к "простым" методам отправки запросов через ext cURL
+ * @description Расширяет класс KnockKnock и предоставляет доступ к "простым" методам отправки запросов через ext cURL
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23

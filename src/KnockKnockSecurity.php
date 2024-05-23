@@ -1,7 +1,7 @@
 <?php /**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
- * @description Класс предоставляет доступ к "функциональным" методам для простой реализации авторизации и отправки запросов через ext cURL
+ * @description Расширяет класс KnockKnockOctopus и предоставляет доступ к функционалу для простой и быстрой реализации авторизации и настройки запросов.
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23

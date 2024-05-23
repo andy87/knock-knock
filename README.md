@@ -1,4 +1,4 @@
-# Вводная
+# Вводная.
 
 Репозиторий содержит 3 класса, применяющих паттерн Фасад,  
 для реализации оправки запроса через php расширение cURL.
@@ -8,14 +8,14 @@
 Я знаю про существование таких библиотек как: [Guzzle](https://github.com/guzzle/guzzle), [Client](https://github.com/yiisoft/yii2-httpclient) _(в моём любимом Yii2)_, но хотелось попробовать создать свою реализацию.
 Без "лишних" данных, вызовов и настроек - только то, что нужно. Разумеется, это не конкурент, а просто попытка создать что-то своё.
 
-## Требования:
+### Требования:
  - php 8.0
  - ext cURL
  - ext JSON
 
 # Установка.
 
-## Git
+### Git
 
 В файл вашего проекта `composer.json` добавьте:  
  в раздел `require`  строку `"andy87/knockknock": "dev-main"`  
@@ -30,7 +30,7 @@
 Возможно придётся так же добавить в корень данных `composer.json`  
 `"minimum-stability": "dev"`
 
-## Composer
+### Composer.
 
 Установка через [composer](https://getcomposer.org/download/)
 
@@ -43,56 +43,16 @@
 
 `"yiisoft/yii2-httpclient": "~2.0.0"`
 
-и выполните команду `php composer.phar update` либо `composer update`
-
-
-
-# Расширения на основе базового класса
-
-### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
-
-<p style="text-align:center"><a href="docs/KnockKnock/KnockKnockOctopus.md"><img src="assets/docs/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnock php curl facade"/></a></p>
-
-Класс с функционалом простой реализации отправки запросов и минимальными настройками
-
-#### Доступные методы.
-
-| get() | post() | put() | patch() | delete() | head() | options() | trace() |
-|-------|--------|-------|---------|----------|--------|-----------|---------|
-
-#### Каждый метод принимает два аргумента:
-| Аргумент  |   Тип   | Обязательный  | Описание                       |
-|:----------|:-------:|:-------------:|:-------------------------------|
-| $endpoint | string  |      Да       | URL запроса (без хоста)        |
-| $params   |  array  |      Нет      | Данные запроса в виде массива  |
-_P.S. host задаётся в конструкторе_
-
-#### Простой пример использования
-```php
-//GET запрос
-$knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
-
-//POST запрос
-$knockKnockOctopus->post( '/new', [ 
-    'name' => 'Новая новость',
-    'content' => 'Текст новости' 
-]);
-```
- <p style="text-align:center"> - - - - - </p>
-
-### [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
-
-<p style="text-align: center"><a href="docs/KnockKnock/KnockKnockSecurity.md"><img src="assets/docs/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnock php curl facade"/></a></p>
-
-Класс с функционалом для быстрой настройки авторизации.
+После выполните команду `php composer.phar update` либо `composer update`
 
 ___
 
-# KnockKnock
+# KnockKnock.
 
 <p style="text-align: center"><img src="assets/docs/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
 
-## Базовый класс: _KnockKnock_
+## Базовый класс: 
+_use [andy87\knock_knock\core\KnockKnock](src/core/KnockKnock.php);_  
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
@@ -184,7 +144,8 @@ $knockKnock->setupEventHandlers([
 
  <p style="text-align:center"> - - - - - </p>
 
-# Запрос: _KnockRequest_
+# Запрос.
+_use [andy87\knock_knock\core\KnockRequest](src/core/KnockRequest.php);_  
 
 Нативное создание объекта / экземпляра класса с данными для конкретного запроса
 ```php
@@ -273,9 +234,10 @@ $knockKnock->setupRequest( $knockRequest, [
 
  <p style="text-align:center"> - - - - - </p>
 
-# Ответ: _KnockResponse_ 
+# Ответ.
+_use [andy87\knock_knock\core\KnockResponse](src/core/KnockResponse.php);_  
 
-Конструктор `KnockResponse` с вызовом callback функции, если она установлена
+Конструктор `KnockResponse` с вызовом callback функции, если она установлена  
 ```php
 $knockResponse = $knockKnock->constructKnockResponse([
     KnockResponse::CONTENT => [
@@ -388,7 +350,46 @@ $knockRequest->enableSSL();
 
 ```
 
+___
 
+# Расширения на основе базового класса
+
+### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
+
+<p style="text-align:center"><a href="docs/KnockKnock/KnockKnockOctopus.md"><img src="assets/docs/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnock php curl facade"/></a></p>
+
+Класс с функционалом простой реализации отправки запросов и минимальными настройками
+
+#### Доступные методы.
+
+| get() | post() | put() | patch() | delete() | head() | options() | trace() |
+|-------|--------|-------|---------|----------|--------|-----------|---------|
+
+#### Каждый метод принимает два аргумента:
+| Аргумент  |   Тип   | Обязательный  | Описание                       |
+|:----------|:-------:|:-------------:|:-------------------------------|
+| $endpoint | string  |      Да       | URL запроса (без хоста)        |
+| $params   |  array  |      Нет      | Данные запроса в виде массива  |
+_P.S. host задаётся в конструкторе_
+
+#### Простой пример использования
+```php
+//GET запрос
+$knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
+
+//POST запрос
+$knockKnockOctopus->post( '/new', [ 
+    'name' => 'Новая новость',
+    'content' => 'Текст новости' 
+]);
+```
+ <p style="text-align:center"> - - - - - </p>
+
+### [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
+
+<p style="text-align: center"><a href="docs/KnockKnock/KnockKnockSecurity.md"><img src="assets/docs/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnock php curl facade"/></a></p>
+
+Класс с функционалом для быстрой настройки авторизации.
 
 ___
 
@@ -476,6 +477,13 @@ $knockResponse = $knockKnockYandex->setupRequest('profile', [
 $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend`
 
 ```
+
+## Лицензия
+
+andy87/KnockKnock выпущен под лицензией CC BY-SA 4.0  
+Для получения дополнительной информации смотрите http://creativecommons.org/licenses/by-sa/4.0/  
+Для не коммерческое использование - FREE  
+Для коммерческого использования -  с указанием авторства  
 
 ---
 > ## 🚧 Альфа версия
