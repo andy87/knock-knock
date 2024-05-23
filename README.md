@@ -28,11 +28,11 @@
 
 > скоро
 
-# Расширения на основе базового класа
+# Расширения на основе базового класса
 
 ### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
 
-<p align="center"><a href="docs/KnockKnock/KnockKnockOctopus.md"><img src="assets/docs/KnockKnockOctopus_320.png" height="200" width="auto" alt="KnockKnock php curl facade"/></a></p>
+<p style="text-align:center"><a href="docs/KnockKnock/KnockKnockOctopus.md"><img src="assets/docs/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnock php curl facade"/></a></p>
 
 Класс с функционалом простой реализации отправки запросов и минимальными настройками
 
@@ -59,11 +59,11 @@ $knockKnockOctopus->post( '/new', [
     'content' => 'Текст новости' 
 ]);
 ```
- <p align="center"> - - - - - </p>
+ <p style="text-align:center"> - - - - - </p>
 
 ### [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
 
-<p align="center"><a href="docs/KnockKnock/KnockKnockSecurity.md"><img src="assets/docs/KnockKnockSecurity_280.png" height="128" width="auto" alt="KnockKnock php curl facade"/></a></p>
+<p style="text-align: center"><a href="docs/KnockKnock/KnockKnockSecurity.md"><img src="assets/docs/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnock php curl facade"/></a></p>
 
 Класс с функционалом для быстрой настройки авторизации.
 
@@ -71,7 +71,7 @@ ___
 
 # KnockKnock
 
-<p align="center"><img src="assets/docs/KnockKnockLogo_256.png" width="164" height="auto" alt="KnockKnock php curl facade"/></p>
+<p style="text-align: center"><img src="assets/docs/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
 
 ## Базовый класс: _KnockKnock_
 
@@ -88,7 +88,7 @@ PHP Фасад\Адаптер для отправки запросов чере�
 
 ### ВАЖНЫЙ МОМЕНТ!
 `CURL_OPTIONS` по умолчанию пустые! В большинстве случаев требуется задать необходимые настройки для получения валидных ответов.  
-см. пример ниже.
+См. пример ниже.
 
 В классах применяется инкапсуляция, поэтому для доступа к свойствам компонентов необходимо использовать сеттеры и геттеры.
 
@@ -163,7 +163,7 @@ $knockKnock->setupEventHandlers([
 - `KnockRequest` - для событий `EVENT_CREATE_REQUEST`, `EVENT_BEFORE_SEND`
 - `KnockResponse` - для событий `EVENT_CREATE_RESPONSE`, `EVENT_AFTER_SEND`
 
- <p align="center"> - - - - - </p>
+ <p style="text-align:center"> - - - - - </p>
 
 # Запрос: _KnockRequest_
 
@@ -183,7 +183,7 @@ $knockRequest = new KnockRequest( 'info/me', [
 ]);
 ```
 
-Доступно создание - через метод фасада (с вызовом callback функции )
+Доступно создание - через метод фасада (с вызовом callback функции)
 ```php
 $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
     KnockRequest::METHOD => LibKnockMethod::POST,
@@ -204,17 +204,17 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
 
 Таблица set/get методов для взаимодействия с отдельными свойствами запроса
 
-| Параметр        | Сеттер                                | Геттер                   | Информация                                                                                                                                                                  |
-|-----------------|---------------------------------------|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Протокол        | setProtocol( string $protocol )       | getProtocol(): string    | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a>                                                                                                  |
-| Хост            | setHost( string $host )               | getHost(): string        | ---                                                                                                                                                                         |
-| Endpoint        | setEndpoint( string $url )            | getEndpoint(): string    | ---                                                                                                                                                                         |
-| Метод           | setMethod( string $method )           | getMethod(): string      | <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>                                                                              |
-| Заголовки       | setHeaders( array $headers )          | getHeaders(): array      | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">загловки</a> |
-| Тип контента    | setContentType( string $contentType ) | getContentType(): string | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a>                           |
-| Данные          | setData( mixed $data )                | getData(): mixed         | ---                                                                                                                                                                         |
-| Опции cURL      | setCurlOptions( array $curlOptions )  | getCurlOptions(): array  | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a>                                                                             |
-| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array     | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                       |
+| Параметр        | Сеттер                                | Геттер                   | Информация                                                                                                                                                                    |
+|-----------------|---------------------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Протокол        | setProtocol( string $protocol )       | getProtocol(): string    | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a>                                                                                                    |
+| Хост            | setHost( string $host )               | getHost(): string        | ---                                                                                                                                                                           |
+| Endpoint        | setEndpoint( string $url )            | getEndpoint(): string    | ---                                                                                                                                                                           |
+| Метод           | setMethod( string $method )           | getMethod(): string      | <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>                                                                                |
+| Заголовки       | setHeaders( array $headers )          | getHeaders(): array      | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">заголовки</a>  |
+| Тип контента    | setContentType( string $contentType ) | getContentType(): string | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a>                             |
+| Данные          | setData( mixed $data )                | getData(): mixed         | ---                                                                                                                                                                           |
+| Опции cURL      | setCurlOptions( array $curlOptions )  | getCurlOptions(): array  | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a>                                                                               |
+| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array     | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                         |
 
 ```php
 $knockRequest = $knockKnock->constructKnockRequest('info/me');
@@ -233,8 +233,8 @@ $knockRequest->setCurlInfo([
 ]);
 $knockRequest->setContentType( LibKnockContentType::JSON );
 
-$protocol = $knockRequest->getPrococol(); // string
-$host = $knockRequest->getHost(); // string
+$protocol = $knockRequest->getPrococol(); // String
+$host = $knockRequest->getHost(); // String
 // ... аналогичным образом доступны и другие подобные методы для получения свойств запроса
 ```
 
@@ -252,7 +252,7 @@ $knockKnock->setupRequest( $knockRequest, [
 ```
 `setupRequest( KnockRequest $knockRequest, array $options = [] ): self`
 
- <p align="center"> - - - - - </p>
+ <p style="text-align:center"> - - - - - </p>
 
 ## Ответ: _KnockResponse_ 
 
@@ -354,6 +354,8 @@ $curlInfo =  $knockResponse->get( KnockResponse::CURL_INFO ); // return array
 ### SSL
 В объектах `KnockKnock` & `KnockRequest` имеется функционал включения/отключения SSL верификации.  
 
+В `curlOptions` добавляется ключ `CURLOPT_SSL_VERIFYPEER`.
+
 `KnockKnock` - для всех запросов
 ```php
 $knockKnock->disableSSL();
@@ -443,7 +445,7 @@ class KnockKnockYandex extends KnockKnock
 ### Пример использования custom реализации
 ```php
 
-$knockKnockYandex = KnockKnockYandex::getInstanse([
+$knockKnockYandex = KnockKnockYandex::getInstanсe([
     KnockKnockYandex::LOGGER => new YandexLogger(),
 ]);
 

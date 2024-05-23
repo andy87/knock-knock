@@ -2,7 +2,7 @@
 
 PHP Фасад для класса `KnockKnock` отправляющего запросы через ext cURL
 
-<p align="center"><img src="../../assets/docs/KnockKnockOctopus_320.png" height="220" alt="KnockKnock php curl facade"/></p>
+<p style="text-align: center"><img src="../../assets/docs/KnockKnockOctopus_320.png" style="height:220px; width: auto" alt="KnockKnock php curl facade"/></p>
 
 Расширяет класс [KnockKnock](../../README.md) и предоставляет доступ к "простым" методам отправки запросов через ext cURL
 
