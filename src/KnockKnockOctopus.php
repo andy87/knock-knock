@@ -33,6 +33,43 @@ use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
  */
 class KnockKnockOctopus extends KnockKnock
 {
+    // === Public ===
+
+    // --- Constructors ---
+
+    /**
+     * Конструктор Endpoint запроса с добавлением GET параметров в URL
+     *
+     * @param string $endpoint
+     * @param array $params
+     * @param bool $isFullUrl
+     *
+     * @return string
+     *
+     * @tag #octopus #construct #endpoint
+     *
+     * @throws Exception
+     */
+    public function constructEndpointUrl(string $endpoint, array $params = [], bool $isFullUrl = false ): string
+    {
+        if ( $isFullUrl )
+        {
+            $output = $this->_commonKnockRequest->getUrl( $endpoint, $this->getHost(), $params );
+
+        } else {
+
+            $getQuery = ( count( $params ) ) ? ('?' . http_build_query( $params )) : '';
+
+            $output = $endpoint . $getQuery;
+        }
+
+        return $output;
+    }
+
+
+
+    // --- Methods ---
+
     /**
      * Отправка GET запроса
      *
@@ -47,12 +84,11 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function get( string $endpoint, array $params = [] ): KnockResponse
     {
-        if ( count( $params ) ) {
-            $endpoint .= '?' . http_build_query( $params );
-        }
+        $endpoint = self::constructEndpointUrl( $endpoint, $params );
 
         return $this->commonMethod( LibKnockMethod::GET, $endpoint, $params );
     }
+
 
     /**
      * Отправка POST запроса
@@ -231,6 +267,5 @@ class KnockKnockOctopus extends KnockKnock
 
             $this->setupRequest( $knockRequest );
         }
-
     }
 }

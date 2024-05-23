@@ -12,6 +12,8 @@
 namespace andy87\knock_knock;
 
 use andy87\knock_knock\core\KnockKnock;
+use andy87\knock_knock\core\KnockRequest;
+use andy87\knock_knock\core\KnockResponse;
 use Exception;
 
 /**
@@ -35,6 +37,14 @@ class KnockKnockSecurity extends KnockKnockOctopus
     public const TOKEN_BASIC = 'Basic';
 
 
+
+    /** @var array Массив с кастомными данными для следующего запроса */
+    private array $use = [];
+
+
+
+    // === Setup ===
+
     /**
      * @param string $token
      * @param string $authType
@@ -43,13 +53,18 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @throws Exception
      *
-     * @tag #security #authorization
+     * @tag #security #setup #authorization
      */
-    public function useAuthorization( string $token, string $authType ): KnockKnock
+    public function setupAuthorization( string $authType, string $token ): KnockKnock
     {
-        $this->getCommonKnockRequest()->addHeaders( 'Authorization', "$authType $token" );
+        if ( in_array( $authType, [ self::TOKEN_BEARER, self::TOKEN_BASIC ] ) )
+        {
+            $this->getCommonKnockRequest()->addHeaders( 'Authorization', "$authType $token" );
 
-        return $this;
+            return $this;
+        }
+
+        throw new Exception( 'Invalid authorization type' );
     }
 
     /**
@@ -59,9 +74,9 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @throws Exception
      *
-     * @tag #security #headers
+     * @tag #security #setup #headers
      */
-    public function useHeaders( array $headers ): KnockKnock
+    public function setupHeaders( array $headers ): KnockKnock
     {
         $headers = array_merge( $this->getCommonKnockRequest()->getHeaders(), $headers );
 
@@ -77,12 +92,107 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @throws Exception
      *
-     * @tag #security #content-type
+     * @tag #security #setup #content-type
      */
-    public function useContentType( string $ContentType ): KnockKnock
+    public function setupContentType( string $ContentType ): KnockKnock
     {
         $this->getCommonKnockRequest()->setContentType( $ContentType );
 
         return $this;
+    }
+
+
+    // === Use ===
+
+    /**
+     * @param array $headers
+     *
+     * @return $this
+     *
+     * @tag #security #use #headers
+     */
+    public function useHeaders( array $headers ): KnockKnock
+    {
+        $this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ] = $headers;
+
+        return $this;
+    }
+
+    /**
+     * @param string $ContentType
+     *
+     * @return $this
+     *
+     * @tag #security #use #content-type
+     */
+    public function useContentType( string $ContentType ): KnockKnock
+    {
+        $this->use[ interfaces\KnockRequestInterface::SETUP_CONTENT_TYPE ] = $ContentType;
+
+        return $this;
+    }
+
+
+
+    // === ReWrite ===
+
+    /**
+     * Модификация метода send для отправки запроса с кастомными данными (array $use)
+     *
+     * @param array $fakeResponse
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     *
+     * @tag #security #use #send
+     */
+    public function send( array $fakeResponse = [] ): KnockResponse
+    {
+        $realKnockRequest = $this->getRealKnockRequest();
+
+        if ( count($this->use) ) {
+            $realKnockRequest = $this->modifyRequest( $realKnockRequest );
+        }
+
+        return $this->sendRequest( $realKnockRequest, $fakeResponse );
+    }
+
+    /**
+     * Применение кастомных данных(array $use) к запросу `$knockRequest`
+     *
+     * @param KnockRequest $knockRequest
+     *
+     * @return KnockRequest
+     *
+     * @throws Exception
+     *
+     * @tag #security #use #request #modify
+     */
+    private function modifyRequest( KnockRequest $knockRequest ): KnockRequest
+    {
+        if ( isset($this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ]) ) {
+            $knockRequest->setHeaders( $this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ] );
+        }
+
+        if ( isset($this->use[ interfaces\KnockRequestInterface::SETUP_CONTENT_TYPE ]) ) {
+            $knockRequest->setContentType( $this->use[ interfaces\KnockRequestInterface::SETUP_CONTENT_TYPE ] );
+        }
+
+        $this->clearUse();
+
+        return $knockRequest;
+    }
+
+    /**
+     * Очистка массива с кастомными данными
+     *
+     * @return void
+     *
+     * @tag #security #use #clear
+     */
+    private function clearUse(): void
+    {
+        $this->use = [];
     }
 }

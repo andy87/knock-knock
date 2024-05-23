@@ -137,17 +137,39 @@ class KnockRequest implements KnockRequestInterface
     /**
      * Получение URL
      *
+     * @param ?string $endpoint
+     * @param ?string $host
+     * @param array $params
+     *
      * @return ?string
+     *
+     * @throws Exception
      *
      * @tag #get #url
      */
-    public function getUrl(): ?string
+    public function getUrl( ?string $endpoint = null, ?string $host = null, array $params = [] ): ?string
     {
-        if ( ($this->_host ?? false ) && ($this->_endpoint ?? false) )
-        {
-            $address = str_replace( ['//','///'], '/', $this->_host . '/' . $this->_endpoint );
+        $host = $host ?? $this->getHost();
+        $endpoint = $endpoint ?? $this->getEndpoint();
 
-            return "$this->_protocol://$address";
+        if ( $host && $endpoint )
+        {
+            $protocol = $this->getProtocol();
+
+            $address = trim($host . '/' . $endpoint);
+            $address = str_replace( ['//','///'], '/', $address );
+
+            $getQuery = ( count($params) ) ? ( '?' . http_build_query($params) ) : '';
+
+            return $protocol . '://' . $address . $getQuery;
+
+        } elseif( !$host ) {
+
+            throw new Exception('Host is not set');
+
+        } elseif( !$endpoint ) {
+
+            throw new Exception('Endpoint is not set');
         }
 
         return null;
@@ -214,6 +236,7 @@ class KnockRequest implements KnockRequestInterface
     {
         return $this->_host ?? null;
     }
+
 
 
     // --- Methods ---

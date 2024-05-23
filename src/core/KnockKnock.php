@@ -25,6 +25,7 @@ use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, 
  *
  * - @see KnockKnock::setupEventHandlers();
  * - @see KnockKnock::off();
+ * - @see KnockKnock::disableSSL();
  */
 class KnockKnock implements KnockKnockInterface
 {
@@ -294,7 +295,29 @@ class KnockKnock implements KnockKnockInterface
 
 
 
-    // === Поведения === Event === Behavior === Callbacks ===
+    // === Обработчики событий === Event === Behavior === Callbacks ===
+
+    /**
+     * Вызов обработчика события
+     *
+     * @param string $event
+     * @param mixed $data
+     *
+     * @return mixed
+     *
+     * @tag #knockKnock #behavior #event #callback
+     */
+    public function event( string $event, mixed $data ): mixed
+    {
+        if ( isset( $this->_callbacks[$event] ) )
+        {
+            $callback = $this->_callbacks[$event];
+
+            return $callback( $this, $data );
+        }
+
+        return null;
+    }
 
     /**
      * Добавление обработчика события
@@ -366,28 +389,9 @@ class KnockKnock implements KnockKnockInterface
         return false;
     }
 
-    /**
-     * Вызов обработчика события
-     *
-     * @param string $event
-     * @param mixed $data
-     *
-     * @return mixed
-     *
-     * @tag #knockKnock #behavior #event #callback
-     */
-    public function event( string $event, mixed $data ): mixed
-    {
-        if ( isset( $this->_callbacks[$event] ) )
-        {
-            $callback = $this->_callbacks[$event];
 
-            return $callback( $this, $data );
-        }
 
-        return null;
-    }
-
+    // === Get ===
 
     /**
      * Получение объекта запроса с общими параметрами для всех запросов
@@ -414,6 +418,22 @@ class KnockKnock implements KnockKnockInterface
     }
 
     /**
+     * Получение хоста
+     *
+     * @return string
+     *
+     * @tag #knockKnock #get #host
+     */
+    public function getHost(): string
+    {
+        return $this->_host;
+    }
+
+
+
+    // === Other ===
+
+    /**
      * Отключение SSL сертификата
      *
      * @throws Exception
@@ -429,7 +449,7 @@ class KnockKnock implements KnockKnockInterface
 
 
 
-    // === Private ===
+    // === protected ===
 
     /**
      * Отправка запроса
@@ -443,7 +463,7 @@ class KnockKnock implements KnockKnockInterface
      *
      * @tag #knockKnock #send #request
      */
-    private function sendRequest( KnockRequest $knockRequest, array $fakeKnockResponseParams = [] ): KnockResponse
+    protected function sendRequest( KnockRequest $knockRequest, array $fakeKnockResponseParams = [] ): KnockResponse
     {
         $this
             ->updatePostFields( $knockRequest )
