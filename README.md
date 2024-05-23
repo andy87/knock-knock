@@ -389,7 +389,45 @@ $knockKnockOctopus->post( '/new', [
 
 <p style="text-align: center"><a href="docs/KnockKnock/KnockKnockSecurity.md"><img src="assets/docs/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnock php curl facade"/></a></p>
 
-Класс с функционалом для быстрой настройки авторизации.
+Расширяет класс [KnockKnockOctopus](KnockKnockOctopus.md) и предоставляет доступ к функционалу для простой и  
+быстрой реализации авторизации и настройки запросов.
+
+```php
+$knockKnockSecurity = new KnockKnockSecurity($_ENV['API_URL']);
+
+// Настройка параметров запроса по умолчанию
+$knockKnockSecurity
+    ->disableSSL()
+    ->setupAuthorization( 'token', KnockKnockSecurity::TOKEN_BEARER )
+    ->setupHeaders( [ 'X-Api-Key' => $_ENV['X_API_KEY'] ] )
+    ->setupContentType( 'application/json' )
+    ->on( KnockKnock::EVENT_AFTER_SEND, fn( KnockKnock $knockKnock, KnockResponse $knockResponse ) => 
+    {
+        $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
+
+        file_put_contents( $logFilePath, $knockResponse->content, FILE_APPEND );
+    });
+
+// Получение ответа на запрос методом `patch`
+$KnockResponsePatch = $knockKnockSecurity->patch( 'product', [
+    'price' => 1000
+]);
+
+$product = json_decode( $KnockResponsePatch->content, true );
+
+$price = $product->price;
+
+// Изменение типа контента на `application/json`, для следующего запроса
+$knockKnockSecurity->useContentType( LibKnockContentType::JSON );
+
+// Отправка POST запроса и получение ответа
+$KnockResponsePost = $knockKnockSecurity->post( 'category', [
+    'name' => 'Фреймворки'
+]);
+
+$category_id = $KnockResponse_Post->content['id'];
+
+```
 
 ___
 
@@ -482,8 +520,8 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 
 https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0  
 Для получения дополнительной информации смотрите http://creativecommons.org/licenses/by-sa/4.0/  
-Для не коммерческое использование - FREE  
-Для коммерческого использования -  с указанием авторства  
+Свободно для не коммерческого использования  
+С указанием авторства для коммерческого использования  
 
 ---
 > ## 🚧 Альфа версия

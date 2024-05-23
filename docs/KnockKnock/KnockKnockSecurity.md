@@ -109,7 +109,7 @@ ___
 можно использовать вместе вызывая их последовательно цепочкой вызовов.  
 
 ```php
-$knockKnockSecurity = new KnockKnockSecurity('https://api.example.com');
+$knockKnockSecurity = new KnockKnockSecurity($_ENV['API_URL']);
 
 // Настройка параметров запроса по умолчанию
 $knockKnockSecurity
