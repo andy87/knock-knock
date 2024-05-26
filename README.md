@@ -20,7 +20,7 @@
 ### Git
 
 В файл вашего проекта `composer.json` добавьте:  
- в раздел `require`  строку `"andy87/knockknock": "dev-main"`  
+ в раздел `require`  строку `"andy87/knockknock": "dev-master"`  
  в раздел `repositories`  
 ```
 {
