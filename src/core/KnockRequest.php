@@ -646,6 +646,22 @@ class KnockRequest implements KnockRequestInterface
         return $this;
     }
 
+    /**
+     * Получение копии объекта в статусе "подготовка"
+     *
+     * @return KnockRequest
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testClone()
+     *
+     * @tag #knockKnock #clone
+     */
+    public function clone(): KnockRequest
+    {
+        return new KnockRequest( $this->_endpoint, $this->getParams() );
+    }
+
 
 
     // === Private ===
@@ -672,66 +688,6 @@ class KnockRequest implements KnockRequestInterface
             $message = $message ?? "Вы не можете изменять параметры запроса в статусе: $label";
 
             throw new Exception( $message );
-        }
-    }
-
-    /**
-     * Проверка статуса запроса на соответствие переданному значению
-     *
-     * @param int $status_id
-     *
-     * @return bool
-     *
-     * Test: @see KnockRequestTest::testStatusIsComplete()
-     * Test: @see KnockRequestTest::testStatusIsPrepare()
-     */
-    private function statusIs( int $status_id ): bool
-    {
-        return $this->getStatusID() === $status_id;
-    }
-
-    /**
-     * Установка статуса запроса, на значение переданное в параметре
-     *
-     * @param int $status
-     *
-     * @return $this
-     *
-     * @throws Exception
-     *
-     * Test: @see KnockRequestTest::testSetupStatusComplete()
-     * Test: @see KnockRequestTest::testSetupStatusComplete()
-     */
-    private function setStatus( int $status ): self
-    {
-        $this->limiterIsComplete("Запрос уже был отправлен: вы не можете изменять статус запроса на `$status`");
-
-        $this->_statusID = $status;
-
-        return $this;
-    }
-
-    /**
-     * Подготовка хоста
-     *
-     * @return void
-     *
-     * @tag #host #prepare
-     *
-     * @throws Exception
-     *
-     * Test: @see KnockRequestTest::testPrepareHost()
-     */
-    private function prepareHost(): void
-    {
-        if ( isset($this->_host) )
-        {
-            $separator = '://';
-
-            if ( str_contains($this->_host, $separator) )
-            {
-                [$this->_protocol, $this->_host] = explode($separator, $this->_host);
-            }
         }
     }
 
@@ -804,6 +760,65 @@ class KnockRequest implements KnockRequestInterface
 
     }
 
+    /**
+     * Проверка статуса запроса на соответствие переданному значению
+     *
+     * @param int $status_id
+     *
+     * @return bool
+     *
+     * Test: @see KnockRequestTest::testStatusIsComplete()
+     * Test: @see KnockRequestTest::testStatusIsPrepare()
+     */
+    private function statusIs( int $status_id ): bool
+    {
+        return $this->getStatusID() === $status_id;
+    }
+
+    /**
+     * Установка статуса запроса, на значение переданное в параметре
+     *
+     * @param int $status
+     *
+     * @return $this
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testSetupStatusComplete()
+     * Test: @see KnockRequestTest::testSetupStatusComplete()
+     */
+    private function setStatus( int $status ): self
+    {
+        $this->limiterIsComplete("Запрос уже был отправлен: вы не можете изменять статус запроса на `$status`");
+
+        $this->_statusID = $status;
+
+        return $this;
+    }
+
+    /**
+     * Подготовка хоста
+     *
+     * @return void
+     *
+     * @tag #host #prepare
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testPrepareHost()
+     */
+    private function prepareHost(): void
+    {
+        if ( isset($this->_host) )
+        {
+            $separator = '://';
+
+            if ( str_contains($this->_host, $separator) )
+            {
+                [$this->_protocol, $this->_host] = explode($separator, $this->_host);
+            }
+        }
+    }
 
 
     // --- getters 4 magic ---

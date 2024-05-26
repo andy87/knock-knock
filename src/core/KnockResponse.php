@@ -26,9 +26,6 @@ use andy87\knock_knock\interfaces\{ KnockRequestInterface, KnockResponseInterfac
  *
  * @property-read KnockRequest $request
  *
- * @property-read array $curlOptions
- * @property-read array $curlInfo
- *
  * @property-read array $errors
  *
  * Покрытие тестами: 100%. @see KnockResponseTest
@@ -99,8 +96,8 @@ class KnockResponse implements KnockResponseInterface
 
             self::REQUEST => $this->getRequest(),
 
-            KnockRequestInterface::SETUP_CURL_OPTIONS => $this->getRequest()->curlOptions,
-            KnockRequestInterface::SETUP_CURL_INFO => $this->getRequest()->curlInfo,
+            KnockRequestInterface::SETUP_CURL_OPTIONS => $this->request->curlOptions,
+            KnockRequestInterface::SETUP_CURL_INFO => $this->request->curlInfo,
 
             self::ERRORS => $this->getErrors(),
 

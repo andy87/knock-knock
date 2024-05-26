@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace tests\core;
+namespace andy87\knock_knock\tests\core;
 
 use andy87\knock_knock\core\KnockKnock;
 use andy87\knock_knock\core\KnockRequest;

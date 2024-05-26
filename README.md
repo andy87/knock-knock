@@ -62,6 +62,13 @@ _use [andy87\knock_knock\core\KnockKnock](src/core/KnockKnock.php);_
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
+### ReadOnly свойства:
+- host - хост
+- commonKnockRequest - объект, содержащий данные запроса, назначаемые всем исходящим запросам
+- realKnockRequest - объект текущего запроса
+- logs - логи
+- eventHandlers - события
+
 Возможности/фичи:
  - Настройка параметров запросов
    - см. `Полный список констант`
@@ -79,7 +86,7 @@ PHP Фасад\Адаптер для отправки запросов чере�
 
 ## Получение объекта/экземпляра класса и его настройка
 
-### Нативный
+Передавая параметры напрямую в конструктор:
 ```php
 // настройки для отправки запросов
 $knockKnockParams = [
@@ -91,10 +98,9 @@ $knockKnockParams = [
     ]
 ];
 // Получаем компонент для отправки запросов
-$knockKnock = new KnockKnock( $_ENV['API_HOST'], $knockKnockParams);
+$knockKnock = new KnockKnock( $_ENV['API_HOST'], $knockKnockParams );
 ``` 
-
-### Singleton
+Применяя, паттерн Singleton:
 ```php
 $knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockParams );
 ```
@@ -112,16 +118,18 @@ $knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockParams );
 - `SETUP_CURL_OPTIONS`
 - `SETUP_CURL_INFO`
 
+После создания объекта `KnockKnock` вызывается метод `init()`, который инициализирует объект  
+и вызывается callback функция, прикреплённая к событию `EVENT_AFTER_CONSTRUCT`
 
 ## Обработчики событий
 
 ### Список событий
-- после создания объекта knockKnock
-- после создания объекта запроса
-- перед отправкой запроса
-- перед отправкой curl запроса
-- после создания объекта ответа
-- после получения ответа
+- `EVENT_AFTER_CONSTRUCT` после создания объекта knockKnock
+- `EVENT_CREATE_REQUEST` после создания объекта запроса
+- `EVENT_BEFORE_SEND` перед отправкой запроса
+- `EVENT_CURL_HANDLER` перед отправкой curl запроса
+- `EVENT_CREATE_RESPONSE` после создания объекта ответа
+- `EVENT_AFTER_SEND` после получения ответа
 
 ##### Пример установки обработчиков событий
 ```php
@@ -159,7 +167,25 @@ $knockKnock->setupEventHandlers([
 
 _use [andy87\knock_knock\core\KnockRequest](src/core/KnockRequest.php);_  
 
-Нативное создание объекта / экземпляра класса с данными для конкретного запроса
+Объект запроса, содержащий данные для отправки запроса.
+
+### ReadOnly свойства:
+- protocol - протокол
+- host - хост
+- endpoint - конечная точка
+- method - метод
+- headers - заголовки
+- contentType - тип контента
+- data - данные
+- curlOptions - опции cURL
+- curlInfo - информация cURL
+- params - параметры запроса
+- url - полный URL
+- params - все Read-only свойства в виде массива
+
+### Создание объекта запроса
+
+Передавая параметры напрямую в конструктор:
 ```php
 $knockRequest = new KnockRequest( 'info/me', [
     KnockRequest::METHOD => LibKnockMethod::POST,
@@ -174,8 +200,7 @@ $knockRequest = new KnockRequest( 'info/me', [
     KnockRequest::CONTENT_TYPE => LibKnockContentType::FORM_DATA,
 ]);
 ```
-
-Доступно создание - через метод фасада (с вызовом callback функции)
+Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_REQUEST`
 ```php
 $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
     KnockRequest::METHOD => LibKnockMethod::POST,
@@ -190,7 +215,18 @@ $knockRequest = $knockKnock->constructKnockRequest( 'info/me', [
     KnockRequest::CONTENT_TYPE => LibKnockContentType::FORM_DATA,
 ]);
 ```
-`constructKnockRequest( string $url, array $knockRequestConfig = [] ): KnockRequest`
+Клонируя существующий объект запроса:
+```php
+$knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
+
+$knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
+
+//Клонирование объекта запроса (без статуса отправки)
+$cloneKnockRequest = $knockRequest->clone();
+
+// Отправка клона запроса
+$knockResponse = $knockKnock->setupRequest( $cloneKnockRequest )->send();
+```
 
 ### Назначение/Изменение/Получение отдельных параметров запроса (set/get)
 
@@ -230,10 +266,7 @@ $host = $knockRequest->getHost(); // String
 // ... аналогичным образом доступны и другие подобные методы для получения свойств запроса
 ```
 
-### Микс параметров создаваемого запроса с данными переданными опционально
-
-Можно создать запрос, на основе уже созданного объекта
-и дополнительным аргументом передать уникальные собственные параметры.
+### Назначение запроса с переназначением свойств
 ```php
 $knockKnock->setupRequest( $knockRequest, [
     KnockRequest::HOST => $_ENV['API_HOST'],
@@ -250,62 +283,104 @@ $knockKnock->setupRequest( $knockRequest, [
 
 _use [andy87\knock_knock\core\KnockResponse](src/core/KnockResponse.php);_  
 
-Конструктор `KnockResponse` с вызовом callback функции, если она установлена  
+Объект ответа, содержащий данные ответа на запрос.
+
+### ReadOnly свойства
+- content - данные ответа
+- httpCode - код ответа
+- request - объект запроса, содержащий данные о запросе
+- curlOptions - быстрый доступ к request->curlOptions
+- curlInfo - быстрый доступ к request->curlInfo
+
+### Создание объекта ответа
+
+Передавая параметры напрямую в конструктор:
+```php
+$knockResponse = new KnockResponse([
+    KnockResponse::CONTENT => '{"id" => 806034, "name" => "and_y87"}',
+    KnockResponse::HTTP_CODE => 200
+]);
+```
+Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_RESPONSE`
 ```php
 $knockResponse = $knockKnock->constructKnockResponse([
     KnockResponse::CONTENT => [
         'id' => 806034,
         'name' => 'and_y87'
     ],
-    KnockResponse::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE ),
+    KnockResponse::HTTP_CODE => 400,
 ], $knockRequest );
 ```
-`constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse`  
-ReadOnly свойства ответа:
- - content
- - httpCode
- - request
- - curlOptions
- - curlInfo
+`constructKnockResponse( array $KnockResponseParams, ?KnockRequest $knockRequest = null ): KnockResponse`
 
-## KnockResponse: Отправка запроса и получение ответа
+## Отправка запроса
+`send( array $kafeResponse = [] ): KnockResponse`  
+Метод требует наличие объекта запроса установленного методом `setupRequest( KnockRequest $knockRequest )`.  
 
-Отправить запрос, получить ответ и вызвать все callback функции, если они установлены
+Вызов метода `send()`, возвращает объект/экземпляр класса `KnockResponse`.  
+Срабатывает callback функция, привязанная к ключу:
+ - `EVENT_AFTER_SEND`
+ - `EVENT_CREATE_RESPONSE`
+ - `EVENT_BEFORE_SEND`
+ - `EVENT_CURL_HANDLER`
+
 ```php
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+
+$knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
+
 $knockKnock->setupRequest( $knockRequest );
+
 $knockResponse = $knockKnock->send();
 ```
-`send( array $kafeResponse = [] ): KnockResponse`
-возвращает объект/экземпляр класса `KnockResponse`
 
-Пример получения ответа с отправкой запроса - цепочкой вызовов (субъективно - более красивый вариант)
+Если запрос уже был отправлен, повторно отправить его нельзя, выбрасывается `Exception`.  
+Для повторной отправки запроса, необходимо создать новый объект запроса:
 ```php
-$knockResponse = $knockKnock->setRequest( $knockRequest )->send(); // return KnockResponse
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
 
-$content = $knockResponse->content;
+$knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
+
+$knockKnock->setupRequest( $knockRequest );
+
+$knockResponse = $knockKnock->send();
+
+// повторная отправка запроса
+$knockResponse = $knockKnock->setupRequest( $knockRequest->clone() )->send();
 ```
+
+#### Цепочка вызовов
+Субъективно - более красивый вариант. Пример получения ответа - цепочкой вызовов.  
+```php
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+
+$knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
+
+//Цепочка вызовов
+$knockResponse = $knockKnock->setRequest( $knockRequest )->send();
+
+$content = json_decode($knockResponse->content, true);
+```
+_Разумеется можно миксовать codeStyle кому как больше нравиться_
 
 ## Отправка запроса с фэйковым ответом
 
-Цепочка вызовов, возвращает подготовленный ответ и вызывает callback функцию, если она установлена
+Получение подготовленного(фэйкового) ответа
 ```php
 // параметры возвращаемого ответа
 $fakeResponse = [
     KnockResponse::HTTP_CODE => 200,
-    KnockResponse::CONTENT => [
-        'id' => 806034,
-        'name' => 'and_y87'
-    ],
+    KnockResponse::CONTENT => '{"id" => 8060345, "nickName" => "and_y87"}'
 ];
 
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send( $fakeResponse );
 ```
-объект `$knockResponse` будет содержать данные переданные в аргументе `$fakeResponse`
+объект `$knockResponse` будет содержать в свойствах `content`, `httpCode` данные переданные в аргументе `$fakeResponse`
 
 
 ## Данные в ответе
 
-В созданный объект `KnockResponse` разрешено задавать данные.
+В созданный объект `KnockResponse`, чей запрос не был отправлен, разрешено задавать данные, используя методы группы `set`.  
 ```php
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 
@@ -325,31 +400,41 @@ $knockResponse
     ->replace( KnockResponse::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}' );
 ```
 
-## Получение из ответа данных о запросе
-Для получения данных о запросе, необходимо обратиться к свойству `request` объекта `KnockResponse`  
-и далее взаимодействовать с ним как с объектом `KnockRequest`  
+## Данные запроса из ответа
+Для получения в объекте `KnockResponse` данных запроса, необходимо обратиться к свойству `request`  
+и далее взаимодействовать с ним аналогично объекту `KnockRequest`  
 
 Получение компонента запроса:
 ```php
-$knockRequest = $knockResponse->request
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockResponse = $knockKnock->setRequest( $knockKnock->constructKnockRequest( 'info/me' ) )->send();
+
+$request = $knockResponse->request;
+
+$method = $request->method;
 ```
-`request` - readOnly свойство
 
-Получение отдельных свойств значений используя константы
+Получения свойств cURL запроса 
 ```php
-// Получение опций запроса (  KnockRequest::CURL_OPTIONS )
-$curlOptions =  $knockResponse->request->curlOption; // return array
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockResponse = $knockKnock->setRequest( $knockKnock->constructKnockRequest( 'info/me' ) )->send();
 
-// Получение данных о запросе ( KnockRequest::CURL_INFO )
-$curlInfo =  $knockResponse->request->curlInfo; // return array
+$knockResponse->request;
 
+// Получение свойств через объект запроса
+$curlOptions =  $knockResponse->request->curlOption;
+$curlInfo =  $knockResponse->request->curlInfo;
+
+//Вариант с использованием быстрого доступа
+$curlOptions =  $knockResponse->curlOption;
+$curlInfo =  $knockResponse->curlInfo;
 ```
 
 ### asArray()
 Преобразование ответа в массив
 ```php
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->asArray()->send();
-$array = $knockResponse->content;
+$array = $knockResponse->content; // Array
 ```
 
 ___
@@ -357,38 +442,36 @@ ___
 # Функциональная часть
 
 ### SSL
-В объектах `KnockKnock` & `KnockRequest` имеется функционал включения/отключения SSL верификации.  
+Функционал включения/отключения SSL верификации в объектах `KnockKnock` & `KnockRequest`.  
 
 В `curlOptions` добавляется ключ `CURLOPT_SSL_VERIFYPEER` и `CURLOPT_SSL_VERIFYHOST`.
+
+`disableSSL( bool $verifyPeer = false, int $verifyHost = 0 );`  
+`enableSSL( bool $verifyPeer = true, int $verifyHost = 2 );`  
 
 `KnockKnock` - для всех запросов
 ```php
 $knockKnock = new KnockKnock( $_ENV['API_HOST'] );
-$knockKnock->disableSSL(); // $knockKnock->enableSSL();
+$knockKnock->disableSSL();
 
 $knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
 
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 ```
-`$knockKnock->disableSSL( bool $verifyPeer = false, int $verifyHost = 0 );`  
-`$knockKnock->enableSSL( bool $verifyPeer = false, int $verifyHost = 0 );`
 
-`KnockRequest` - для конкретного запроса
+`KnockRequest` - для конкретного запроса  
 ```php
 $knockKnock = new KnockKnock( $_ENV['API_HOST'] )->disableSSL();
 
 $knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
-$knockRequest->enableSSL(); // $knockRequest->disableSSL();
+$knockRequest->enableSSL();
 
 $knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
 ```
-`$knockRequest->disableSSL( bool $verifyPeer = true, int $verifyHost = 2 );`  
-`$knockRequest->enableSSL( bool $verifyPeer = true, int $verifyHost = 2 );`
 
 ### Cookie
-В объекте `KnockKnock` имеется функционал использования cookie.
-
-`KnockKnock` - для всех запросов
+В объекте `KnockKnock` имеется функционал использования cookie.  
+`KnockKnock` - для всех запросов  
 ```php
 $knockKnock = new KnockKnock( $_ENV['API_HOST'] );
 
@@ -396,11 +479,9 @@ $cookie = $_ENV['COOKIE'];
 $jar = $_ENV['COOKIE_JAR'];
 
 $knockKnock->useCookie( $cookie, $jar );
-
-//...
 ```  
-`$knockKnock->useCookie( string $cookie, string $jar, ?string $file = null )` 
-по умолчанию `$file = null` и при null, `$file` приравнивается к `$jar`  
+`$knockKnock->useCookie( string $cookie, string $jar, ?string $file = null )`  
+по умолчанию `$file = null` и  `$file` приравнивается к `$jar`  
 
 <p align="center">- - - - -</p>
 
@@ -580,8 +661,8 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 ## Тесты
 
 ### Настройка тестов:
- - 89 tests  
- - 337 assertions  
+ - 90 tests  
+ - 348 assertions  
 
 ### Запуск тестов:
 Нативный 

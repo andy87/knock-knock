@@ -10,10 +10,10 @@
 
 declare(strict_types=1);
 
-namespace tests;
+namespace andy87\knock_knock\tests;
 
 use Exception;
-use tests\core\UnitTestCore;
+use andy87\knock_knock\tests\core\UnitTestCore;
 use andy87\knock_knock\interfaces\KnockRequestInterface;
 use andy87\knock_knock\core\{ KnockKnock, KnockRequest };
 use andy87\knock_knock\lib\{ LibKnockMethod, LibKnockContentType };
@@ -971,5 +971,44 @@ class KnockRequestTest extends UnitTestCore
         $knockRequest->addError( 'next Error' );
 
         $this->assertCount( 2, $knockRequest->errors );
+    }
+
+    /**
+     * Проверка клонирования объекта запроса.
+     *      Тест ожидает, что клонированный объект будет идентичен исходному, за исключением статуса запроса.
+     *
+     * Source: @see KnockRequest::clone()
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testClone
+     *
+     * @tag #test #knockRequest #clone
+     */
+    public function testClone(): void
+    {
+        $knockRequest = new KnockRequest(self::HOST, self::PARAMS);
+        $this->assertInstanceOf(KnockRequest::class, $knockRequest );
+
+        $knockRequestClone = $knockRequest->clone();
+
+        $this->assertEquals( $knockRequest->protocol, $knockRequestClone->protocol, "у клона не совпадает `protocol` " );
+        $this->assertEquals( $knockRequest->host, $knockRequestClone->host, "у клона не совпадает `host` " );
+        $this->assertEquals( $knockRequest->endpoint, $knockRequestClone->endpoint, "у клона не совпадает `endpoint` " );
+
+        $this->assertEquals( $knockRequest->method, $knockRequestClone->method, "у клона не совпадает `method` " );
+        $this->assertEquals( $knockRequest->headers, $knockRequestClone->headers,  "у клона не совпадает `headers` " );
+        $this->assertEquals( $knockRequest->contentType, $knockRequestClone->contentType, "у клона не совпадает `contentType` ");
+
+        $this->assertEquals( $knockRequest->data, $knockRequestClone->data, "у клона не совпадает `data` ");
+
+        $this->assertEquals( $knockRequest->curlOptions, $knockRequestClone->curlOptions, "у клона не совпадает `curlOptions` ");
+        $this->assertEquals( $knockRequest->curlInfo, $knockRequestClone->curlInfo, "у клона не совпадает `curlInfo` ");
+
+        $knockRequest->setupStatusComplete();
+
+        $this->assertEquals( KnockRequestInterface::STATUS_PREPARE, $knockRequestClone->status_id );
     }
 }

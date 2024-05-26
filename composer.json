@@ -33,7 +33,7 @@
     "psr-4": {
       "andy87\\knock_knock\\": "src/",
       "app\\": "src/",
-      "tests\\": "tests/"
+      "andy87\\knock_knock\\tests\\": "tests/"
     }
   }
 }

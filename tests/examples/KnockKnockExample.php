@@ -10,7 +10,7 @@
 
 declare(strict_types=1);
 
-namespace tests\examples;
+namespace andy87\knock_knock\tests\examples;
 
 use Exception;
 use andy87\knock_knock\core\KnockKnock;

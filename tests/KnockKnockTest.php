@@ -10,12 +10,12 @@
 
 declare(strict_types=1);
 
-namespace tests;
+namespace andy87\knock_knock\tests;
 
 use Exception;
 use ReflectionClass;
-use tests\examples\KnockKnockExample;
-use tests\core\{ PostmanEcho, UnitTestCore };
+use andy87\knock_knock\tests\examples\KnockKnockExample;
+use andy87\knock_knock\tests\core\{ UnitTestCore, PostmanEcho };
 use andy87\knock_knock\lib\{ LibKnockMethod, LibKnockContentType };
 use andy87\knock_knock\core\{ KnockKnock, KnockRequest, KnockResponse };
 use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, KnockResponseInterface };
