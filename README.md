@@ -580,6 +580,9 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 ## Тесты
 
 ### Настройка тестов:
+ - 89 tests, 
+ - 337 assertions
+
 `./vendor/bin/phpunit --migrate-configuration`
 
 ### Запуск тестов:

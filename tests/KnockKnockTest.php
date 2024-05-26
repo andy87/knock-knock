@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99b
+ * @version 0.99c
  */
 
 declare(strict_types=1);
