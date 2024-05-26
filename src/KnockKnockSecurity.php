@@ -5,8 +5,10 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99a
+ * @version 0.99b
  */
+
+declare(strict_types=1);
 
 namespace andy87\knock_knock;
 
@@ -21,12 +23,15 @@ use Exception;
  * @package andy87\knock_knock
  *
  * Fix not used:
- * - @see KnockKnockSecurity::TOKEN_BEARER;
- * - @see KnockKnockSecurity::TOKEN_BASIC;
+ * - @see KnockKnockSecurity::TOKEN_BEARER
+ * - @see KnockKnockSecurity::TOKEN_BASIC
  *
- * - @see KnockKnockSecurity::useAuthorization();
- * - @see KnockKnockSecurity::useHeaders();
- * - @see KnockKnockSecurity::useContentType();
+ * - @see KnockKnockSecurity::setupAuthorization()
+ * - @see KnockKnockSecurity::setupHeaders()
+ * - @see KnockKnockSecurity::setupContentType()
+ *
+ * - @see KnockKnockSecurity::useHeaders()
+ * - @see KnockKnockSecurity::useContentType()
  */
 class KnockKnockSecurity extends KnockKnockOctopus
 {
@@ -58,7 +63,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
     {
         if ( in_array( $authType, [ self::TOKEN_BEARER, self::TOKEN_BASIC ] ) )
         {
-            $this->getCommonKnockRequest()->addHeaders( 'Authorization', "$authType $token" );
+            $this->getCommonKnockRequest()->setHeader( 'Authorization', "$authType $token" );
 
             return $this;
         }
@@ -77,9 +82,9 @@ class KnockKnockSecurity extends KnockKnockOctopus
      */
     public function setupHeaders( array $headers ): KnockKnock
     {
-        $headers = array_merge( $this->getCommonKnockRequest()->getHeaders(), $headers );
+        $headers = array_merge( $this->getCommonKnockRequest()->headers, $headers );
 
-        $this->getCommonKnockRequest()->setHeaders( $headers );
+        $this->getCommonKnockRequest()->addHeaders( $headers );
 
         return $this;
     }
@@ -148,13 +153,11 @@ class KnockKnockSecurity extends KnockKnockOctopus
      */
     public function send( array $fakeResponse = [] ): KnockResponse
     {
-        $realKnockRequest = $this->getRealKnockRequest();
-
-        if ( count($this->use) ) {
-            $realKnockRequest = $this->modifyRequest( $realKnockRequest );
+        if ( count( $this->use ) ) {
+            $this->modifyRequestByUse( $this->getRealKnockRequest() );
         }
 
-        return $this->sendRequest( $realKnockRequest, $fakeResponse );
+        return $this->sendRequest( $this->getRealKnockRequest(), $fakeResponse );
     }
 
     /**
@@ -162,16 +165,16 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @param KnockRequest $knockRequest
      *
-     * @return KnockRequest
+     * @return void
      *
      * @throws Exception
      *
      * @tag #security #use #request #modify
      */
-    private function modifyRequest( KnockRequest $knockRequest ): KnockRequest
+    protected function modifyRequestByUse( KnockRequest $knockRequest ): void
     {
         if ( isset($this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ]) ) {
-            $knockRequest->setHeaders( $this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ] );
+            $knockRequest->addHeaders( $this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ] );
         }
 
         if ( isset($this->use[ interfaces\KnockRequestInterface::SETUP_CONTENT_TYPE ]) ) {
@@ -179,8 +182,6 @@ class KnockKnockSecurity extends KnockKnockOctopus
         }
 
         $this->clearUse();
-
-        return $knockRequest;
     }
 
     /**

@@ -5,8 +5,10 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99a
+ * @version 0.99b
  */
+
+declare(strict_types=1);
 
 namespace andy87\knock_knock\core;
 
@@ -18,13 +20,13 @@ use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, 
  * Class KnockKnock
  *
  * @package andy87\knock_knock
- *z
- * Fix not used:
- * - @see KnockKnock::getInstance();
  *
- * - @see KnockKnock::setupEventHandlers();
- * - @see KnockKnock::off();
- * - @see KnockKnock::disableSSL();
+ * @property-read string $host
+ * @property-read KnockRequest $commonKnockRequest
+ * @property-read KnockRequest $realKnockRequest
+ * @property-read callable[] $events
+ *
+ * Покрытие тестами: 100%. @see KnockKnockTest
  */
 class KnockKnock implements KnockKnockInterface
 {
@@ -44,6 +46,7 @@ class KnockKnock implements KnockKnockInterface
         self::EVENT_AFTER_INIT => null,
         self::EVENT_CONSTRUCT_REQUEST => null,
         self::EVENT_BEFORE_SEND => null,
+        self::EVENT_CURL_HANDLER => null,
         self::EVENT_CONSTRUCT_RESPONSE => null,
         self::EVENT_AFTER_SEND => null,
     ];
@@ -66,17 +69,147 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
-     * @tag #knockKnock #magic
+     * Test: @see KnockKnockTest::testConstructor()
+     *
+     * @tag #knockKnock #magic #construct
      */
     public function __construct( string $host, array $commonKnockRequestParams = [] )
     {
         $this->_host = $host;
 
-        $this->_commonKnockRequest = new KnockRequest( null, $commonKnockRequestParams );
+        $this->_commonKnockRequest = $this->prepareCommonKnockRequestParams( $commonKnockRequestParams );
 
         $this->init();
 
-        $this->event( self::EVENT_AFTER_INIT, $this );
+        $this->event( self::EVENT_AFTER_INIT, [ $this ] );
+    }
+
+    /**
+     * Подготовка общих параметров запроса
+     *
+     * @param array $commonKnockRequestParams
+     *
+     * @return KnockRequest
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testConstructor()
+     *
+     * @tag #knockKnock #prepare #common #request
+     */
+    private function prepareCommonKnockRequestParams( array $commonKnockRequestParams ): KnockRequest
+    {
+        $domainSeparator = '://';
+
+        if ( str_contains( $this->_host, $domainSeparator ) )
+        {
+            [ $protocol, $this->_host ] = explode( $domainSeparator, $this->_host );
+
+            $commonKnockRequestParams = array_merge(
+                [
+                    KnockRequestInterface::SETUP_PROTOCOL => $protocol
+                ],
+                $commonKnockRequestParams
+            );
+        }
+
+        if ( !self::validateHostName( $this->_host ) )
+        {
+            throw new Exception("Хост `$this->_host` не валиден");
+        }
+
+        $commonKnockRequestParams = array_merge(
+            [
+            KnockRequestInterface::SETUP_PROTOCOL => KnockRequest::PROTOCOL_HTTP,
+            KnockRequestInterface::SETUP_HOST => $this->_host,
+        ],
+            $commonKnockRequestParams
+        );
+
+        return new KnockRequest( null, $commonKnockRequestParams );
+    }
+
+    /**
+     * Проверка валидности хоста
+     *
+     * @param string $host
+     *
+     * @return bool
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testValidateHostName()
+     *
+     * @tag #knockKnock #validate #host
+     */
+    public static function validateHostName( string $host ): bool
+    {
+        if ( strlen($host) < 4 OR strlen($host) > 253  ) return false;
+
+        if ( str_contains($host, '--') OR str_contains($host, '..') ) return false;
+
+        $parts = ( str_contains( $host, '.' ) ) ? explode('.', $host) : [$host];
+        $parts = array_reverse($parts);
+
+        $regexName = '/^(?!-)[A-Za-z0-9-]{1,63}(?<!-)$/';
+        $regexZone = '/^(?!-)[A-Za-z0-9-]{2.63}(?<!-)$/';
+
+        foreach ( $parts as $index => $part )
+        {
+            if ( $index )
+            {
+                if ( !preg_match($regexName, $part)) return false;
+
+            } elseif ( strlen($part) < 2 ){ // проверка доменной зоны
+
+                if ( !preg_match($regexZone, $part)) return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Магический метод для получения свойств
+     *
+     * @param string $paramName
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @tag #knockKnock #magic #get
+     */
+    public function __get( string $paramName ): mixed
+    {
+        return match ($paramName) {
+            'host' => $this->getHost(),
+            'commonKnockRequest' => $this->getCommonKnockRequest(),
+            'realKnockRequest' => $this->getRealKnockRequest(),
+            'events' => $this->getEvents(),
+            default => throw new Exception("Property `$paramName` not found"),
+        };
+    }
+
+    /**
+     * Возвращает данные компонента
+     *
+     * @return array
+     *
+     * Test: @see KnockKnockTest::testGetParams()
+     *
+     * @tag #knockKnock #get #params
+     */
+    public function getParams(): array
+    {
+        return [
+            'host' => $this->getHost(),
+            'commonKnockRequest' => $this->getCommonKnockRequest(),
+            'realKnockRequest' => $this->getRealKnockRequest(),
+            'events' => $this->getEvents(),
+        ];
     }
 
     /**
@@ -87,9 +220,11 @@ class KnockKnock implements KnockKnockInterface
      *
      * @return self
      *
+     * Test: @see KnockKnockTest::testGetInstance()
+     *
      * @tag #knockKnock #get #instance
      */
-    public static function getInstance( string $host, array $commonKnockRequestParams ): self
+    public static function getInstance( string $host, array $commonKnockRequestParams = [] ): self
     {
         if ( static::$_instance === null )
         {
@@ -105,6 +240,8 @@ class KnockKnock implements KnockKnockInterface
      * Пользовательская инициализация
      *
      * @return void
+     *
+     * Test: @see KnockKnockTest::testEventInit()
      *
      * @tag #knockKnock #init
      */
@@ -124,6 +261,8 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testConstruct()
+     *
      * @tag #knockKnock #construct #request
      */
     public function constructRequest( string $method, string $endpoint, array $knockRequestConfig = [] ): KnockRequest
@@ -133,18 +272,20 @@ class KnockKnock implements KnockKnockInterface
             KnockRequestInterface::SETUP_METHOD => $method,
         ], $knockRequestConfig );
 
-        $commonKnockRequestParams = $this->getCommonKnockRequest()->getParams();
+        $commonKnockRequestParams = $this->getCommonKnockRequest()->params;
 
         $knockRequestParams = array_merge( $knockRequestConfig, $commonKnockRequestParams );
 
         $knockRequest = new KnockRequest( $endpoint, $knockRequestParams );
 
-        $this->event( self::EVENT_CONSTRUCT_REQUEST, $knockRequest );
+        $this->event( self::EVENT_CONSTRUCT_REQUEST, [ $this, $knockRequest ] );
 
         return $knockRequest;
     }
 
     /**
+     * Конструктор ответа
+     *
      * @param array $responseParams
      * @param ?KnockRequest $knockRequest
      *
@@ -152,25 +293,22 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testConstruct()
+     *
      * @tag #knockKnock #construct #response
      */
     public function constructResponse( array $responseParams, ?KnockRequest $knockRequest = null ): KnockResponse
     {
-        $knockRequest->setStatusProcessing();
+        $content = $responseParams[ KnockResponseInterface::CONTENT ] ?? null;
 
-        $content = $responseParams[KnockResponseInterface::CONTENT] ?? null;
-
-        $httpCode = $responseParams[KnockResponseInterface::HTTP_CODE] ?? KnockResponseInterface::OK;
+        $httpCode = $responseParams[ KnockResponseInterface::HTTP_CODE ] ?? KnockResponseInterface::OK;
 
         $knockResponse = new KnockResponse( $content, $httpCode, $knockRequest );
 
-        $knockRequest->setStatusComplete();
-
-        $this->event( self::EVENT_CONSTRUCT_RESPONSE, $knockResponse );
+        $this->event( self::EVENT_CONSTRUCT_RESPONSE, [ $this, $knockResponse ] );
 
         return $knockResponse;
     }
-
 
 
     // === Setup ===
@@ -180,6 +318,10 @@ class KnockKnock implements KnockKnockInterface
      * @param array $options
      *
      * @return $this
+     * 
+     * @throws Exception
+     * 
+     * Test: @see KnockKnockTest::testSetupRequest()
      *
      * @tag #knockKnock #setup #request
      */
@@ -203,14 +345,22 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testSetupEventHandlers()
+     *
      * @tag #knockKnock #setup #event #callback #behavior
      */
     public function setupEventHandlers( array $callbacks ): array
     {
-        foreach ( $callbacks as $event => $callback )
+        $events = [];
+
+        if ( count($callbacks) )
         {
-            $this->on( $event, $callback );
+            foreach ( $callbacks as $event => $callback ) {
+                $events[$event] = $callback;
+            }
         }
+
+        $this->_callbacks = $events;
 
         return $this->_callbacks;
     }
@@ -228,6 +378,8 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testSendRequest()
+     *
      * @tag #knockKnock #send #response
      */
     public function send( array $fakeResponse = [] ): KnockResponse
@@ -244,17 +396,15 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testSendRequest()
+     *
      * @tag #knockKnock #send #request #query #response
      */
     public function getResponseOnSendCurlRequest( KnockRequest $knockRequest ): KnockResponse
     {
-        $knockRequest->setStatusProcessing();
+        $ch = curl_init( $knockRequest->url );
 
-        $url = $knockRequest->getUrl();
-
-        $ch = curl_init($url);
-
-        $curlParams = $knockRequest->getCurlParams();
+        $curlParams = $knockRequest->curlParams;
 
         $options = $curlParams[KnockRequestInterface::SETUP_CURL_OPTIONS];
 
@@ -280,19 +430,18 @@ class KnockKnock implements KnockKnockInterface
             KnockResponseInterface::HTTP_CODE => curl_getinfo( $ch, CURLINFO_HTTP_CODE ),
         ];
 
-        $knockRequest->addErrors( curl_error($ch) );
-
         $knockResponse = $this->constructResponse( $knockResponseParams, $knockRequest );
+
+        $knockResponse->addError( curl_error($ch) );
+
+        $this->event( self::EVENT_CURL_HANDLER, [ $this, $ch ] );
 
         curl_close( $ch );
 
-        $knockRequest->setStatusComplete();
-
-        $this->event( self::EVENT_AFTER_SEND, $knockResponse );
+        $this->event( self::EVENT_AFTER_SEND, [ $this, $knockResponse ] );
 
         return $knockResponse;
     }
-
 
 
     // === Обработчики событий === Event === Behavior === Callbacks ===
@@ -301,19 +450,21 @@ class KnockKnock implements KnockKnockInterface
      * Вызов обработчика события
      *
      * @param string $event
-     * @param mixed $data
+     * @param array $args
      *
      * @return mixed
      *
+     * Test: @see KnockKnockTest::testEventCall()
+     *
      * @tag #knockKnock #behavior #event #callback
      */
-    public function event( string $event, mixed $data ): mixed
+    public function event( string $event, array $args = [] ): mixed
     {
         if ( isset( $this->_callbacks[$event] ) )
         {
             $callback = $this->_callbacks[$event];
 
-            return $callback( $this, $data );
+            return call_user_func_array( $callback, $args );
         }
 
         return null;
@@ -329,21 +480,18 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testEventsOn()
+     *
      * @tag #knockKnock #behavior #event #callback
      */
-    public function on( string $event, callable $callbacks ): ?bool
+    public function on(string $event, callable $callbacks ): ?bool
     {
-        if ( isset( $this->_callbacks[$event] ) )
+        if ( !isset($this->_callbacks[$event]) || $this->_callbacks[$event] === null )
         {
-            if ( $this->_callbacks[$event] === null )
-            {
-                return $this->change( $event, $callbacks );
-            }
-
-            throw new Exception('Event already exists. Use method change() for change event handler');
+            return $this->changeEvent( $event, $callbacks );
         }
 
-        return false;
+        throw new Exception('Event already exists. Use method change() for change event handler');
     }
 
     /**
@@ -354,18 +502,15 @@ class KnockKnock implements KnockKnockInterface
      *
      * @return bool
      *
+     * Test: @see KnockKnockTest::testEventChange()
+     *
      * @tag #knockKnock #behavior #event #callback
      */
-    public function change( string $event, callable $callback ): bool
+    public function changeEvent(string $event, callable $callback ): bool
     {
-        if ( isset( $this->_callbacks[$event] ) )
-        {
-            $this->_callbacks[$event] = $callback;
+        $this->_callbacks[$event] = $callback;
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
@@ -375,13 +520,15 @@ class KnockKnock implements KnockKnockInterface
      *
      * @return bool
      *
+     * Test: @see KnockKnockTest::testEventOff()
+     *
      * @tag #knockKnock #behavior #event #callback
      */
     public function off( string $event ): bool
     {
-        if ( isset( $this->_callbacks[$event] ) && $this->_callbacks[$event] )
+        if ( isset( $this->_callbacks[$event] ) )
         {
-            $this->_callbacks[$event] = null;
+            unset( $this->_callbacks[$event] );
 
             return true;
         }
@@ -398,9 +545,11 @@ class KnockKnock implements KnockKnockInterface
      *
      * @return ?KnockRequest
      *
+     * Test: @see KnockKnockTest::testGetter()
+     *
      * @tag #knockKnock #request #common
      */
-    public function getCommonKnockRequest(): ?KnockRequest
+    protected function getCommonKnockRequest(): ?KnockRequest
     {
         return $this->_commonKnockRequest ?? null;
     }
@@ -410,9 +559,11 @@ class KnockKnock implements KnockKnockInterface
      *
      * @return ?KnockRequest
      *
+     * Test: @see KnockKnockTest::testGetter()
+     *
      * @tag #knockKnock #request #real
      */
-    public function getRealKnockRequest(): ?KnockRequest
+    protected function getRealKnockRequest(): ?KnockRequest
     {
         return $this->_realKnockRequest ?? null;
     }
@@ -422,30 +573,112 @@ class KnockKnock implements KnockKnockInterface
      *
      * @return string
      *
+     * Test: @see KnockKnockTest::testGetter()
+     *
      * @tag #knockKnock #get #host
      */
-    public function getHost(): string
+    protected function getHost(): string
     {
         return $this->_host;
     }
 
+    /**
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @return callable[]
+     */
+    protected function getEvents(): array
+    {
+        return $this->_callbacks;
+    }
 
 
-    // === Other ===
+
+    // === SSL ===
 
     /**
      * Отключение SSL сертификата
      *
+     * @param bool $verifyPeer проверка подлинность сертификата сервера
+     * @param int  $verifyHost проверка соответствия имени хоста сервера и имени, указанного в сертификате сервера
+     *
      * @throws Exception
      *
-     * @tag #knockKnock #ssl #disable
+     * Test: @see KnockKnockTest::testDisableSsl()
+     *
+     * @tag #knockKnock #disable #ssl
      */
-    public function disableSSL(): self
+    public function disableSSL( bool $verifyPeer = false, int $verifyHost = 0 ): self
     {
-        $this->_commonKnockRequest->addCurlOptions( CURLOPT_SSL_VERIFYPEER, false );
+        $this->_commonKnockRequest->setCurlOption( CURLOPT_SSL_VERIFYPEER, $verifyPeer );
+        $this->_commonKnockRequest->setCurlOption( CURLOPT_SSL_VERIFYHOST, $verifyHost );
 
         return $this;
     }
+
+    /**
+     * Включение SSL сертификата
+     *
+     * @param bool $verifyPeer проверка подлинность сертификата сервера
+     * @param int $verifyHost проверка соответствия имени хоста сервера и имени, указанного в сертификате сервера
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testEnableSsl()
+     *
+     * @tag #knockKnock #enable #ssl
+     */
+    public function enableSSL( bool $verifyPeer = true, int  $verifyHost = 2 ): self
+    {
+        $this->_commonKnockRequest->setCurlOption( CURLOPT_SSL_VERIFYPEER, $verifyPeer );
+        $this->_commonKnockRequest->setCurlOption( CURLOPT_SSL_VERIFYHOST, $verifyHost );
+
+        return $this;
+    }
+
+    /**
+     * Включение редиректа, добавляя `CURLOPT_FOLLOWLOCATION` = true
+     * если сервер возвращает код 301 или 302
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testEnableRedirect()
+     *
+     * @tag #knockKnock #enable #redirect
+     */
+    public function enableRedirect(): self
+    {
+        $this->_commonKnockRequest->setCurlOption( CURLOPT_FOLLOWLOCATION, true );
+
+        return $this;
+    }
+
+
+    /**
+     * Использование cookie, добавляя в запрос параметры:
+     *  - `CURLOPT_COOKIE`
+     *  - `CURLOPT_COOKIEJAR`
+     *  - `CURLOPT_COOKIEFILE`
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testUseCookie()
+     *
+     * @tag #knockKnock #use #cookie
+     */
+    public function useCookie( string $cookie, string $jar, ?string $file = null ): self
+    {
+        $file = $file ?? $jar;
+
+        $this->_commonKnockRequest->addCurlOptions([
+            CURLOPT_COOKIE      => $cookie,
+            CURLOPT_COOKIEJAR   => $jar,
+            CURLOPT_COOKIEFILE  => $file,
+        ]);
+
+        return $this;
+    }
+
 
 
 
@@ -455,24 +688,32 @@ class KnockKnock implements KnockKnockInterface
      * Отправка запроса
      *
      * @param KnockRequest $knockRequest
-     * @param array $fakeKnockResponseParams
+     * @param ?array $fakeKnockResponseParams
      *
      * @return KnockResponse
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testSendRequest()
+     *
      * @tag #knockKnock #send #request
      */
-    protected function sendRequest( KnockRequest $knockRequest, array $fakeKnockResponseParams = [] ): KnockResponse
+    protected function sendRequest( KnockRequest $knockRequest, ?array $fakeKnockResponseParams = null ): KnockResponse
     {
+        $knockRequest->setupStatusProcessing();
+
         $this
             ->updatePostFields( $knockRequest )
             ->updateMethod( $knockRequest )
-            ->event( self::EVENT_BEFORE_SEND, $knockRequest );
+            ->event( self::EVENT_BEFORE_SEND, [ $this, $knockRequest ] );
 
-        return (count($fakeKnockResponseParams))
+        $knockResponse = ( $fakeKnockResponseParams )
             ? $this->constructResponse( $fakeKnockResponseParams, $knockRequest )
             : $this->getResponseOnSendCurlRequest( $knockRequest );
+
+        $knockRequest->setupStatusComplete();
+
+        return $knockResponse;
     }
 
 
@@ -487,28 +728,49 @@ class KnockKnock implements KnockKnockInterface
      *
      * @return KnockRequest
      *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testUpdateRequestParams()
+     *
      * @tag #knockKnock #update #request
      */
     private function updateRequestParams( KnockRequest $knockRequest, array $params ): KnockRequest
     {
-        $functionMapping = [
-            KnockRequestInterface::SETUP_PROTOCOL => 'setProtocol',
-            KnockRequestInterface::SETUP_HOST => 'setHost',
-            KnockRequestInterface::SETUP_METHOD => 'setMethod',
-            KnockRequestInterface::SETUP_HEADERS => 'setHeaders',
-            KnockRequestInterface::SETUP_DATA => 'setData',
-            KnockRequestInterface::SETUP_CURL_OPTIONS => 'setCurlOptions',
-            KnockRequestInterface::SETUP_CURL_INFO => 'setCurlInfo',
-            KnockRequestInterface::SETUP_CONTENT_TYPE => 'setContentType',
-        ];
-
-        foreach ( $params as $setupKey => $value )
+        foreach ($params as $key => $value )
         {
-            if ( $value && isset( $functionMapping[$setupKey] ) )
+            switch ($key)
             {
-                $func = $functionMapping[$setupKey];
+                case KnockRequestInterface::SETUP_PROTOCOL:
+                    $knockRequest->setProtocol( $value );
+                    break;
 
-                $knockRequest->$func( $value );
+                case KnockRequestInterface::SETUP_HOST:
+                    $knockRequest->setHost( $value );
+                    break;
+
+                case KnockRequestInterface::SETUP_METHOD:
+                    $knockRequest->setMethod( $value );
+                    break;
+
+                case KnockRequestInterface::SETUP_HEADERS:
+                    $knockRequest->addHeaders( $value );
+                    break;
+
+                case KnockRequestInterface::SETUP_DATA:
+                    $knockRequest->setData( $value );
+                    break;
+
+                case KnockRequestInterface::SETUP_CURL_OPTIONS:
+                    $knockRequest->setCurlOptions( $value );
+                    break;
+
+                case KnockRequestInterface::SETUP_CURL_INFO:
+                    $knockRequest->setCurlInfo( $value );
+                    break;
+
+                case KnockRequestInterface::SETUP_CONTENT_TYPE:
+                    $knockRequest->setContentType( $value );
+                    break;
             }
         }
 
@@ -524,33 +786,46 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testUpdatePostFields()
+     *
      * @tag #knockKnock #update #post
      */
     private function updatePostFields( KnockRequest $knockRequest ): self
     {
-        if ( $knockRequest->getMethod() !== LibKnockMethod::GET )
-        {
-            $data = $knockRequest->getData();
+        $data = $knockRequest->data;
 
-            if ( $data && count( $data ) )
+        if ( $data && count( $data ) )
+        {
+            if ( $knockRequest->method === LibKnockMethod::GET )
             {
-                switch( $knockRequest->getContentType() )
+                $knockRequest->prepareEndpoint();
+
+            } else {
+
+                switch( $knockRequest->contentType )
                 {
-                    case LibKnockContentType::JSON: $data = json_encode( $data ); break;
+                    case LibKnockContentType::JSON:
+                        $data = json_encode( $data );
+                        break;
 
                     case LibKnockContentType::FORM:
                     case LibKnockContentType::MULTIPART:
+                        $data = http_build_query($data);
+                        break;
+
                     case LibKnockContentType::XML:
                     case LibKnockContentType::TEXT:
                     default: break;
                 }
 
-                $knockRequest->addCurlOptions( CURLOPT_POSTFIELDS, $data );
+                $knockRequest->setCurlOption( CURLOPT_POSTFIELDS, $data );
             }
         }
 
         return $this;
     }
+
+
 
     /**
      * Установка метода запроса
@@ -561,15 +836,17 @@ class KnockKnock implements KnockKnockInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockTest::testUpdateMethod()
+     *
      * @tag #knockKnock #update #method
      */
-    private function updateMethod(KnockRequest $knockRequest ): self
+    private function updateMethod( KnockRequest $knockRequest ): self
     {
-        $method = $knockRequest->getMethod();
+        $method = $knockRequest->method;
 
         if ( $method !== LibKnockMethod::GET )
         {
-            $knockRequest->addCurlOptions( CURLOPT_CUSTOMREQUEST, $method );
+            $this->getRealKnockRequest()->setMethod( $method );
         }
 
         return $this;

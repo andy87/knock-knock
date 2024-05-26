@@ -5,40 +5,52 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99a
+ * @version 0.99b
  */
+
+declare(strict_types=1);
 
 namespace andy87\knock_knock\core;
 
 use Exception;
 use andy87\knock_knock\interfaces\{ KnockRequestInterface, KnockResponseInterface };
+use tests\KnockResponseTest;
 
 /**
  * Class KnockRequest
  *
  * @package andy87\knock_knock\query
  *
- * @property-read KnockRequest $request
  * @property-read int $httpCode
- * @property-read string $content
- * @property-read array $trace
+ * @property-read mixed $content
+ *
+ * @property-read KnockRequest $request
+ *
  * @property-read array $curlOptions
  * @property-read array $curlInfo
  *
- * Fix not used:
- * - @see KnockResponse::replace();
+ * @property-read array $errors
+ *
+ * Покрытие тестами: 100%. @see KnockResponseTest
  */
 class KnockResponse implements KnockResponseInterface
 {
-    /** @var string $_data */
-    private string $_data;
+    /** @var mixed $_data */
+    protected mixed $_data;
 
     /** @var int $_httpCode */
-    private int $_httpCode = 0;
+    protected int $_httpCode;
 
 
-    /** @var ?KnockRequest $knockRequest */
-    private ?KnockRequest $knockRequest = null;
+    /** @var ?KnockRequest $_knockRequest */
+    protected ?KnockRequest $_knockRequest = null;
+
+    /** @var array $_errors */
+    protected array $_errors = [];
+
+
+    /** @var bool $isArray */
+    protected bool $isArray = false;
 
 
 
@@ -47,34 +59,51 @@ class KnockResponse implements KnockResponseInterface
      *
      * @param string $data
      * @param int $httpCode
-     * @param ?KnockRequest $knockRequest
+     * @param KnockRequest $knockRequest
      *
+     * @return void
      * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testConstructor()
+     *
+     * @tag #constructor #response
      */
-    public function __construct( string $data, int $httpCode, ?KnockRequest $knockRequest = null  )
+    public function __construct( string $data, int $httpCode, KnockRequest $knockRequest )
     {
-        $this->setData( $data );
+        $this->setupData( $data );
 
-        $this->setHttpCode( $httpCode );
+        $this->setupHttpCode( $httpCode );
 
-        $this->setRequest( $knockRequest );
+        $this->setupRequest( $knockRequest );
     }
 
     /**
-     * @param $name
+     * Магия для получения read-only свойств
      *
-     * @return string|array|int|self
+     * @param string $name
+     *
+     * @return mixed
      *
      * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testMagicGet()
+     *
+     * @tag #magic #get
      */
-    public function __get($name): string|array|int|self
+    public function __get( string $name ): mixed
     {
-        return match ($name) {
-            self::REQUEST => $this->getRequest(),
+        return match ( $name ) {
+
             self::HTTP_CODE => $this->getHttpCode(),
             self::CONTENT => $this->getData(),
-            self::TRACE => $this->getTrace(),
-            KnockRequestInterface::SETUP_CURL_OPTIONS, KnockRequestInterface::SETUP_CURL_INFO => $this->get($name),
+
+            self::REQUEST => $this->getRequest(),
+
+            KnockRequestInterface::SETUP_CURL_OPTIONS => $this->getRequest()->curlOptions,
+            KnockRequestInterface::SETUP_CURL_INFO => $this->getRequest()->curlInfo,
+
+            self::ERRORS => $this->getErrors(),
+
             default => throw new Exception("Property `$name`not found on: " . __CLASS__),
         };
     }
@@ -84,69 +113,29 @@ class KnockResponse implements KnockResponseInterface
     // === PUBLIC ===
 
     /**
-     * @param int $httpCode
+     * Замена значений в свойствах
      *
-     * @return self
-     *
-     * @throws Exception
-     */
-    public function setHttpCode( int $httpCode ): self
-    {
-        if ( $this->_httpCode )
-        {
-            throw new Exception('Request is already set');
-        }
-
-        $this->_httpCode = $httpCode;
-
-        return $this;
-    }
-
-    /**
-     * @return int
-     */
-    private function getHttpCode(): int
-    {
-        return $this->_httpCode;
-    }
-
-    /**
-     * @param string $data
-     *
-     * @return $this
-     *
-     * @throws Exception
-     */
-    public function setData( string $data ): self
-    {
-        if ( isset($this->_data) )
-        {
-            throw new Exception('`_data` is already set');
-        }
-
-        $this->_data = $data;
-
-        return $this;
-    }
-
-    /**
      * @param string $key
      * @param mixed $value
      *
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testReplace()
+     *
+     * @tag #response #replace #content #httpCode
      */
     public function replace( string $key, mixed $value ): KnockResponse
     {
         switch ( $key )
         {
             case self::HTTP_CODE:
-                $this->setHttpCode( $value );
+                $this->_httpCode = $value;
                 break;
 
             case self::CONTENT:
-                $this->setData( $value );
+                $this->_data = $value;
                 break;
 
             default:
@@ -157,90 +146,263 @@ class KnockResponse implements KnockResponseInterface
     }
 
     /**
-     * @param string $key
-     * @return array
+     * Задаёт ответ в виде массива
      *
-     * @throws Exception
+     * @return $this
+     *
+     * Test: @see KnockResponseTest::testAsArray()
+     *
+     * @tag #response #array #set
      */
-    public function get( string $key ): array
+    public function asArray(): self
     {
-        $resp = null;
+        $this->isArray = true;
 
-        $access = [ KnockRequestInterface::SETUP_CURL_OPTIONS, KnockRequestInterface::SETUP_CURL_INFO ];
+        return $this;
+    }
 
-        if ( in_array( $key, $access ) )
-        {
-            $curlParams = $this->knockRequest->getCurlParams();
 
-            switch ( $key )
-            {
-                case KnockRequestInterface::SETUP_CURL_OPTIONS:
-                    $resp = $curlParams[KnockRequestInterface::SETUP_CURL_OPTIONS];
-                    break;
+    // --- Errors ---
 
-                case KnockRequestInterface::SETUP_CURL_INFO:
-                    $resp = $curlParams[KnockRequestInterface::SETUP_CURL_INFO];
-                    break;
-            }
-
-            if ( $resp ) return $resp;
+    /**
+     * Добавление ошибки в массив ошибок
+     *
+     * @param string $errorMessage
+     *
+     * @return $this
+     *
+     * Test: @see KnockResponseTest::testGetErrors()
+     *
+     * @tag #response #error #add
+     */
+    public function addError( string $errorMessage ): self
+    {
+        if ( $this->request->statusIsPrepare() ) {
+            $this->_errors[] = $errorMessage;
         }
 
-        throw new Exception('Bad key');
+        return $this;
+    }
+
+    /**
+     * Получение Trace лог истории вызовов методов
+     *
+     * @return array
+     *
+     * Test: @see KnockResponseTest::testGetErrors()
+     *
+     *  @tag #response #getter #error
+     */
+    private function getErrors(): array
+    {
+        return $this->_errors;
+    }
+
+    /**
+     * Валидация ошибок, если ошибок нет, то возвращает true
+     *
+     * @return bool
+     *
+     * Test: @see KnockResponseTest::testValidate()
+     *
+     * @tag #response #validate #error
+     */
+    public function validate(): bool
+    {
+        return empty($this->_errors);
     }
 
 
 
     // === PRIVATE ===
 
-    /**
-     * @return string
-     */
-    private function getData(): string
-    {
-        return $this->_data;
-    }
+
+    // --- Setters ---
 
     /**
-     * @param KnockRequest $knockRequest
+     * Общий метод для установки значений в свойства
+     *
+     * @param string $key
+     * @param mixed $value
      *
      * @return void
      *
      * @throws Exception
      */
-    private function setRequest( KnockRequest $knockRequest ): void
+    public function setter( string $key, mixed $value ): void
     {
-        if ( $this->knockRequest )
+        if ( isset($this->$key) )
         {
-            throw new Exception('Request is already set');
+            $error = "`$key` is already set";
+
+            $this->addError( $error );
+
+            throw new Exception( $error );
         }
 
-        $this->knockRequest = $knockRequest;
+        if ( $this->_knockRequest && $this->_knockRequest->statusIsComplete() ) {
+            throw new Exception("Запрос уже был отправлен: нельзя изменить данные ответа `$key`");
+        }
+
+        $this->$key = $value;
     }
 
     /**
+     * Установка HTTP кода ответа
+     *
+     * @param int $httpCode
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testSetupHttpCode()
+     *
+     * @tag #setter #httpCode
+     */
+    private function setupHttpCode( int $httpCode ): void
+    {
+        $this->setter( '_httpCode', $httpCode );
+    }
+
+    /**
+     * Установка данных ответа
+     *
+     * @param string $data
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockResponseTest::setupData()
+     *
+     * @tag #setter #data
+     */
+    private function setupData( string $data ): void
+    {
+        $this->setter( '_data', $data );
+    }
+
+
+    /**
+     * Установка объекта запроса
+     *
+     * @param KnockRequest $knockRequest
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testSetupRequest()
+     *
+     * @tag #setter #request
+     */
+    private function setupRequest( KnockRequest $knockRequest ): void
+    {
+        $this->setter( '_knockRequest', $knockRequest );
+    }
+
+
+    // --- Getters ---
+
+    /**
+     * Возвращает данные ответа
+     *
+     * @return mixed
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testSetupData()
+     *
+     * @tag #getter #data
+     */
+    private function getData(): mixed
+    {
+        if ( $this->isArray )
+        {
+            $content = $this->convertDataToArray($this->_data);
+
+            if ( $content === null )
+            {
+                $content = $this->_data;
+
+                $this->addError('Unknown data type: ' . gettype($content) );
+            }
+
+        } else {
+
+            $content = $this->_data;
+        }
+
+        return $content;
+    }
+
+    /**
+     * Преобразование данных в массив
+     *
+     * @param mixed $data
+     *
+     * @return ?array
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testSetupData()
+     *
+     * @tag #response #data #array
+     */
+    private function convertDataToArray( mixed $data ): ?array
+    {
+        $resp = null;
+
+        if ( is_array($data) || is_object($data) )
+        {
+            $resp = (array) $data;
+
+        } elseif ( is_string($data) ) {
+
+            $resp =  json_decode( $data, true );
+
+            if ( json_last_error() !== JSON_ERROR_NONE )
+            {
+                $resp = null;
+
+                $this->addError('JSON decode error: ' . json_last_error_msg());
+            }
+        }
+
+        return $resp;
+    }
+
+    /**
+     * Возвращает объект запроса
+     *
      * @return KnockRequest
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testSetupRequest()
+     *
+     * @tag #getter #request
      */
     private function getRequest(): KnockRequest
     {
-        return $this->knockRequest;
+        return $this->_knockRequest;
     }
 
+
     /**
-     * Получение Trace лог истории вызовов методов
+     * Возвращает HTTP код ответа
      *
-     * @return array
+     * @return int
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockResponseTest::testSetupHttpCode()
+     *
+     * @tag #getter #httpCode
      */
-    private function getErrors(): array
+    private function getHttpCode(): int
     {
-        return $this->request->getErrors();
-    }
-
-    /**
-     * Получение Trace лог истории вызовов методов
-     */
-    private function getTrace(): array
-    {
-        return debug_backtrace();
+        return $this->_httpCode;
     }
 }

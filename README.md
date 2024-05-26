@@ -13,7 +13,9 @@
  - ext cURL
  - ext JSON
 
-# Установка.
+<p align="center">- - - - -</p>
+
+<h1 align="center">Установка</h1>
 
 ### Git
 
@@ -45,11 +47,11 @@
 
 После выполните команду `php composer.phar update` либо `composer update`
 
-___
+<p align="center"> - - - - - </p>
 
-# KnockKnock.
+<h1 align="center">KnockKnock</h1>
 
-<p style="text-align: center"><img src="assets/docs/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
+<p align="center"><img src="assets/docs/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
 
 ## Базовый класс: 
 _use [andy87\knock_knock\core\KnockKnock](src/core/KnockKnock.php);_  
@@ -75,21 +77,22 @@ PHP Фасад\Адаптер для отправки запросов чере�
 
 ### Нативный
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'],[
-     KnockRequestInterface::SETUP_CURL_OPTIONS => [
+// настройки для отправки запросов
+$knockKnockParams = [
+    KnockRequest::SETUP_PROTOCO => $_ENV['API_PROTOCOL'],
+    KnockRequest::SETUP_CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
+    KnockRequestInterface::SETUP_CURL_OPTIONS => [
         CURLOPT_HEADER => false,
         CURLOPT_RETURNTRANSFER => true
     ]
-]);
-```
+];
+// Получаем компонент для отправки запросов
+$knockKnock = new KnockKnock( $_ENV['API_HOST'], $knockKnockParams);
+``` 
 
 ### Singleton
 ```php
-$knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'],[
-        KnockRequest::SETUP_PROTOCO => KnockRequest::PROTOCOL_HTTP,
-        KnockRequest::SETUP_CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
-    ])
-    ->disableSSL();
+$knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockParams );
 ```
 Оба вызова вернут объект/экземпляр класса `KnockKnock` и принимают на вход два аргумента:
 - `string $host` - хост
@@ -112,6 +115,7 @@ $knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'],[
 - после создания объекта knockKnock
 - после создания объекта запроса
 - перед отправкой запроса
+- перед отправкой curl запроса
 - после создания объекта ответа
 - после получения ответа
 
@@ -119,19 +123,22 @@ $knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'],[
 ```php
 $knockKnock->setupEventHandlers([
     KnockKnock::EVENT_AFTER_CONSTRUCT => fn( static $knockKnock ) => {
-        // создание объекта knockKnock
+        // создание объекта knockKnock, для взаимодействия с $knockKnock
     },
     KnockKnock::EVENT_CREATE_REQUEST => fn( static $knockKnock, KnockRequest $knockRequest ) => {
-        // создание объекта запроса
+        // создание объекта запроса, для взаимодействия с $knockRequest
     },
     KnockKnock::EVENT_BEFORE_SEND => fn(  static $knockKnock, KnockRequest $knockRequest ) => {
-        // отправка запроса
+        // отправка запроса, для взаимодействия с $knockRequest
+    },
+    KnockKnock::EVENT_CURL_HANDLER => fn( static $knockKnock, resource $ch ) => {
+        // перед отправкой curl запроса, для взаимодействия с $ch
     },
     KnockKnock::EVENT_CREATE_RESPONSE => fn( static $knockKnock, KnockResponse $knockResponse ) => {
-        // создание объекта ответа
+        // создание объекта ответа, для взаимодействия с $knockResponse
     },
     KnockKnock::EVENT_AFTER_SEND => fn( static $knockKnock, KnockResponse $knockResponse ) => {
-        // получение ответа
+        // получение ответа, для взаимодействия с $knockResponse
     }
 ]);
 ```
@@ -142,9 +149,10 @@ $knockKnock->setupEventHandlers([
 - `KnockRequest` - для событий `EVENT_CREATE_REQUEST`, `EVENT_BEFORE_SEND`
 - `KnockResponse` - для событий `EVENT_CREATE_RESPONSE`, `EVENT_AFTER_SEND`
 
- <p style="text-align:center"> - - - - - </p>
+<p align="center">- - - - -</p>
 
-# Запрос.
+<h1 align="center">Запрос</h1>
+
 _use [andy87\knock_knock\core\KnockRequest](src/core/KnockRequest.php);_  
 
 Нативное создание объекта / экземпляра класса с данными для конкретного запроса
@@ -232,9 +240,10 @@ $knockKnock->setupRequest( $knockRequest, [
 ```
 `setupRequest( KnockRequest $knockRequest, array $options = [] ): self`
 
- <p style="text-align:center"> - - - - - </p>
+<p align="center">- - - - -</p>
 
-# Ответ.
+<h1 align="center">Ответ</h1>
+
 _use [andy87\knock_knock\core\KnockResponse](src/core/KnockResponse.php);_  
 
 Конструктор `KnockResponse` с вызовом callback функции, если она установлена  
@@ -313,8 +322,10 @@ $knockResponse
 ```
 
 ## Получение из ответа данных о запросе
+Для получения данных о запросе, необходимо обратиться к свойству `request` объекта `KnockResponse`  
+и далее взаимодействовать с ним как с объектом `KnockRequest`  
 
-Получение компонента запроса
+Получение компонента запроса:
 ```php
 $knockRequest = $knockResponse->request
 ```
@@ -323,40 +334,84 @@ $knockRequest = $knockResponse->request
 Получение отдельных свойств значений используя константы
 ```php
 // Получение опций запроса (  KnockRequest::CURL_OPTIONS )
-$curlOptions =  $knockResponse->get( KnockResponse::CURL_OPTIONS ); // return array
+$curlOptions =  $knockResponse->request->curlOption; // return array
 
 // Получение данных о запросе ( KnockRequest::CURL_INFO )
-$curlInfo =  $knockResponse->get( KnockResponse::CURL_INFO ); // return array
+$curlInfo =  $knockResponse->request->curlInfo; // return array
 
 ```
 
-## Функциональная часть
-
-### SSL
-В объектах `KnockKnock` & `KnockRequest` имеется функционал включения/отключения SSL верификации.  
-
-В `curlOptions` добавляется ключ `CURLOPT_SSL_VERIFYPEER`.
-
-`KnockKnock` - для всех запросов
+### asArray()
+Преобразование ответа в массив
 ```php
-$knockKnock->disableSSL();
-$knockKnock->enableSSL();
-```
-
-`KnockRequest` - для конкретного запроса
-```php
-$knockRequest->disableSSL();
-$knockRequest->enableSSL();
-
+$knockResponse = $knockKnock->setupRequest( $knockRequest )->asArray()->send();
+$array = $knockResponse->content;
 ```
 
 ___
 
-# Расширения на основе базового класса
+# Функциональная часть
 
+### SSL
+В объектах `KnockKnock` & `KnockRequest` имеется функционал включения/отключения SSL верификации.  
+
+В `curlOptions` добавляется ключ `CURLOPT_SSL_VERIFYPEER` и `CURLOPT_SSL_VERIFYHOST`.
+
+`KnockKnock` - для всех запросов
+```php
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock->disableSSL(); // $knockKnock->enableSSL();
+
+$knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
+
+$knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
+```
+`$knockKnock->disableSSL( bool $verifyPeer = false, int $verifyHost = 0 );`  
+`$knockKnock->enableSSL( bool $verifyPeer = false, int $verifyHost = 0 );`
+
+`KnockRequest` - для конкретного запроса
+```php
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] )->disableSSL();
+
+$knockRequest = $knockKnock->constructKnockRequest( 'info/me' );
+$knockRequest->enableSSL(); // $knockRequest->disableSSL();
+
+$knockResponse = $knockKnock->setupRequest( $knockRequest )->send();
+```
+`$knockRequest->disableSSL( bool $verifyPeer = true, int $verifyHost = 2 );`  
+`$knockRequest->enableSSL( bool $verifyPeer = true, int $verifyHost = 2 );`
+
+### Cookie
+В объекте `KnockKnock` имеется функционал использования cookie.
+
+`KnockKnock` - для всех запросов
+```php
+$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+
+$cookie = $_ENV['COOKIE'];
+$jar = $_ENV['COOKIE_JAR'];
+
+$knockKnock->useCookie( $cookie, $jar );
+
+//...
+```  
+`$knockKnock->useCookie( string $cookie, string $jar, ?string $file = null )` 
+по умолчанию `$file = null` и при null, `$file` приравнивается к `$jar`  
+
+<p align="center">- - - - -</p>
+
+<h1 align="center">Расширения на основе базового класса</h1>
+
+<h3 align="center">
+    <a href="docs/KnockKnock/KnockKnockOctopus.md" target="_blank">
+        KnockKnockOctopus
+        <br>
+        <img src="assets/docs/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnockOctopus php curl facade"/>
+    </a>
+</h3>
 ### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
 
-<p style="text-align:center"><a href="docs/KnockKnock/KnockKnockOctopus.md"><img src="assets/docs/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnock php curl facade"/></a></p>
+
 
 Класс с функционалом простой реализации отправки запросов и минимальными настройками
 
@@ -383,11 +438,16 @@ $knockKnockOctopus->post( '/new', [
     'content' => 'Текст новости' 
 ]);
 ```
- <p style="text-align:center"> - - - - - </p>
 
-### [KnockKnockSecurity](docs/KnockKnock/KnockKnockSecurity.md)
+<p align="center"> - - - - - </p>
 
-<p style="text-align: center"><a href="docs/KnockKnock/KnockKnockSecurity.md"><img src="assets/docs/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnock php curl facade"/></a></p>
+<h3 align="center">
+    <a href="docs/KnockKnock/KnockKnockSecurity.md" target="_blank">
+        KnockKnockSecurity
+        <br>
+        <img src="assets/docs/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnockSecurity php curl facade"/>
+    </a>
+</h3>
 
 Расширяет класс [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md) и предоставляет доступ к функционалу для простой и  
 быстрой реализации авторизации и настройки запросов.
@@ -429,9 +489,9 @@ $category_id = $KnockResponse_Post->content['id'];
 
 ```
 
-___
+<p align="center"> - - - - - </p>
 
-# Custom реализация
+<h1 align="center">Custom реализация</h1>
 
 Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
@@ -516,12 +576,59 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 
 ```
 
+## Тесты
+
+### Настройка тестов:
+`./vendor/bin/phpunit --migrate-configuration`
+
+### Запуск тестов:
+Нативный 
+```bash
+./vendor/bin/phpunit
+```  
+Информационный 
+```bash
+./vendor/bin/phpunit --testdox
+```  
+С лолгированием 
+```bash
+./vendor/bin/phpunit --testdox --log-junit "tests/logs/phpunit.xml"
+```  
+Отдельного файла 
+```bash
+./vendor/bin/phpunit --testdox tests/KnockKnockTest.php
+```  
+
+
 ## Лицензия
 
 https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0  
 Для получения дополнительной информации смотрите http://creativecommons.org/licenses/by-sa/4.0/  
 Свободно для не коммерческого использования  
 С указанием авторства для коммерческого использования  
+
+## Изменения
+Для получения полной информации смотрите [CHANGELOG](docs/CHANGELOG.md)
+
+### Последние изменения
+24/05/2024
+- Большое изменение:
+  - Добавлены UnitTests
+  - `strict_types` добавлен во все файлы
+  - Убраны геттеры
+  - Добавлены ReadOnly свойства
+  - Добавлены новые методы
+    - `asArray()`
+    - `validate()`
+    - `useCookie()`
+    - `enableRedirect()`
+  - Изменены методы:
+    - многие методы переработаны
+    - `disableSSL()` - теперь может принимать аргументы
+    - `enableSSL()` - теперь может принимать аргументы
+    - переименованы некоторые методы
+  - Добавлены события:
+    - `EVENT_CURL_HANDLER`
 
 ---
 > ## 🚧 Альфа версия

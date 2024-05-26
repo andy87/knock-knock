@@ -5,8 +5,10 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99a
+ * @version 0.99b
  */
+
+declare(strict_types=1);
 
 namespace andy87\knock_knock;
 
@@ -32,40 +34,20 @@ use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
  */
 class KnockKnockOctopus extends KnockKnock
 {
-    // === Public ===
-
-    // --- Constructors ---
-
     /**
-     * Конструктор Endpoint запроса с добавлением GET параметров в URL
-     *
-     * @param string $endpoint
-     * @param array $params
-     * @param bool $isFullUrl
-     *
-     * @return string
-     *
-     * @tag #octopus #construct #endpoint
-     *
      * @throws Exception
      */
-    public function constructEndpointUrl(string $endpoint, array $params = [], bool $isFullUrl = false ): string
+    public function init(): void
     {
-        if ( $isFullUrl )
-        {
-            $output = $this->_commonKnockRequest->getUrl( $endpoint, $this->getHost(), $params );
-
-        } else {
-
-            $getQuery = ( count( $params ) ) ? ('?' . http_build_query( $params )) : '';
-
-            $output = $endpoint . $getQuery;
-        }
-
-        return $output;
+        $this->getCommonKnockRequest()->addCurlOptions([
+            CURLOPT_HEADER => false,
+            CURLOPT_RETURNTRANSFER => true
+        ]);
     }
 
 
+
+    // === Public ===
 
     // --- Methods ---
 
@@ -83,8 +65,6 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function get( string $endpoint, array $params = [] ): KnockResponse
     {
-        $endpoint = self::constructEndpointUrl( $endpoint, $params );
-
         return $this->commonMethod( LibKnockMethod::GET, $endpoint, $params );
     }
 
@@ -227,7 +207,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     private function commonMethod( string $method, string $endpoint, array $data = [] ): KnockResponse
     {
-        $this->validateRealKnockRequest( $method, $endpoint, $data );
+        $this->validateIssetRealKnockRequest( $method, $endpoint, $data );
 
         return $this->send();
     }
@@ -245,26 +225,18 @@ class KnockKnockOctopus extends KnockKnock
      *
      * @tag #octopus #request #setup
      */
-    private function validateRealKnockRequest(string $method, string $endpoint, array $data = []): void
+    private function validateIssetRealKnockRequest(string $method, string $endpoint, array $data = [] ): void
     {
-        if ( $this->getRealKnockRequest() === null )
-        {
-            $knockRequestParams = [
-                KnockRequestInterface::SETUP_CURL_OPTIONS => [
-                    CURLOPT_HEADER => false,
-                    CURLOPT_RETURNTRANSFER => true
-                ]
-            ];
+        $knockRequestParams = [];
 
-            if ( $method !== LibKnockMethod::GET && count($data) ) {
-                $knockRequestParams[KnockRequestInterface::SETUP_DATA] = $data;
-            }
-
-            $knockRequestParams[KnockRequestInterface::SETUP_METHOD] = $method;
-
-            $knockRequest = $this->constructRequest( $method, $endpoint, $knockRequestParams );
-
-            $this->setupRequest( $knockRequest );
+        if ( $method !== LibKnockMethod::GET && count($data) ) {
+            $knockRequestParams[KnockRequestInterface::SETUP_DATA] = $data;
         }
+
+        $knockRequestParams[KnockRequestInterface::SETUP_METHOD] = $method;
+
+        $knockRequest = $this->constructRequest( $method, $endpoint, $knockRequestParams );
+
+        $this->setupRequest( $knockRequest );
     }
 }

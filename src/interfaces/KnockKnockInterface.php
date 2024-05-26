@@ -5,8 +5,10 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99a
+ * @version 0.99b
  */
+
+declare(strict_types=1);
 
 namespace andy87\knock_knock\interfaces;
 
@@ -26,9 +28,12 @@ interface KnockKnockInterface
     /** @var string  */
     public const EVENT_BEFORE_SEND = 'beforeSend';
     /** @var string  */
+    public const EVENT_CURL_HANDLER = 'curlHandler';
+    /** @var string  */
     public const EVENT_CONSTRUCT_RESPONSE = 'constructResponse';
     /** @var string  */
     public const EVENT_AFTER_SEND = 'afterSend';
+
 
 
     /**
@@ -83,13 +88,13 @@ interface KnockKnockInterface
      *
      * @return ?bool
      */
-    public function on( string $event, callable $callbacks ): ?bool;
+    public function on(string $event, callable $callbacks ): ?bool;
 
     /**
      * @param string $event
-     * @param mixed $data
+     * @param array $args
      *
      * @return mixed
      */
-    public function event( string $event, mixed $data ): mixed;
+    public function event( string $event, array $args = [] ): mixed;
 }

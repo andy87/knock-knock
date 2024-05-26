@@ -5,8 +5,10 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99a
+ * @version 0.99b
  */
+
+declare(strict_types=1);
 
 namespace andy87\knock_knock\interfaces;
 
@@ -36,20 +38,5 @@ interface KnockResponseInterface
     public const REQUEST = 'request';
     /** @var string  */
     public const TRACE = 'trace';
-
-
-
-    /**
-     * @param string $data
-     *
-     * @return self
-     */
-    public function setData( string $data ): self;
-
-    /**
-     * @param int $httpCode
-     *
-     * @return self
-     */
-    public function setHttpCode( int $httpCode ): self;
+    public const ERRORS = 'errors';
 }

@@ -5,11 +5,14 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99a
+ * @version 0.99b
  */
+
+declare(strict_types=1);
 
 namespace andy87\knock_knock\core;
 
+use andy87\knock_knock\lib\LibKnockMethod;
 use Exception;
 use andy87\knock_knock\interfaces\KnockRequestInterface;
 
@@ -18,19 +21,44 @@ use andy87\knock_knock\interfaces\KnockRequestInterface;
  *
  * @package andy87\knock_knock\query
  *
- * Fix not used:
- * - @see KnockRequest::getStatusLabel()
+ * @property-read array $status_id
+ * @property-read array $statusLabel
+ *
+ * @property-read array $params
+ *
+ * @property-read string $protocol
+ * @property-read string $host
+ * @property-read string $endpoint
+ * @property-read string $url
+ * @property-read string $method
+ * @property-read array $headers
+ * @property-read string $contentType
+ * @property-read mixed $data
+ * @property-read mixed $postFields
+ * @property-read array $curlParams
+ * @property-read array $curlOptions
+ * @property-read array $curlInfo
+ *
+ * @property-read array $errors
+ *
+ * Покрытие тестами: 100%. @see KnockRequestTest
  */
 class KnockRequest implements KnockRequestInterface
 {
-    public const SET = 'set';
-    public const GET = 'get';
+    public const URL = 'url';
+    public const ERRORS = 'errors';
+    public const STATUS_ID = 'status_id';
+    public const STATUS_LABEL = 'statusLabel';
+    public const CURL_PARAMS = 'curlParams';
+    public const PARAMS = 'params';
+
+
 
     public const PROTOCOL_HTTP = 'http';
     public const PROTOCOL_HTTPS = 'https';
 
     /** @var array */
-    public const STATUS_LABELS = [
+    public const LABELS_STATUS = [
         self::STATUS_PREPARE => 'новый запрос',
         self::STATUS_PROCESSING => 'запрос отправляется',
         self::STATUS_COMPLETE => 'ответ получен'
@@ -38,12 +66,12 @@ class KnockRequest implements KnockRequestInterface
 
 
 
-    /** @var int $status Статус запроса */
-    public int $status = self::STATUS_PREPARE;
+    /** @var int $_statusID Статус запроса */
+    private int $_statusID = self::STATUS_PREPARE;
 
 
     /** @var string $_protocol Протокол */
-    private string $_protocol = self::PROTOCOL_HTTPS;
+    private string $_protocol;
 
     /** @var string $_host Хост */
     private string $_host;
@@ -62,17 +90,14 @@ class KnockRequest implements KnockRequestInterface
     private mixed $_data;
 
     /** @var array $_errors Ошибки */
-    private mixed $_errors;
+    private array $_errors = [];
 
 
     /** @var array $curl Параметры curl */
-    private array $curlParams = [
+    private array $_curlParams = [
         self::SETUP_CURL_INFO => [],
         self::SETUP_CURL_OPTIONS => []
     ];
-
-
-
 
 
 
@@ -84,6 +109,8 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testConstructor()
+     *
      * @tag #constructor
      */
     public function __construct( ?string $endpoint , array $params = [] )
@@ -92,99 +119,139 @@ class KnockRequest implements KnockRequestInterface
             $this->setEndpoint( $endpoint );
         }
 
-        $this->setupParamsFromArray( $params );
+        if ( count($params) ) {
+            $this->setupParamsFromArray( $params );
+        }
 
         $this->prepareHost();
     }
 
-
-
-    // === Setters & Getters ===
-
-
-    // --- Url ---
-
     /**
-     * Установка endpoint запроса
+     * Магия для получения read-only свойств
      *
-     * @param string $endpoint
+     * @param string $name
      *
-     * @return $this
+     * @return mixed
      *
      * @throws Exception
      *
-     * @tag #set #endpoint
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #magic #get
      */
-    public function setEndpoint( string $endpoint ): self
+    public function __get( string $name ): mixed
     {
-        return $this->setParamsOnStatusPrepare( self::SETUP_ENDPOINT, $endpoint );
-    }
+        return match ( $name ) {
 
-    /**
-     * Получение endpoint запроса
-     *
-     * @return ?string
-     *
-     * @tag #get #endpoint
-     */
-    public function getEndpoint(): ?string
-    {
-        return $this->_endpoint ?? null;
+            self::STATUS_ID => $this->getStatusID(),
+            self::STATUS_LABEL => $this->getStatusLabel(),
+
+            self::SETUP_PROTOCOL => $this->getProtocol(),
+            self::SETUP_HOST => $this->getHost(),
+            self::SETUP_ENDPOINT => $this->getEndpoint(),
+
+            self::URL => $this->getUrl(),
+
+            self::SETUP_METHOD => $this->getMethod(),
+            self::SETUP_CONTENT_TYPE => $this->getContentType(),
+            self::SETUP_HEADERS => $this->getHeaders(),
+            self::SETUP_DATA => $this->getData(),
+            self::CURL_PARAMS => $this->getCurlParams(),
+            self::SETUP_CURL_OPTIONS => $this->getCurlOptions(),
+            self::SETUP_CURL_INFO => $this->getCurlInfo(),
+
+            self::SETUP_POST_FIELD => $this->getPostFields(),
+
+            self::PARAMS => $this->getParams(),
+
+            self::ERRORS => $this->getErrors(),
+
+            default => throw new Exception("Property `$name`not found on: " . __CLASS__),
+        };
     }
 
 
     /**
      * Получение URL
      *
-     * @param ?string $endpoint
-     * @param ?string $host
-     * @param array $params
-     *
-     * @return ?string
+     * @return string
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testConstructUrlOnGet()
+     *
      * @tag #get #url
      */
-    public function getUrl( ?string $endpoint = null, ?string $host = null, array $params = [] ): ?string
+    public function constructUrl(): string
     {
-        $host = $host ?? $this->getHost();
-        $endpoint = $endpoint ?? $this->getEndpoint();
-
-        if ( $host && $endpoint )
+        if ( $this->_protocol && $this->_host && $this->_endpoint )
         {
-            $protocol = $this->getProtocol();
+            $this->prepareHost();
+            $this->prepareEndpoint();
 
-            $address = trim($host . '/' . $endpoint);
+            $address = trim($this->_host . '/' . $this->_endpoint);
             $address = str_replace( ['//','///'], '/', $address );
 
-            $getQuery = ( count($params) ) ? ( '?' . http_build_query($params) ) : '';
+            return $this->_protocol . '://' . $address;
 
-            return $protocol . '://' . $address . $getQuery;
-
-        } elseif( !$host ) {
+        } elseif( !$this->_host ) {
 
             throw new Exception('Host is not set');
 
-        } elseif( !$endpoint ) {
+        } elseif( !$this->_endpoint ) {
 
             throw new Exception('Endpoint is not set');
-        }
 
-        return null;
+        } else {
+
+            throw new Exception('Protocol is not set');
+        }
+    }
+
+    /**
+     * Подготовка endpoint
+     *
+     * @return void
+     *
+     * Test: @see KnockRequestTest::testPrepareEndpointOnGet()
+     *
+     * @tag #endpoint #prepare
+     */
+    public function prepareEndpoint(): void
+    {
+        if ( isset($this->_data) && count($this->_data) )
+        {
+            if ( $this->_method === LibKnockMethod::GET )
+            {
+                $endpoint = $this->_endpoint;
+
+                $query = http_build_query( $this->_data );
+
+                $endpoint = trim( $endpoint, '?' );
+                $endpoint = trim( $endpoint, '&' );
+
+                $symbol = ( str_contains($endpoint, '?') ) ? '&' : '?';
+
+                $this->_endpoint = $endpoint . $symbol . $query;
+                $this->_data = null;
+            }
+        }
     }
 
 
-    // --- Protocol ---
+
+    // === Setters ===
 
     /**
      * Установка протокола
      *
      * @param string $protocol
      *
-     * @return $this
+          * @return $this
      *
      * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testSetProtocol()
      *
      * @tag #set #protocol
      */
@@ -192,21 +259,6 @@ class KnockRequest implements KnockRequestInterface
     {
         return $this->setParamsOnStatusPrepare( self::SETUP_PROTOCOL, $protocol );
     }
-
-    /**
-     * Получение протокола
-     *
-     * @return ?string
-     *
-     * @tag #get #protocol
-     */
-    public function getProtocol(): ?string
-    {
-        return $this->_protocol ?? null;
-    }
-
-
-    // --- Host ---
 
     /**
      * Установка хоста
@@ -217,28 +269,32 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetHost()
+     *
      * @tag #set #host
      */
-    public function setHost( string $host ): self
+    public function setHost(string $host ): self
     {
         return $this->setParamsOnStatusPrepare( self::SETUP_HOST, $host );
     }
 
     /**
-     * Получение хоста
+     * Установка endpoint запроса
      *
-     * @return ?string
+     * @param string $endpoint
      *
-     * @tag #get #host
+     * @return $this
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testSetEndpoint()
+     *
+     * @tag #set #endpoint
      */
-    public function getHost(): ?string
+    public function setEndpoint( string $endpoint ): self
     {
-        return $this->_host ?? null;
+        return $this->setParamsOnStatusPrepare( self::SETUP_ENDPOINT, $endpoint );
     }
-
-
-
-    // --- Methods ---
 
     /**
      * Установка метода запроса
@@ -249,6 +305,8 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetMethod()
+     *
      * @tag #set #method
      */
     public function setMethod( string $method ): self
@@ -257,19 +315,51 @@ class KnockRequest implements KnockRequestInterface
     }
 
     /**
-     * Получение метода запроса
+     * Установка заголовков
      *
-     * @return ?string
+     * @param string $key
+     * @param string $value
      *
-     * @tag #get #method
+     * @return $this
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testSetHeader()
+     *
+     * @tag #set #headers
      */
-    public function getMethod(): ?string
+    public function setHeader( string $key, string $value ): self
     {
-        return $this->_method ?? null;
+        $this->limiterIsComplete();
+
+        $this->_headers[ $key ] = $value;
+
+        return $this;
+
     }
 
+    /**
+     * Установка заголовка
+     *
+     * @param array $headers
+     *
+     * @return $this
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testAddHeaders()
+     *
+     * @tag #add #headers
+     */
+    public function addHeaders( array $headers ): self
+    {
+        foreach ($headers as $key => $value )
+        {
+            $this->setHeader( $key, $value );
+        }
 
-    // --- ContentType ---
+        return $this;
+    }
 
     /**
      * Установка типа контента
@@ -280,85 +370,14 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetContentType()
+     *
      * @tag #set #contentType
      */
     public function setContentType( string $contentType ): self
     {
         return $this->setParamsOnStatusPrepare( self::SETUP_CONTENT_TYPE, $contentType );
     }
-
-    /**
-     * Получение типа контента
-     *
-     * @return ?string
-     *
-     * @tag #get #contentType
-     */
-    public function getContentType(): ?string
-    {
-        return $this->_contentType ?? null;
-    }
-
-
-    // --- Headers ---
-
-    /**
-     * Установка заголовков
-     *
-     * @param array $headers
-     *
-     * @return $this
-     *
-     * @throws Exception
-     *
-     * @tag #set #headers
-     */
-    public function setHeaders( array $headers ): self
-    {
-        foreach ($headers as $key => $value ) {
-            $this->addHeaders($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Установка заголовка
-     *
-     * @param string $key
-     * @param string $value
-     *
-     * @return $this
-     *
-     * @throws Exception
-     *
-     * @tag #add #headers
-     */
-    public function addHeaders( string $key, string $value ): self
-    {
-        if ( $this->status === self::STATUS_COMPLETE ){
-            throw new Exception('Request is completed');
-        }
-
-        $this->_headers[$key] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Получение заголовков
-     *
-     * @return array
-     *
-     * @tag #get #headers
-     */
-    public function getHeaders(): array
-    {
-        return $this->_headers;
-    }
-
-
-    // --- Data ---
 
     /**
      * Установка данных запроса
@@ -369,42 +388,14 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetData()
+     *
      * @tag #set #data
      */
     public function setData( mixed $data ): self
     {
         return $this->setParamsOnStatusPrepare( self::SETUP_DATA, $data );
     }
-
-    /**
-     * Получение данных запроса
-     *
-     * @return mixed
-     *
-     * @tag #get #data
-     */
-    public function getData(): mixed
-    {
-        return $this->_data ?? null;
-    }
-
-    /**
-     * Получение данных запроса преобразованных компонентом
-     *
-     * @return mixed
-     *
-     * @tag #get #data #postFields
-     */
-    public function getPostFields(): mixed
-    {
-        $curlOptions = $this->getCurlOptions();
-
-        return $curlOptions[CURLOPT_POSTFIELDS] ?? null;
-    }
-
-
-
-    // --- Curl ---
 
     /**
      * Установка параметров curl
@@ -415,15 +406,15 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetCurlOptions()
+     *
      * @tag #set #curlOptions
      */
     public function setCurlOptions( array $curlOptions ): self
     {
-        if ( $this->status === self::STATUS_COMPLETE ){
-            throw new Exception('Request is completed');
-        }
+        $this->limiterIsComplete();
 
-        $this->curlParams[self::SETUP_CURL_OPTIONS] = $curlOptions;
+        $this->_curlParams[self::SETUP_CURL_OPTIONS] = $curlOptions;
 
         return $this;
     }
@@ -431,7 +422,7 @@ class KnockRequest implements KnockRequestInterface
     /**
      * Добавление параметра curl
      *
-     * @param string $key
+     * @param int $key
      * @param mixed $value
      *
      * @return $this
@@ -440,36 +431,35 @@ class KnockRequest implements KnockRequestInterface
      *
      * @tag #add #curlOptions
      */
-    public function addCurlOptions( string $key, mixed $value ): self
+    public function setCurlOption( int $key, mixed $value ): self
     {
-        if ( $this->status === self::STATUS_PREPARE )
-        {
-            $this->curlParams[self::SETUP_CURL_OPTIONS][$key] = $value;
+        $this->limiterIsComplete();
 
-            return $this;
-        }
+        $this->_curlParams[self::SETUP_CURL_OPTIONS][$key] = $value;
 
-        throw new Exception('Request is completed');
+        return $this;
     }
 
     /**
-     * Получение параметров curl
+     * Добавление curl параметров
      *
-     * @param ?string $key
+     * @param array $curlOptions
      *
-     * @return ?array
+     * @return $this
      *
-     * @tag #get #curlOptions
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testAddCurlOptions()
+     *
+     * @tag #add #curlOptions
      */
-    public function getCurlOptions( string $key = null ): ?array
+    public function addCurlOptions( array $curlOptions ): self
     {
-        $output = $this->curlParams[self::SETUP_CURL_OPTIONS];
-
-        if ( $key ) {
-            $output = $curlOptions[$key] ?? null;
+        foreach ( $curlOptions as $key => $value ) {
+            $this->setCurlOption($key, $value);
         }
 
-        return $output;
+        return $this;
     }
 
     /**
@@ -481,43 +471,47 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetCurlInfo()
+     *
      * @tag #set #curlInfo
      */
     public function setCurlInfo( array $curlInfo ): self
     {
-        if ( $this->status === self::STATUS_COMPLETE ){
-            throw new Exception('Request is completed');
-        }
+        $this->limiterIsComplete();
 
-        $this->curlParams[self::SETUP_CURL_INFO] = $curlInfo;
+        $this->_curlParams[self::SETUP_CURL_INFO] = $curlInfo;
 
         return $this;
     }
 
     /**
-     * Получение информации о запросе
+     * @param string $curlError
+     * @param ?string $key
      *
-     * @return array
+     * @return $this
      *
-     * @tag #get #curlInfo
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testAddError()
+     *
+     * @tag #add #errors
+     *
      */
-    public function getCurlInfo(): array
+    public function addError( string $curlError, ?string $key = null ): self
     {
-        return $this->curlParams[self::SETUP_CURL_INFO];
-    }
+        $this->limiterIsComplete();
 
-    /**
-     * Получение параметров curl
-     *
-     * @return array
-     *
-     * @tag #get #curlParams
-     */
-    public function getCurlParams(): array
-    {
-        return $this->curlParams;
-    }
+        if ( $key ) {
 
+            $this->_errors[$key] = $curlError;
+
+        } else {
+
+            $this->_errors[] = $curlError;
+        }
+
+        return $this;
+    }
 
     // --- Status ---
 
@@ -526,13 +520,15 @@ class KnockRequest implements KnockRequestInterface
      *
      * @return $this
      *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testSetupStatusComplete()
+     *
      * @tag #set #status #processing
      */
-    public function setStatusProcessing(): self
+    public function setupStatusProcessing(): self
     {
-        $this->status = self::STATUS_PROCESSING;
-
-        return $this;
+        return $this->setStatus(self::STATUS_PROCESSING);
     }
 
     /**
@@ -540,119 +536,89 @@ class KnockRequest implements KnockRequestInterface
      *
      * @return $this
      *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testSetupStatusComplete()
+     *
      * @tag #set #status #complete
      */
-    public function setStatusComplete(): self
+    public function setupStatusComplete(): self
     {
-        $this->status = self::STATUS_COMPLETE;
-
-        return $this;
+        return $this->setStatus(self::STATUS_COMPLETE);
     }
 
-    // --- Errors ---
+    /**
+     * Проверка состояния запроса на значении не равное "завершён"
+     *
+     * @return bool
+     *
+     * Test: @see KnockRequestTest::testStatusIsComplete()
+     *
+     * @tag #knockKnock #status #not_complete
+     */
+    public function statusIsComplete(): bool
+    {
+        return $this->statusIs( self::STATUS_COMPLETE );
+    }
 
     /**
-     * @param string $curlError
+     * Проверка состояния запроса на значении "подготовка"
+     *
+     * @return bool
+     *
+     * Test: @see KnockRequestTest::testStatusIsPrepare()
+     *
+     * @tag #knockKnock #status #prepare
+     */
+    public function statusIsPrepare(): bool
+    {
+        return $this->statusIs( self::STATUS_PREPARE );
+    }
+
+
+
+    // === SSL ===
+
+    /**
+     * Отключение SSL сертификата
+     *
+     * @param bool $verifyPeer проверка подлинность сертификата сервера
+     * @param int  $verifyHost проверка соответствия имени хоста сервера и имени, указанного в сертификате сервера
      *
      * @return $this
      *
-     * @tag #add #errors
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testDisableSSL()
+     *
+     * @tag #knockKnock #ssl #disable
      */
-    public function addErrors( string $curlError ): self
+    public function disableSSL( bool $verifyPeer = false, int $verifyHost = 0 ): self
     {
-        $this->_errors[] = $curlError;
+        $this->setCurlOption( CURLOPT_SSL_VERIFYPEER, $verifyPeer );
+        $this->setCurlOption( CURLOPT_SSL_VERIFYHOST, $verifyHost );
 
         return $this;
     }
 
     /**
-     * @return array
+     * Включение SSL сертификата
      *
-     * @tag #get #errors
-     */
-    public function getErrors(): array
-    {
-        return $this->_errors;
-    }
-
-
-    // --- Common ---
-
-    /**
-     * Получение параметров запроса
+     * @param bool $verifyPeer проверка подлинность сертификата сервера
+     * @param int $verifyHost проверка соответствия имени хоста сервера и имени, указанного в сертификате сервера
      *
-     * @return array
+     * @return $this
      *
      * @throws Exception
      *
-     * @tag #get #params
+     * Test: @see KnockRequestTest::testEnableSSL()
+     *
+     * @tag #knockKnock #ssl #enable
      */
-    public function getParams(): array
+    public function enableSSL( bool $verifyPeer = true, int  $verifyHost = 2 ): self
     {
-        $params = [
-            self::SETUP_PROTOCOL => $this->setGet(self::GET, self::SETUP_PROTOCOL),
-            self::SETUP_HOST => $this->setGet(self::GET, self::SETUP_HOST),
-            self::SETUP_ENDPOINT => $this->setGet(self::GET, self::SETUP_ENDPOINT),
-            self::SETUP_METHOD => $this->setGet(self::GET, self::SETUP_METHOD),
-            self::SETUP_CONTENT_TYPE => $this->setGet(self::GET, self::SETUP_CONTENT_TYPE),
-            self::SETUP_HEADERS => $this->setGet(self::GET, self::SETUP_HEADERS),
-            self::SETUP_DATA => $this->setGet(self::GET, self::SETUP_DATA ),
-            self::SETUP_CURL_OPTIONS => $this->setGet(self::GET, self::SETUP_CURL_OPTIONS),
-            self::SETUP_CURL_INFO => $this->setGet(self::GET, self::SETUP_CURL_INFO),
-            self::SETUP_POST_FIELD => $this->setGet(self::GET, self::SETUP_POST_FIELD),
-        ];
-
-        foreach ( $params as $setupKey => $value ) {
-            if ( empty($value) ) {
-                unset($params[$setupKey]);
-            }
-        }
-
-        return $params;
-    }
-
-    /**
-     * @param string $key
-     *
-     * @return string
-     *
-     * @throws Exception
-     *
-     * @tag #get #status
-     */
-    public function getStatusLabel( string $key ): string
-    {
-        if ( isset(self::STATUS_LABELS[$key]) ) {
-            return self::STATUS_LABELS[$key];
-        }
-
-        throw new Exception('Unknown status');
-    }
-
-    /**
-     * Отключение SSL сертификата
-     *
-     * @throws Exception
-     *
-     * @tag #security #ssl
-     */
-    public function disableSSL(): self
-    {
-        $this->addCurlOptions( CURLOPT_SSL_VERIFYPEER, false );
-
-        return $this;
-    }
-
-    /**
-     * Отключение SSL сертификата
-     *
-     * @throws Exception
-     *
-     * @tag #security #ssl
-     */
-    public function enableSSL(): self
-    {
-        $this->addCurlOptions( CURLOPT_SSL_VERIFYPEER, true );
+        $this->setCurlOption( CURLOPT_SSL_VERIFYPEER, $verifyPeer );
+        $this->setCurlOption( CURLOPT_SSL_VERIFYHOST, $verifyHost );
 
         return $this;
     }
@@ -662,11 +628,76 @@ class KnockRequest implements KnockRequestInterface
     // === Private ===
 
     /**
+     * Проверка на завершённость запроса, если запрос завершён, то выбрасывается исключение
+     *
+     * @param ?string $message
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testLimiterIsComplete()
+     *
+     * @tag #knockKnock #limiter #complete
+     */
+    public function limiterIsComplete( ?string $message = null ): void
+    {
+        if ( $this->statusIsComplete() )
+        {
+            $label = $this->getStatusLabel( $this->_statusID );
+
+            $message = $message ?? "Вы не можете изменять параметры запроса в статусе: $label";
+
+            throw new Exception( $message );
+        }
+    }
+
+    /**
+     * Проверка статуса запроса на соответствие переданному значению
+     *
+     * @param int $status_id
+     *
+     * @return bool
+     *
+     * Test: @see KnockRequestTest::testStatusIsComplete()
+     * Test: @see KnockRequestTest::testStatusIsPrepare()
+     */
+    private function statusIs( int $status_id ): bool
+    {
+        return $this->getStatusID() === $status_id;
+    }
+
+    /**
+     * Установка статуса запроса, на значение переданное в параметре
+     *
+     * @param int $status
+     *
+     * @return $this
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testSetupStatusComplete()
+     * Test: @see KnockRequestTest::testSetupStatusComplete()
+     */
+    private function setStatus( int $status ): self
+    {
+        $this->limiterIsComplete("Запрос уже был отправлен: вы не можете изменять статус запроса на `$status`");
+
+        $this->_statusID = $status;
+
+        return $this;
+    }
+
+    /**
      * Подготовка хоста
      *
      * @return void
      *
      * @tag #host #prepare
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testPrepareHost()
      */
     private function prepareHost(): void
     {
@@ -690,6 +721,8 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetupParamsFromArray()
+     *
      * @tag #setup #paramList #on_status
      */
     private function setupParamsFromArray( array $params ): void
@@ -711,88 +744,306 @@ class KnockRequest implements KnockRequestInterface
      *
      * @throws Exception
      *
+     * Test: @see KnockRequestTest::testSetParamsOnStatusPrepare()
+     *
      * @tag #setup #param #on_status
      */
-    private function setParamsOnStatusPrepare(string $param, $value ): self
+    private function setParamsOnStatusPrepare( string $param, $value ): self
     {
-        if ( $this->status === self::STATUS_PREPARE )
+        $this->limiterIsComplete();
+
+        switch ($param)
         {
-            switch ($param)
-            {
-                case self::SETUP_PROTOCOL: $this->_protocol = $value; return $this;
-                case self::SETUP_HOST: $this->_host = $value; return $this;
-                case self::SETUP_ENDPOINT: $this->_endpoint = $value; return $this;
-                case self::SETUP_METHOD: $this->_method = $value; return $this;
-                case self::SETUP_CONTENT_TYPE: $this->_contentType = $value; return $this;
-                case self::SETUP_HEADERS: $this->_headers = $value; return $this;
-                case self::SETUP_DATA: $this->_data = $value; return $this;
-                case self::SETUP_CURL_OPTIONS: $this->curlParams[self::SETUP_CURL_OPTIONS] = $value; return $this;
-                case self::SETUP_CURL_INFO: $this->curlParams[self::SETUP_CURL_INFO] = $value; return $this;
+            case self::STATUS_ID: $this->_statusID = $value; return $this;
+            case self::SETUP_PROTOCOL: $this->_protocol = $value; return $this;
+            case self::SETUP_HOST:
+                $this->_host = $value;
+                $this->prepareHost();
+                return $this;
 
-                default:
-                    throw new Exception("неизвестный параметр запроса `$param`");
-            }
+            case self::SETUP_ENDPOINT: $this->_endpoint = $value; return $this;
 
-        } else {
+            case self::SETUP_METHOD:
+                $this->setCurlOption( CURLOPT_CUSTOMREQUEST, $value );
+                $this->_method = $value;
+                return $this;
 
-            $mapping = [
-                self::STATUS_PROCESSING => 'processing',
-                self::STATUS_COMPLETE => 'complete'
-            ];
+            case self::SETUP_CONTENT_TYPE: $this->_contentType = $value; return $this;
+            case self::SETUP_HEADERS: $this->_headers = $value; return $this;
+            case self::SETUP_DATA: $this->_data = $value; return $this;
+            case self::CURL_PARAMS: $this->_curlParams = $value; return $this;
+            case self::SETUP_CURL_OPTIONS: $this->_curlParams[self::SETUP_CURL_OPTIONS] = $value; return $this;
+            case self::SETUP_CURL_INFO: $this->_curlParams[self::SETUP_CURL_INFO] = $value; return $this;
 
-            throw new Exception('Вы не можете изменять параметры запроса в статусе: ' . $mapping[$this->status]);
+            default:
+                throw new Exception("неизвестный параметр запроса `$param`");
         }
+
+    }
+
+
+
+    // --- getters 4 magic ---
+
+    /**
+     * @return int
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #status
+     */
+    private function getStatusID(): int
+    {
+        return $this->_statusID;
     }
 
     /**
-     * @param string $method
-     * @param string $key
-     * @param mixed $value
+     * Возвращает метку статуса
      *
-     * @return mixed
+     * @param ?int $status_id
+     *
+     * @return string
      *
      * @throws Exception
      *
-     * @tag #setup #get #set
+     * Test: @see KnockRequestTest::testGetStatusLabel()
+     *
+     * @tag #get #status
      */
-    private function setGet( string $method, string $key, mixed $value = null ): mixed
+    private function getStatusLabel( ?int $status_id = null ): string
     {
-        if ( $method === self::SET )
-        {
-            switch ($key)
-            {
-                case self::SETUP_PROTOCOL: $this->setProtocol($value); return $this;
-                case self::SETUP_HOST: $this->setHost($value); return $this;
-                case self::SETUP_ENDPOINT: $this->setEndpoint($value); return $this;
-                case self::SETUP_METHOD: $this->setMethod($value); return $this;
-                case self::SETUP_CONTENT_TYPE: $this->setContentType($value); return $this;
-                case self::SETUP_HEADERS: $this->setHeaders($value); return $this;
-                case self::SETUP_DATA: $this->setData($value); return $this;
-                case self::SETUP_CURL_OPTIONS: $this->setCurlOptions($value); return $this;
-                case self::SETUP_CURL_INFO: $this->setCurlInfo($value); return $this;
+        $status_id = $status_id ?? $this->getStatusID();
 
-                default:
-                    throw new Exception("неизвестный параметр запроса `$key`");
-            }
-
-        } elseif ( $method === self::GET ) {
-
-            return match ($key) {
-                self::SETUP_PROTOCOL => $this->getProtocol(),
-                self::SETUP_HOST => $this->getHost(),
-                self::SETUP_ENDPOINT => $this->getEndpoint(),
-                self::SETUP_METHOD => $this->getMethod(),
-                self::SETUP_CONTENT_TYPE => $this->getContentType(),
-                self::SETUP_HEADERS => $this->getHeaders(),
-                self::SETUP_DATA => $this->getData(),
-                self::SETUP_CURL_OPTIONS => $this->getCurlOptions(),
-                self::SETUP_CURL_INFO => $this->getCurlInfo(),
-                self::SETUP_POST_FIELD => $this->getPostFields(),
-                default => throw new Exception("неизвестный параметр запроса `$key`"),
-            };
-
-        } else {
-            throw new Exception("неизвестный метод `$method`");
+        if ( isset(self::LABELS_STATUS[$status_id]) ) {
+            return self::LABELS_STATUS[$status_id];
         }
+
+        throw new Exception('Unknown status');
+    }
+
+
+    /**
+     * Получение параметров запроса
+     *
+     * @return array
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testGetParams()
+     *
+     * @tag #get #params
+     */
+    private function getParams(): array
+    {
+        $params = [
+            self::SETUP_PROTOCOL => $this->getProtocol(),
+            self::SETUP_HOST => $this->getHost(),
+            self::SETUP_ENDPOINT => $this->getEndpoint(),
+
+            self::SETUP_METHOD => $this->getMethod(),
+            self::SETUP_HEADERS => $this->getHeaders(),
+            self::SETUP_CONTENT_TYPE => $this->getContentType(),
+
+            self::SETUP_DATA => $this->getData(),
+
+            self::SETUP_CURL_OPTIONS => $this->getCurlOptions(),
+            self::SETUP_CURL_INFO => $this->getCurlInfo(),
+        ];
+
+        foreach ( $params as $setupKey => $value ) {
+            if ( empty($value) ) {
+                unset($params[$setupKey]);
+            }
+        }
+
+        return $params;
+    }
+
+
+    /**
+     * Получение протокола
+     *
+     * @return ?string
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #protocol
+     */
+    private function getProtocol(): ?string
+    {
+        return $this->_protocol ?? null;
+    }
+
+    /**
+     * Получение хоста
+     *
+     * @return ?string
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #host
+     */
+    private function getHost(): ?string
+    {
+        return $this->_host ?? null;
+    }
+
+    /**
+     * Получение endpoint запроса
+     *
+     * @return ?string
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #endpoint
+     */
+    private function getEndpoint(): ?string
+    {
+        return $this->_endpoint ?? null;
+    }
+
+    /**
+     * Получение url
+     *
+     * @return ?string
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #url
+     */
+    private function getUrl(): ?string
+    {
+        return $this->constructUrl();
+    }
+
+
+    /**
+     * Получение метода запроса
+     *
+     * @return ?string
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #method
+     */
+    private function getMethod(): ?string
+    {
+        return $this->_method ?? null;
+    }
+
+    /**
+     * Получение заголовков
+     *
+     * @return array
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #headers
+     */
+    private function getHeaders(): array
+    {
+        return $this->_headers;
+    }
+
+    /**
+     * Получение типа контента
+     *
+     * @return ?string
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #contentType
+     */
+    private function getContentType(): ?string
+    {
+        return $this->_contentType ?? null;
+    }
+
+
+    /**
+     * Получение данных запроса
+     *
+     * @return mixed
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #data
+     */
+    private function getData(): mixed
+    {
+        return $this->_data ?? null;
+    }
+
+    /**
+     * Получение данных запроса преобразованных компонентом
+     *
+     * @return mixed
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #data #postFields
+     */
+    private function getPostFields(): mixed
+    {
+        $curlOptions = $this->getCurlOptions();
+
+        return $curlOptions[CURLOPT_POSTFIELDS] ?? null;
+    }
+
+    /**
+     * Получение параметров curl
+     *
+     * @return array
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #curlParams
+     */
+    private function getCurlParams(): array
+    {
+        return $this->_curlParams;
+    }
+
+    /**
+     * Получение параметров curl
+     *
+     * @return ?array
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #curlOptions
+     */
+    private function getCurlOptions(): ?array
+    {
+        return $this->_curlParams[self::SETUP_CURL_OPTIONS];
+    }
+
+    /**
+     * Получение информации о запросе
+     *
+     * @return array
+     *
+     * Test: @see KnockRequestTest::testMagicGet()
+     *
+     * @tag #get #curlInfo
+     */
+    private function getCurlInfo(): array
+    {
+        return $this->_curlParams[self::SETUP_CURL_INFO];
+    }
+
+
+    /**
+     * @return array
+     *
+     * Test: @see KnockRequestTest::testGetErrors()
+     *
+     * @tag #get #errors
+     */
+    private function getErrors(): array
+    {
+        return $this->_errors;
     }
 }

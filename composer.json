@@ -1,10 +1,10 @@
 {
   "name": "andy87/knockknock",
   "description": "PHP Facade Curl library - developed by and_y87",
-  "version": "0.1.1",
-  "keywords": ["and_y87", "php", "cURL"],
+  "version": "0.99.2",
+  "keywords": ["and_y87", "php", "cURL","facade", "knock-knock", "knockknock"],
   "homepage": "https://andy87.ru",
-  "license": "MIT",
+  "license": "CC BY-SA",
 
   "authors": [
     {
@@ -16,12 +16,15 @@
   "require": {
     "php": ">=8.0.0",
     "ext-curl": "*",
-    "ext-json": "*"
+    "ext-json": "*",
+    "phpunit/phpunit": "^10.5"
   },
 
   "autoload": {
     "psr-4": {
-      "andy87\\knock_knock\\": "src/"
+      "andy87\\knock_knock\\": "src/",
+      "app\\": "src/",
+      "tests\\": "tests/"
     }
   }
 }
