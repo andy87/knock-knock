@@ -12,18 +12,12 @@ declare(strict_types=1);
 
 namespace tests;
 
-use andy87\knock_knock\interfaces\KnockKnockInterface;
-use andy87\knock_knock\interfaces\KnockRequestInterface;
-use andy87\knock_knock\lib\LibKnockContentType;
 use Exception;
-use tests\core\PostmanEcho;
-use tests\core\UnitTestCore;
-use andy87\knock_knock\core\KnockKnock;
-use andy87\knock_knock\core\KnockRequest;
-use andy87\knock_knock\core\KnockResponse;
-use andy87\knock_knock\interfaces\KnockResponseInterface;
-use andy87\knock_knock\lib\LibKnockMethod;
 use tests\examples\KnockKnockExample;
+use tests\core\{ PostmanEcho, UnitTestCore };
+use andy87\knock_knock\lib\{ LibKnockMethod, LibKnockContentType };
+use andy87\knock_knock\core\{ KnockKnock, KnockRequest, KnockResponse };
+use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, KnockResponseInterface };
 
 /**
  * Class KnockKnockTest

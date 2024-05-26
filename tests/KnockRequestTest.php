@@ -12,13 +12,11 @@ declare(strict_types=1);
 
 namespace tests;
 
-use andy87\knock_knock\core\KnockKnock;
-use andy87\knock_knock\lib\LibKnockContentType;
-use andy87\knock_knock\lib\LibKnockMethod;
 use Exception;
 use tests\core\UnitTestCore;
-use andy87\knock_knock\core\KnockRequest;
 use andy87\knock_knock\interfaces\KnockRequestInterface;
+use andy87\knock_knock\core\{ KnockKnock, KnockRequest };
+use andy87\knock_knock\lib\{ LibKnockMethod, LibKnockContentType };
 
 /**
  * Class KnockRequestTest

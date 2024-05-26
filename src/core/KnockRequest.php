@@ -12,9 +12,8 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\lib\LibKnockMethod;
 use Exception;
-use andy87\knock_knock\interfaces\KnockRequestInterface;
+use andy87\knock_knock\{ lib\LibKnockMethod, interfaces\KnockRequestInterface };
 
 /**
  * Class KnockRequest

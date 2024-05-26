@@ -12,8 +12,7 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\interfaces;
 
-use andy87\knock_knock\core\KnockRequest;
-use andy87\knock_knock\core\KnockResponse;
+use andy87\knock_knock\core\{ KnockRequest, KnockResponse };
 
 /**
  * Interface KnockSender

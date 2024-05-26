@@ -13,8 +13,8 @@ declare(strict_types=1);
 namespace andy87\knock_knock\core;
 
 use Exception;
-use andy87\knock_knock\interfaces\{ KnockRequestInterface, KnockResponseInterface };
 use tests\KnockResponseTest;
+use andy87\knock_knock\interfaces\{ KnockRequestInterface, KnockResponseInterface };
 
 /**
  * Class KnockRequest

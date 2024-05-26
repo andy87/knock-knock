@@ -53,6 +53,10 @@
 
 <p align="center"><img src="assets/docs/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
 
+### Условная схема работы приложения
+
+<p align="center"><img src="assets/docs/logicKnockKnock.png"></p>
+
 ## Базовый класс: 
 _use [andy87\knock_knock\core\KnockKnock](src/core/KnockKnock.php);_  
 
@@ -409,9 +413,6 @@ $knockKnock->useCookie( $cookie, $jar );
         <img src="assets/docs/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnockOctopus php curl facade"/>
     </a>
 </h3>
-### [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md)
-
-
 
 Класс с функционалом простой реализации отправки запросов и минимальными настройками
 

@@ -12,10 +12,8 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock;
 
-use andy87\knock_knock\core\KnockKnock;
-use andy87\knock_knock\core\KnockRequest;
-use andy87\knock_knock\core\KnockResponse;
 use Exception;
+use andy87\knock_knock\core\{ KnockKnock, KnockRequest, KnockResponse };
 
 /**
  * Class KnockAuthorization
