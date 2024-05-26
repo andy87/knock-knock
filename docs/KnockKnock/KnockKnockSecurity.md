@@ -150,8 +150,3 @@ $KnockResponsePost = $knockKnockSecurity->post( 'category', [
 $category_id = $KnockResponse_Post->content['id'];
 
 ```
-
----
-> ## 🚧 Альфа версия
-> Возможно наличие багов
----

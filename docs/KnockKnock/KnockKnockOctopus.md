@@ -84,8 +84,3 @@ $knockKnockResponse = $knockKnockOctopus
 ```php
 $knockKnockResponse = $knockKnockOctopus->trace( '/post' );
 ```
-
----
-> ## 🚧 Альфа версия
-> Возможно наличие багов
----

@@ -36,16 +36,19 @@
 
 Установка через [composer](https://getcomposer.org/download/)
 
-Либо запустите
+#### Консольные команды.
+_предпочтительней:_  
+composer: `composer require andy87/KnockKnock`   
+composer.phar: `php composer.phar require andy87/KnockKnock`  
 
-`composer require --prefer-dist andy87/KnockKnock`  
-`php composer.phar require --prefer-dist andy87/KnockKnock`
+#### Вручную.
+Добавьте в раздел `require` вашего `composer.json` файла строку
 
-Либо добавьте в раздел `require` вашего `composer.json` файла строку
+`"andy87/KnockKnock": "*"`
 
-`"yiisoft/yii2-httpclient": "~2.0.0"`
-
-После выполните команду `php composer.phar update` либо `composer update`
+После выполните команду:  
+composer: `composer update`  
+composer.phar: `php composer.phar update`  
 
 <p align="center"> - - - - - </p>
 
@@ -690,8 +693,4 @@ https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0
 
 ### Последние изменения
 24/05/2024 - 99b  
-
----
-> ## 🚧 Альфа версия
-> Возможно наличие багов
----
+26/05/2024 - v1.0.0
