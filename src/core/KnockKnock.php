@@ -24,7 +24,8 @@ use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, 
  * @property-read string $host
  * @property-read KnockRequest $commonKnockRequest
  * @property-read KnockRequest $realKnockRequest
- * @property-read callable[] $events
+ * @property-read callable[] $eventHandlers
+ * @property-read array $logs
  *
  * Покрытие тестами: 100%. @see KnockKnockTest
  */
@@ -42,7 +43,7 @@ class KnockKnock implements KnockKnockInterface
 
 
     /** @var callable[] Список callback функций, обработчиков событий */
-    protected array $_callbacks = [
+    protected array $_eventHandlers = [
         self::EVENT_AFTER_INIT => null,
         self::EVENT_CONSTRUCT_REQUEST => null,
         self::EVENT_BEFORE_SEND => null,
@@ -57,6 +58,9 @@ class KnockKnock implements KnockKnockInterface
      * @var string $_host
      */
     protected string $_host;
+
+    /** @var array $_log Список логов*/
+    protected array $_log = [];
 
 
 
@@ -188,7 +192,8 @@ class KnockKnock implements KnockKnockInterface
             'host' => $this->getHost(),
             'commonKnockRequest' => $this->getCommonKnockRequest(),
             'realKnockRequest' => $this->getRealKnockRequest(),
-            'events' => $this->getEvents(),
+            'eventHandlers' => $this->getEvents(),
+            'logs' => $this->getLogs(),
             default => throw new Exception("Property `$paramName` not found"),
         };
     }
@@ -215,7 +220,7 @@ class KnockKnock implements KnockKnockInterface
     /**
      * Получение экземпляра класса, используя паттерн Singleton
      *
-     * @param string $host
+     * @param ?string $host
      * @param array $commonKnockRequestParams
      *
      * @return self
@@ -224,7 +229,7 @@ class KnockKnock implements KnockKnockInterface
      *
      * @tag #knockKnock #get #instance
      */
-    public static function getInstance( string $host, array $commonKnockRequestParams = [] ): self
+    public static function getInstance( string $host = null, array $commonKnockRequestParams = [] ): self
     {
         if ( static::$_instance === null )
         {
@@ -360,9 +365,31 @@ class KnockKnock implements KnockKnockInterface
             }
         }
 
-        $this->_callbacks = $events;
+        $this->_eventHandlers = $events;
 
-        return $this->_callbacks;
+        return $this->_eventHandlers;
+    }
+
+    /**
+     * Добавление Записи в лог ошибок
+     *
+     * @param string $error
+     * @param ?string $key
+     *
+     * @return $this
+     */
+    public function addLog( string $error, ?string $key = null ): self
+    {
+        if ( $key )
+        {
+            $this->_log[$key] = $error;
+
+        } else {
+
+            $this->_log[] = $error;
+        }
+
+        return $this;
     }
 
 
@@ -443,13 +470,10 @@ class KnockKnock implements KnockKnockInterface
         return $knockResponse;
     }
 
-
-    // === Обработчики событий === Event === Behavior === Callbacks ===
-
     /**
-     * Вызов обработчика события
+     * Вызов обработчика события снаружи класса
      *
-     * @param string $event
+     * @param string $eventKey
      * @param array $args
      *
      * @return mixed
@@ -458,16 +482,37 @@ class KnockKnock implements KnockKnockInterface
      *
      * @tag #knockKnock #behavior #event #callback
      */
-    public function event( string $event, array $args = [] ): mixed
+    public function callEventHandler( string $eventKey, array $args = [] ): mixed
     {
-        if ( isset( $this->_callbacks[$event] ) )
-        {
-            $callback = $this->_callbacks[$event];
-
-            return call_user_func_array( $callback, $args );
-        }
+        $this->event( $eventKey, $args );
 
         return null;
+    }
+
+    // === Обработчики событий === Event === Behavior === Callbacks ===
+
+    /**
+     * Вызов обработчика события внутри класса
+     *
+     * @param string $eventKey
+     * @param array $args
+     *
+     * @return void
+     *
+     * Test: @see KnockKnockTest::testEventCall()
+     *
+     * @tag #knockKnock #behavior #event #callback
+     */
+    private function event( string $eventKey, array $args = [] ): void
+    {
+        if ( isset( $this->_eventHandlers[ $eventKey ] ) )
+        {
+            $callback = $this->_eventHandlers[ $eventKey ];
+
+            if ( empty($args) ) $args = [ $this ];
+
+            call_user_func_array( $callback, $args );
+        }
     }
 
     /**
@@ -486,7 +531,7 @@ class KnockKnock implements KnockKnockInterface
      */
     public function on(string $event, callable $callbacks ): ?bool
     {
-        if ( !isset($this->_callbacks[$event]) || $this->_callbacks[$event] === null )
+        if ( !isset($this->_eventHandlers[$event]) || $this->_eventHandlers[$event] === null )
         {
             return $this->changeEvent( $event, $callbacks );
         }
@@ -508,7 +553,7 @@ class KnockKnock implements KnockKnockInterface
      */
     public function changeEvent(string $event, callable $callback ): bool
     {
-        $this->_callbacks[$event] = $callback;
+        $this->_eventHandlers[$event] = $callback;
 
         return true;
     }
@@ -526,9 +571,9 @@ class KnockKnock implements KnockKnockInterface
      */
     public function off( string $event ): bool
     {
-        if ( isset( $this->_callbacks[$event] ) )
+        if ( isset( $this->_eventHandlers[$event] ) )
         {
-            unset( $this->_callbacks[$event] );
+            unset( $this->_eventHandlers[$event] );
 
             return true;
         }
@@ -583,13 +628,27 @@ class KnockKnock implements KnockKnockInterface
     }
 
     /**
+     * Получение обработчиков событий
+     *
      * Test: @see KnockKnockTest::testGetter()
      *
      * @return callable[]
      */
     protected function getEvents(): array
     {
-        return $this->_callbacks;
+        return $this->_eventHandlers;
+    }
+
+    /**
+     * Получение логов
+     *
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @return array
+     */
+    protected function getLogs(): array
+    {
+        return $this->_log;
     }
 
 

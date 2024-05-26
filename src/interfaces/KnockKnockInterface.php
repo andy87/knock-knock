@@ -90,10 +90,10 @@ interface KnockKnockInterface
     public function on(string $event, callable $callbacks ): ?bool;
 
     /**
-     * @param string $event
+     * @param string $eventKey
      * @param array $args
      *
      * @return mixed
      */
-    public function event( string $event, array $args = [] ): mixed;
+    public function callEventHandler( string $eventKey, array $args = [] ): mixed;
 }

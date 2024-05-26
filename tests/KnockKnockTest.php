@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace tests;
 
 use Exception;
+use ReflectionClass;
 use tests\examples\KnockKnockExample;
 use tests\core\{ PostmanEcho, UnitTestCore };
 use andy87\knock_knock\lib\{ LibKnockMethod, LibKnockContentType };
@@ -25,6 +26,10 @@ use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, 
  *  Тесты для методов класса KnockKnock
  *
  * @package tests
+ *
+ * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox
+ *
+ * @tag #test #knockKnock
  */
 class KnockKnockTest extends UnitTestCore
 {
@@ -48,13 +53,16 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `__construct`
+     *  Проверка конструктора
+     *      Тест ожидает что будет создан объект/ экземпляр класса KnockKnock
      *
      * Source: @see KnockKnock::__construct()
      *
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testConstructor
      *
      * @tag #test #knockKnock #constructor
      */
@@ -64,7 +72,8 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `getInstance`
+     * Проверка работы Singleton
+     *      Тест ожидает что метод вернет объект/ экземпляр класса KnockKnock
      *
      * Source: @see KnockKnock::getInstance()
      *
@@ -72,17 +81,33 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testGetInstance
+     *
      * @tag #test #knockKnock #get #instance
      */
     public function testGetInstance(): void
     {
         $knockKnock = KnockKnock::getInstance(self::HOST );
 
-            $this->assertInstanceOf(KnockKnock::class, $knockKnock );
+        $this->assertInstanceOf(KnockKnock::class, $knockKnock );
+
+        $knockKnock->disableSSL();
+
+        // переназначаем переменную взяв ее из статического метода
+        // -> статический метод должен вернуть тот же объект
+        $knockKnock = KnockKnock::getInstance();
+
+        $this->assertInstanceOf(KnockKnock::class, $knockKnock );
+
+        $knockRequest = $knockKnock->commonKnockRequest;
+
+        $this->assertArrayHasKey(CURLOPT_SSL_VERIFYPEER, $knockRequest->curlOptions );
+        $this->assertArrayHasKey(CURLOPT_SSL_VERIFYHOST, $knockRequest->curlOptions );
     }
 
     /**
-     * Тест для метода `validateHostName`
+     *  Проверка работы валидации имени хоста
+     *      Ожидается, что метод вернет true если переданное имя хоста валидно
      *
      * Source: @see KnockKnock::validateHostName()
      *
@@ -94,6 +119,8 @@ class KnockKnockTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testValidateHostName
      *
      * @tag #test #knockKnock #validate #hostName
      */
@@ -136,13 +163,16 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `setupResponse`
+     * Проверка работы события INIT вызывающегося после __construct
+     *      Ожидается что `KnockKnock` выполнит метод init().
      *
      * Source: @see KnockKnock::init()
      *
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventInit
      *
      * @tag #test #knockKnock #event #init
      */
@@ -154,7 +184,8 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `__get`
+     * Проверка работы геттеров
+     *      Ожидается, что метод вернет значение свойств
      *
      * Source: @see KnockKnock::__get()
      *
@@ -162,34 +193,39 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testGetter
+     *
      * @tag #test #knockKnock #get
      */
     public function testGetter()
     {
         $knockKnock = $this->knockKnock;
-
-            $this->assertEquals(self::HOST, $knockKnock->host);
-            $this->assertInstanceOf(KnockRequest::class, $knockKnock->commonKnockRequest);
+        $this->assertEquals(self::HOST, $knockKnock->host);
+        $this->assertInstanceOf(KnockRequest::class, $knockKnock->commonKnockRequest);
 
         $knockRequest = $this->getKnockRequest();
-
-            $this->assertInstanceOf(KnockRequest::class, $knockRequest );
+        $this->assertInstanceOf(KnockRequest::class, $knockRequest );
 
         $knockKnock->setupRequest( $knockRequest );
+        $this->assertInstanceOf(KnockRequest::class, $knockKnock->realKnockRequest );
+        $this->assertCount(6, $knockKnock->eventHandlers);
 
-            $this->assertInstanceOf(KnockRequest::class, $knockKnock->realKnockRequest );
-
-            $this->assertCount(6, $knockKnock->events);
+        $knockKnock->addLog('test');
+        $this->assertIsArray( $knockKnock->logs );
+        $this->assertCount(1, $knockKnock->logs );
     }
 
     /**
-     * Тест для метода `getParams`
+     * Проверка метода возвращающего все геттеры
+     *      Ожидается, что метод вернет массив с актуальными значениями свойств
      *
      * Source: @see KnockKnock::getParams()
      *
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testGetParams
      *
      * @tag #test #knockKnock #get #params
      */
@@ -239,7 +275,9 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для методов `construct...`
+     * Проверка методов отвечающихз за создание объектов `KnockRequest` и `KnockResponse`
+     *      Ожидается, что методы `construct` вернут объекты классов `KnockRequest` и `KnockResponse`
+     *      Ожидается, что сработают эвенты `EVENT_CONSTRUCT_REQUEST` и `EVENT_CONSTRUCT_RESPONSE` и в лог запишутся данные
      *
      * Source: @see KnockKnock::constructRequest()
      * Source: @see KnockKnock::constructResponse()
@@ -247,6 +285,8 @@ class KnockKnockTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testConstruct
      *
      * @tag #test #knockKnock #construct
      */
@@ -256,23 +296,30 @@ class KnockKnockTest extends UnitTestCore
 
             $this->assertEquals(self::HOST, $knockKnock->host);
 
-        $knockRequest = $knockKnock->constructRequest(
-            LibKnockMethod::GET,
-            self::ENDPOINT
-        );
+        $knockKnock->on(KnockKnockInterface::EVENT_CONSTRUCT_REQUEST, function(KnockKnock $knockKnock) {
+            $knockKnock->addLog(KnockKnockInterface::EVENT_CONSTRUCT_REQUEST);
+        });
+        $knockKnock->on(KnockKnockInterface::EVENT_CONSTRUCT_RESPONSE, function(KnockKnock $knockKnock) {
+            $knockKnock->addLog(KnockKnockInterface::EVENT_CONSTRUCT_RESPONSE);
+        });
 
-            $this->assertInstanceOf(KnockRequest::class, $knockRequest );
+        $knockRequest = $knockKnock->constructRequest( LibKnockMethod::GET, self::ENDPOINT );
+        $this->assertInstanceOf(KnockRequest::class, $knockRequest );
+        $this->assertTrue(in_array(KnockKnockInterface::EVENT_CONSTRUCT_REQUEST, $knockKnock->logs));
 
         $knockResponse = $knockKnock->constructResponse([
             KnockResponseInterface::CONTENT => 'content',
             KnockResponseInterface::HTTP_CODE => 200,
         ], $knockRequest );
 
-            $this->assertInstanceOf(KnockResponse::class, $knockResponse );
+        $this->assertInstanceOf(KnockResponse::class, $knockResponse );
+
+        $this->assertTrue(in_array(KnockKnockInterface::EVENT_CONSTRUCT_RESPONSE, $knockKnock->logs));
     }
 
     /**
-     * Тест для метода `setupRequest`
+     * Проверка что задаётся свойство `realKnockRequest`
+     *      Ожидается что метод задаст свойство `realKnockRequest` объектом класса `KnockRequest`
      *
      * Source: @see KnockKnock::setupRequest()
      *
@@ -280,25 +327,42 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSetupRequest
+     *
      * @tag #test #knockKnock #setup #request
      */
     public function testSetupRequest()
     {
         $knockKnock = $this->knockKnock;
 
-        $knockKnock->setupRequest( $this->getKnockRequest() );
+        $knockRequest = $this->getKnockRequest(null, [
+            KnockRequestInterface::SETUP_DATA => self::DATA_A
+        ]);
 
+        $knockKnock->setupRequest( $knockRequest );
         $this->assertInstanceOf( KnockRequest::class, $knockKnock->realKnockRequest );
+        $this->assertEquals( json_encode(self::DATA_A), json_encode($knockKnock->realKnockRequest->data) );
+
+        // Проверка с перезаписью и добавлением свойств
+        $knockKnock->setupRequest( $knockRequest, [
+            KnockRequestInterface::SETUP_DATA => self::DATA_B,
+            KnockRequestInterface::SETUP_CONTENT_TYPE => LibKnockContentType::RAR
+        ]);
+
+        $this->assertEquals( json_encode(self::DATA_B), json_encode($knockKnock->realKnockRequest->data) );
+        $this->assertEquals( LibKnockContentType::RAR, $knockKnock->realKnockRequest->contentType );
     }
 
     /**
-     * Тест для метода `setupEventHandlers`
+     * Ожидается что метод задаст свойство `events` массивом с колбеками
      *
      * Source: @see KnockKnock::setupEventHandlers()
      *
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSetupEventHandlers
      *
      * @tag #test #knockKnock #setup #eventHandlers
      */
@@ -308,8 +372,8 @@ class KnockKnockTest extends UnitTestCore
 
         $knockKnock->setupEventHandlers([]);
 
-        $this->assertIsArray( $knockKnock->events );
-        $this->assertCount(0, $knockKnock->events);
+        $this->assertIsArray( $knockKnock->eventHandlers );
+        $this->assertCount(0, $knockKnock->eventHandlers);
 
         $eventList = [
             KnockKnockInterface::EVENT_AFTER_INIT => function() {
@@ -327,12 +391,12 @@ class KnockKnockTest extends UnitTestCore
 
         $this->assertSameSize( $callBackList, $eventList );
 
-        $this->assertIsArray( $knockKnock->events );
-        $this->assertSameSize( $eventList, $knockKnock->events );
+        $this->assertIsArray( $knockKnock->eventHandlers );
+        $this->assertSameSize( $eventList, $knockKnock->eventHandlers );
     }
 
     /**
-     * Тест для метода `on`
+     * Ожидается что метод добавит callBack в массив `events`
      *
      * Source: @see KnockKnock::on()
      *
@@ -340,24 +404,21 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventsOn
+     *
      * @tag #test #knockKnock #event #on
      */
     public function testEventsOn()
     {
         $knockKnockExample = $this->getKnockKnockExample();
 
-        $eventsStart = (count($knockKnockExample->events));
+        $knockKnockExample->on(KnockKnockExample::MY_EVENT, function() {});
 
-        $knockKnockExample->on(KnockKnockExample::MY_EVENT_1, function() {
-            return KnockKnockExample::MY_EVENT_1;
-        });
-
-        $this->assertCount(($eventsStart + 1), $knockKnockExample->events);
-        $this->assertArrayHasKey(KnockKnockExample::MY_EVENT_1, $knockKnockExample->events );
+        $this->assertArrayHasKey(KnockKnockExample::MY_EVENT, $knockKnockExample->eventHandlers );
     }
 
     /**
-     * Тест для метода `event`
+     * Ожидается что метод event приватный
      *
      * Source: @see KnockKnock::event()
      *
@@ -365,24 +426,33 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventCall
+     *
      * @tag #test #knockKnock #event #call
      */
     public function testEventCall()
     {
+        $reflection = new ReflectionClass(KnockKnock::class);
+        $method = $reflection->getMethod('event');
+
+        // проверка на приватность метода
+        $this->assertTrue($method->isPrivate());
+
         $knockKnockExample = $this->getKnockKnockExample();
 
-        $knockKnockExample->on(KnockKnockExample::MY_EVENT_1, function() {
-            return KnockKnockExample::MY_EVENT_1;
+        $knockKnockExample->on(KnockKnockExample::MY_EVENT, function(KnockKnock $knockKnock) {
+            $knockKnock->addLog(KnockKnockExample::MY_EVENT);
         });
 
-        $this->assertEquals(
-            KnockKnockExample::MY_EVENT_1,
-            $knockKnockExample->event(KnockKnockExample::MY_EVENT_1)
-        );
+        /** Проверка на вызов `event()` через `callEventHandler` */
+        $knockKnockExample->callEventHandler(KnockKnockExample::MY_EVENT);
+
+        $this->assertCount(1, $knockKnockExample->logs, "Ожидается что после вызова `callEventHandler` в лог запишутся данные " );
+        $this->assertEquals(KnockKnockExample::MY_EVENT, $knockKnockExample->logs[0], "Ожидается что значение в `logs[0]` будет равно значению `KnockKnockExample::MY_EVENT` " );
     }
 
     /**
-     * Тест для метода `off`
+     * Тест ожидает что после вызова метода `off` callBack не будет вызван
      *
      * Source: @see KnockKnock::off()
      *
@@ -390,25 +460,34 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventOff
+     *
      * @tag #test #knockKnock #event #off
      */
     public function testEventOff()
     {
         $knockKnockExample = $this->getKnockKnockExample();
 
-        $knockKnockExample->on(KnockKnockExample::MY_EVENT_1, function() {
-            return KnockKnockExample::MY_EVENT_1;
-        });
+        $knockKnockExample->on(KnockKnockExample::MY_EVENT,
+            function( KnockKnock $knockKnock ) {
+                $knockKnock->addLog(KnockKnockExample::MY_EVENT );
+            }
+        );
 
-        $this->assertEquals(KnockKnockExample::MY_EVENT_1, $knockKnockExample->event(KnockKnockExample::MY_EVENT_1) );
+        $knockKnockExample->callEventHandler(KnockKnockExample::MY_EVENT );
 
-        $knockKnockExample->off(KnockKnockExample::MY_EVENT_1);
+        $this->assertCount(1, $knockKnockExample->logs );
+        $this->assertEquals(KnockKnockExample::MY_EVENT, $knockKnockExample->logs[0] );
 
-        $this->assertEquals(null, $knockKnockExample->event(KnockKnockExample::MY_EVENT_1));
+        $knockKnockExample->off(KnockKnockExample::MY_EVENT );
+
+        $knockKnockExample->callEventHandler(KnockKnockExample::MY_EVENT );
+
+        $this->assertCount(1, $knockKnockExample->logs );
     }
 
     /**
-     * Тест для метода `changeEvent`
+     * Тест ожидает что после вызова метода `changeEvent` callBack будет изменен
      *
      * Source: @see KnockKnock::changeEvent()
      *
@@ -416,47 +495,63 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventChange
+     *
      * @tag #test #knockKnock #event #change
      */
     public function testEventChange()
     {
         $knockKnockExample = $this->getKnockKnockExample();
 
-        $knockKnockExample->on(KnockKnockExample::MY_EVENT_1, function() {
-            return KnockKnockExample::MY_EVENT_1;
-        });
-
-        $this->assertEquals(
-            KnockKnockExample::MY_EVENT_1,
-            $knockKnockExample->event(KnockKnockExample::MY_EVENT_1)
+        $knockKnockExample->on(KnockKnockExample::MY_EVENT,
+            function( KnockKnock $knockKnock ) {
+                $knockKnock->addLog(KnockKnockExample::MY_EVENT );
+            }
         );
+
+        $knockKnockExample->callEventHandler(KnockKnockExample::MY_EVENT );
+
+        $this->assertCount(1, $knockKnockExample->logs );
+        $this->assertEquals(KnockKnockExample::MY_EVENT, $knockKnockExample->logs[0] );
+
 
         $this->expectException(Exception::class);
-        $knockKnockExample->on(KnockKnockExample::MY_EVENT_1, function() {
-            return 67890;
+
+        $knockKnockExample->on(KnockKnockExample::MY_EVENT,
+            function( KnockKnock $knockKnock ) {
+            $knockKnock->addLog(KnockKnockExample::MY_EVENT );
+            $knockKnock->addLog(KnockKnockExample::MY_EVENT );
+            $knockKnock->addLog(KnockKnockExample::MY_EVENT );
         });
 
-        $this->assertEquals(
-            KnockKnockExample::MY_EVENT_1,
-            $knockKnockExample->event(KnockKnockExample::MY_EVENT_1)
-        );
+        $knockKnockExample->callEventHandler(KnockKnockExample::MY_EVENT );
 
-        $knockKnockExample->changeEvent(KnockKnockExample::MY_EVENT_1, function() {
-            return KnockKnockExample::MY_EVENT_2;
-        });
+        $this->assertCount(2, $knockKnockExample->logs );
+        $this->assertEquals(KnockKnockExample::MY_EVENT, $knockKnockExample->logs[1] );
 
-        $this->assertEquals(
-            KnockKnockExample::MY_EVENT_2,
-            $knockKnockExample->event(KnockKnockExample::MY_EVENT_1)
-        );
+        $knockKnockExample->changeEvent(KnockKnockExample::MY_EVENT,
+            function( KnockKnock $knockKnock ) {
+                $knockKnock->addLog(KnockKnockExample::MY_EVENT . '3' );
+                $knockKnock->addLog(KnockKnockExample::MY_EVENT . '4' );
+            });
+
+        $knockKnockExample->callEventHandler(KnockKnockExample::MY_EVENT );
+
+        $this->assertCount(4, $knockKnockExample->logs );
+        $this->assertEquals(KnockKnockExample::MY_EVENT . '3', $knockKnockExample->logs[3] );
+        $this->assertEquals(KnockKnockExample::MY_EVENT . '4', $knockKnockExample->logs[4] );
+
     }
 
     /**
-     * Тест для метода `disableSSL`
+     * Ожидается что метод, задаст значения false и 0
+     * для `CURLOPT_SSL_VERIFYPEER` и `CURLOPT_SSL_VERIFYHOST` в запросе
      *
      * Source: @see KnockKnock::disableSSL()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testDisableSsl
      *
      * @tag #test #knockKnock #ssl #disable
      */
@@ -476,11 +571,14 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `enableSSL`
+     * Ожидается что метод, задаст значения true и 2
+     * для `CURLOPT_SSL_VERIFYPEER` и `CURLOPT_SSL_VERIFYHOST` в запросе
      *
      * Source: @see KnockKnock::enableSSL()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEnableSsl
      *
      * @tag #test #knockKnock #ssl #enable
      */
@@ -501,11 +599,13 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `enableRedirect`
+     * Ожидается что метод, задаст значение true для `CURLOPT_FOLLOWLOCATION` в запросе
      *
      * Source: @see KnockKnock::enableRedirect()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEnableRedirect
      *
      * @tag #test #knockKnock #redirect #enable
      */
@@ -524,11 +624,13 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `UseCookie`
+     * Ожидается что метод, задаст значения для `CURLOPT_COOKIE`, `CURLOPT_COOKIEJAR` и `CURLOPT_COOKIEFILE` в запросе
      *
      * Source: @see KnockKnock::UseCookie()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUseCookie
      *
      * @tag #test #knockKnock #cookie
      */
@@ -564,13 +666,16 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `send` и дальнейших методов вызывающихся последовательно
+     * Ожидается что метод `send` вернет объект класса `KnockResponse` с заданными свойствами
+     * и что в свойстве `content` будет содержимое ответа
      *
      * Source: @see KnockKnock::send()
      * Source: @see KnockKnock::SendRequest()
      * Source: @see KnockKnock::getResponseOnSendCurlRequest()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSendRequest
      *
      * @tag #test #knockKnock #send
      */
@@ -596,7 +701,7 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `send` и дальнейших методов вызывающихся последовательно
+     * Ожидается что метод `send` вернет объект класса `KnockResponse` с заданными фейковыми свойствами
      *
      * Source: @see KnockKnock::send()
      * Source: @see KnockKnock::SendRequest()
@@ -605,6 +710,8 @@ class KnockKnockTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSendRequestWithFakeResponse
      *
      * @tag #test #knockKnock #send #fakeResponse
      */
@@ -629,7 +736,7 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `send` при отправке запросов методом POST
+     * Ожидается что метод `send` вернет `KnockResponse` ответ на запрос методом `POST`
      *
      * Source: @see KnockKnock::send()
      * Source: @see KnockKnock::SendRequest()
@@ -638,6 +745,8 @@ class KnockKnockTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSendRequestOnMethodPost
      *
      * @tag #test #knockKnock #send #post
      */
@@ -676,11 +785,14 @@ class KnockKnockTest extends UnitTestCore
 
 
     /**
-     * Тест для метода `updateRequestParams`
+     * Ожидается что метод `updateRequestParams` обновит параметры запроса.
+     * Вызов метода `updateRequestParams` с новыми параметрами произойдет внутри метода `setupRequest`
      *
      * Source: @see KnockKnock::updateRequestParams()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUpdateRequestParams
      *
      * @tag #test #knockKnock #update #requestParams
      */
@@ -740,11 +852,13 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `updatePostFields`
+     * Ожидается что метод `updatePostFields` задаст `CURLOPT_POSTFIELDS` свойство запроса
      *
      * Source: @see KnockKnock::updatePostFields()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUpdatePostFields
      *
      * @tag #test #knockKnock #update #postFields
      */
@@ -788,11 +902,13 @@ class KnockKnockTest extends UnitTestCore
     }
 
     /**
-     * Тест для метода `updateMethod`
+     * Ожидается что метод `updateMethod` задаст `CURLOPT_CUSTOMREQUEST` свойство запроса
      *
      * Source: @see KnockKnock::updateMethod()
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUpdateMethod
      *
      * @tag #test #knockKnock #update #method
      */
@@ -829,6 +945,8 @@ class KnockKnockTest extends UnitTestCore
     // === Private ===
 
     /**
+     * Вспомогательный метод для создания объекта класса `KnockKnockExample`
+     *
      * @return KnockKnockExample
      *
      * @throws Exception

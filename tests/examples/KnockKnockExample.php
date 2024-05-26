@@ -12,9 +12,9 @@ declare(strict_types=1);
 
 namespace tests\examples;
 
+use Exception;
 use andy87\knock_knock\core\KnockKnock;
 use andy87\knock_knock\interfaces\KnockKnockInterface;
-use Exception;
 
 /**
  *  Class KnockKnockExample
@@ -23,26 +23,16 @@ use Exception;
  */
 class KnockKnockExample extends KnockKnock
 {
-    public const INIT_INIT = 'init_stay';
-    public const INIT_DONE = 'init_done';
+    public const INIT_INIT = 'init_Stay';
+    public const INIT_DONE = 'init_Done';
 
     public static string $initResult = self::INIT_INIT;
 
 
-    public const EVENT_INIT = 'event_Init';
-    public const EVENT_DONE = 'event_Done';
 
-    public array $eventResultList = [
-        KnockKnockInterface::EVENT_AFTER_INIT => self::EVENT_INIT,
-        KnockKnockInterface::EVENT_CONSTRUCT_REQUEST => self::EVENT_INIT,
-        KnockKnockInterface::EVENT_BEFORE_SEND => self::EVENT_INIT,
-        KnockKnockInterface::EVENT_CURL_HANDLER => self::EVENT_INIT,
-        KnockKnockInterface::EVENT_CONSTRUCT_RESPONSE => self::EVENT_INIT,
-        KnockKnockInterface::EVENT_AFTER_SEND => self::EVENT_INIT,
-    ];
+    public const MY_EVENT = 'my_event';
 
-    public const MY_EVENT_1 = 'my_event_1';
-    public const MY_EVENT_2 = 'my_event_2';
+
 
     /**
      * @throws Exception
@@ -53,6 +43,4 @@ class KnockKnockExample extends KnockKnock
 
         parent::init();
     }
-
-
 }

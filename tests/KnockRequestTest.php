@@ -24,6 +24,10 @@ use andy87\knock_knock\lib\{ LibKnockMethod, LibKnockContentType };
  * Тесты для методов класса KnockRequest
  *
  * @package tests
+ *
+ * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox
+ *
+ * @tag #test #knockRequest
  */
 class KnockRequestTest extends UnitTestCore
 {
@@ -47,9 +51,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест конструктора
-     *
-     *      Проверка создания объекта класса `KnockRequest`
+     * Проверка создания объекта класса `KnockRequest`
      *      Тест ожидает, что объект будет создан
      *
      * Source: @see KnockRequest::__construct()
@@ -57,6 +59,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testConstructor
      *
      * @tag #test #knockRequest #constructor
      */
@@ -66,9 +70,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `__get`
-     *
-     *      Проверка доступа к ReadOnly свойствам объекта.
+     * Проверка доступа к ReadOnly свойствам объекта.
      *      Тест ожидает, что свойства будут доступны для чтения.
      *
      * Source: @see KnockRequest::__get()
@@ -76,6 +78,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testMagicGet
      *
      * @tag #test #knockRequest #magic #get
      */
@@ -122,9 +126,7 @@ class KnockRequestTest extends UnitTestCore
 
 
     /**
-     * Тест метода `constructUrl`
-     *
-     *      Проверка формирования URL для запроса методом GET.
+     * Проверка формирования URL для запроса методом GET.
      *      Тест ожидает, что установленный URL будет доступен в свойстве `url`
      *      с добавлением HttpBuildQuery данных в строку запроса.
      *
@@ -133,6 +135,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testConstructUrlOnGet
      *
      * @tag #test #knockRequest #constructUrl #get
      */
@@ -152,9 +156,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `constructUrl`
-     *
-     *      Проверка формирования URL для запроса методом POST.
+     * Проверка формирования URL для запроса методом POST.
      *      Тест ожидает, что установленный URL будет доступен в свойстве `url`
      *      без добавления данных в строку запроса.
      *
@@ -164,11 +166,18 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testConstructUrlOnPost
+     *
      * @tag #test #knockRequest #constructUrl #post
      */
     public function testConstructUrlOnPost(): void
     {
-        $knockRequest = $this->knockRequest->setMethod(LibKnockMethod::POST );
+        $knockRequest = (new KnockKnock(self::HOST))
+            ->constructRequest(
+                LibKnockMethod::POST,
+                self::ENDPOINT
+            );
+
         $this->assertInstanceOf(KnockRequest::class, $knockRequest );
 
         $this->assertEquals( self::PROTOCOL, $knockRequest->protocol );
@@ -177,14 +186,12 @@ class KnockRequestTest extends UnitTestCore
 
         $url = self::PROTOCOL . '://' . self::HOST . self::ENDPOINT;
 
+
         $this->assertEquals( $knockRequest->url, $url );
     }
 
-
     /**
-     * Тест метода `prepareEndpoint`
-     *
-     *      Проверка подготовки `endpoint` для запроса методом GET.
+     * Проверка подготовки `endpoint` для запроса методом GET.
      *      Тест ожидает, что установленный `endpoint` будет доступен в свойстве `endpoint`
      *      с добавлением HttpBuildQuery данных в строку запроса.
      *
@@ -193,6 +200,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testPrepareEndpointOnGet
      *
      * @tag #test #knockRequest #prepare #endpoint #get
      */
@@ -213,11 +222,8 @@ class KnockRequestTest extends UnitTestCore
         $this->assertEquals( $endpoint, $knockRequest->endpoint );
     }
 
-
     /**
-     * Тест метода `prepareEndpoint`
-     *
-     *      Проверка подготовки `endpoint` для запроса методом POST.
+     * Проверка подготовки `endpoint` для запроса методом POST.
      *      Тест ожидает, что установленный `endpoint` будет доступен в свойстве `endpoint`
      *      без добавления данных в строку запроса.
      *
@@ -226,6 +232,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testPrepareEndpointOnPost
      *
      * @tag #test #knockRequest #prepare #endpoint #post
      */
@@ -243,11 +251,8 @@ class KnockRequestTest extends UnitTestCore
         $this->assertEquals( $endpoint, $knockRequest->endpoint );
     }
 
-
     /**
-     * Тест метода `setProtocol`
-     *
-     *      Проверка установки протокола для запроса.
+     * Проверка установки протокола для запроса.
      *      Тест ожидает, что установленный протокол будет доступен в свойстве `protocol`
      *
      * Source: @see KnockRequest::setProtocol()
@@ -255,6 +260,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetProtocol
      *
      * @tag #test #knockRequest #set #protocol
      */
@@ -269,9 +276,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setHost`
-     *
-     *      Проверка установки `host` для запроса.
+     * Проверка установки `host` для запроса.
      *      Тест ожидает, что установленный `host` будет доступен в свойстве `host`
      *
      * Source: @see KnockRequest::setHost()
@@ -279,6 +284,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetHost
      *
      * @tag #test #knockRequest #set #host
      */
@@ -293,9 +300,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setEndpoint`
-     *
-     *      Проверка установки `endpoint` для запроса.
+     * Проверка установки `endpoint` для запроса.
      *      Тест ожидает, что установленный `endpoint` будет доступен в свойстве `endpoint`
      *
      * Source: @see KnockRequest::setEndpoint()
@@ -303,6 +308,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetEndpoint
      *
      * @tag #test #knockRequest #set #endpoint
      */
@@ -317,9 +324,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setMethod`
-     *
-     *      Проверка установки метода запроса.
+     * Проверка установки метода запроса.
      *      Тест ожидает, что установленный метод будет доступен в свойстве `method`
      *
      * Source: @see KnockRequest::setMethod()
@@ -327,6 +332,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetMethod
      *
      * @tag #test #knockRequest #set #method
      */
@@ -340,9 +347,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setHeaders`
-     *
-     *      Проверка установки одного заголовка к запросу.
+     * Проверка установки одного заголовка к запросу.
      *      Тест ожидает, что установленный заголовок будет доступен в свойстве `headers`
      *
      * Source: @see KnockRequest::setHeader()
@@ -350,6 +355,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetHeader
      *
      * @tag #test #knockRequest #set #headers
      */
@@ -367,9 +374,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `addHeaders`
-     *
-     *      Проверка добавления заголовков к запросу.
+     * Проверка добавления заголовков к запросу.
      *      Тест ожидает, что добавленные заголовки будут доступны в свойстве `headers`
      *
      * Source: @see KnockRequest::addHeaders()
@@ -377,6 +382,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testAddHeaders
      *
      * @tag #test #knockRequest #headers #add
      */
@@ -396,9 +403,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setContentType`
-     *
-     *      Проверка установки `contentType` для запроса.
+     * Проверка установки `contentType` для запроса.
      *      Тест ожидает, что установленный тип контента будет доступен в свойстве `contentType`
      *
      * Source: @see KnockRequest::setContentType()
@@ -406,6 +411,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetContentType
      *
      * @tag #test #knockRequest #set #contentType
      */
@@ -420,9 +427,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setData`
-     *
-     *      Проверка установки данных для запроса.
+     * Проверка установки данных для запроса.
      *      Тест ожидает, что установленные данные будут доступны в свойстве `data`
      *
      * Source: @see KnockRequest::setData()
@@ -430,6 +435,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetData
      *
      * @tag #test #knockRequest #set #data
      */
@@ -446,9 +453,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setCurlOptions`
-     *
-     *      Проверка установки опций для запроса.
+     * Проверка установки опций для запроса.
      *      Тест ожидает, что установленные опции будут доступны в свойстве `curlOptions`
      *
      * Source: @see KnockRequest::setCurlOptions()
@@ -456,6 +461,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetCurlOptions
      *
      * @tag #test #knockRequest #set #curlOptions
      */
@@ -472,9 +479,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `addCurlOptions`
-     *
-     *      Проверка добавления опций к запросу.
+     * Проверка добавления опций к запросу.
      *      Тест ожидает, что добавленные опции будут доступны в свойстве `curlOptions`
      *
      * Source: @see KnockRequest::addCurlOptions()
@@ -482,6 +487,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testAddCurlOptions
      *
      * @tag #test #knockRequest #add #curlOptions
      */
@@ -501,9 +508,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setCurlInfo`
-     *
-     *      Проверка установки информации о запросе.
+     * Проверка установки информации о запросе.
      *      Тест ожидает, что установленные значения будут доступны в свойстве `curlInfo`
      *
      * Source: @see KnockRequest::setCurlInfo()
@@ -511,6 +516,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetCurlInfo
      *
      * @tag #test #knockRequest #set #curlInfo
      */
@@ -531,9 +538,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `addError`
-     *
-     *      Проверка добавления ошибки в массив ошибок запроса.
+     * Проверка добавления ошибки в массив ошибок запроса.
      *      Тест ожидает, что добавленная ошибка будет доступна по ключу.
      *
      * Source: @see KnockRequest::addError()
@@ -541,6 +546,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testAddError
      *
      * @tag #test #knockRequest #add #error
      */
@@ -558,9 +565,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setupStatusProcessing`
-     *
-     *      Проверка назначения запросу статуса - "в обработке".
+     * Проверка назначения запросу статуса - "в обработке".
      *      Тест ожидает актуальные значения в свойствах `status_id` и `statusLabel`
      *
      * Source: @see KnockRequest::setupStatusProcessing()
@@ -568,6 +573,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetupStatusProcessing
      *
      * @tag #test #knockRequest #status #processing
      */
@@ -586,9 +593,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setupStatusComplete`
-     *
-     *      Проверка назначения запросу статуса - "завершён".
+     * Проверка назначения запросу статуса - "завершён".
      *      Тест ожидает актуальные значения в свойствах `status_id` и `statusLabel`
      *
      * Source: @see KnockRequest::setupStatusComplete()
@@ -596,6 +601,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetupStatusComplete
      *
      * @tag #test #knockRequest #status #complete
      */
@@ -614,9 +621,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `statusIsComplete`
-     *
-     *      Проверка что запрос завершён.
+     * Проверка, что запрос завершён.
      *      Тест ожидает `false` на проверку значения статуса = `STATUS_COMPLETE` при новом, созданном объекте
      *      и `true` после изменения статуса на `STATUS_COMPLETE`
      *
@@ -625,6 +630,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testStatusIsComplete
      *
      * @tag #test #knockRequest #status #complete
      */
@@ -641,9 +648,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `statusIsPrepare`
-     *
-     *      Проверка установленного статуса запроса - "подготовка".
+     * Проверка установленного статуса запроса - "подготовка".
      *      Тест ожидает у созданного объекта `KnockRequest` статус `STATUS_PREPARE`,
      *      а после изменения статуса на `STATUS_COMPLETE` ожидает `false`
      *
@@ -652,6 +657,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testStatusIsPrepare
      *
      * @tag #test #knockRequest #status #prepare
      */
@@ -668,9 +675,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `disableSSL`
-     *
-     *      Проверка данных указывающих на ОТКЛЮЧЕНИЕ проверки SSL
+     * Проверка данных указывающих на ОТКЛЮЧЕНИЕ проверки SSL
      *      Тест ожидает определённые значения
      *      в свойствах `curlOptions[CURLOPT_SSL_VERIFYPEER]` и `curlOptions[CURLOPT_SSL_VERIFYHOST]`
      *
@@ -679,6 +684,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testDisableSSL
      *
      * @tag #test #knockRequest #ssl #disable
      */
@@ -697,9 +704,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `enableSSL`
-     *
-     *      Проверка данных указывающих на ВКЛЮЧЕНИЕ проверки SSL
+     * Проверка данных указывающих на ВКЛЮЧЕНИЕ проверки SSL
      *      Тест ожидает определённые значения
      *      в свойствах `curlOptions[CURLOPT_SSL_VERIFYPEER]` и `curlOptions[CURLOPT_SSL_VERIFYHOST]`
      *
@@ -708,6 +713,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testEnableSSL
      *
      * @tag #test #knockRequest #ssl #enable
      */
@@ -726,9 +733,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `limiterIsComplete`
-     *
-     *      Проверка, невозможности назначения свойств запросу который уже выполнен.
+     * Проверка, невозможности назначения свойств запросу который уже выполнен.
      *      Тест ожидает `Exception` потому что запрос уже завершен(статус `STATUS_COMPLETE`)
      *      и нельзя изменить параметры запроса.
      *
@@ -737,6 +742,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testLimiterIsComplete
      *
      * @tag #test #knockRequest #limiter #status #complete
      */
@@ -760,9 +767,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `prepareHost`
-     *
-     *      Проверка подготовки `domain` для запроса.
+     * Проверка подготовки `domain` для запроса.
      *      Тест ожидает, что собранный `domain` будет доступен в свойстве `domain`
      *
      * Source: @see KnockRequest::prepareHost()
@@ -770,6 +775,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testPrepareHost
      *
      * @tag #test #knockRequest #prepare #host
      */
@@ -804,9 +811,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setupParamsFromArray`
-     *
-     *      Проверка установки параметров запроса из массива.
+     * Проверка установки параметров запроса из массива.
      *      Тест ожидает, что установленные параметры будут доступны в свойствах объекта
      *
      * Source: @see KnockRequest::setupParamsFromArray()
@@ -814,6 +819,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetupParamsFromArray
      *
      * @tag #test #knockRequest #setup #params
      */
@@ -827,9 +834,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setParamsOnStatusPrepare`
-     *
-     *      Проверка установки параметров запроса в статусе "подготовка".
+     * Проверка установки параметров запроса в статусе "подготовка".
      *      Тест ожидает, что можно установить параметры запроса в статусе "подготовка"
      *      и они будут доступны в свойствах объекта.
      *      Тест ожидает, что нельзя установить параметры запроса в статусе "завершён"
@@ -840,6 +845,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetParamsOnStatusPrepare
      *
      * @tag #test #knockRequest #set #prepare #params
      */
@@ -870,9 +877,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `getStatusLabel`
-     *
-     *      Проверка получения текстового статуса запроса.
+     * Проверка получения текстового статуса запроса.
      *      Тест ожидает, что текстовый статус запроса будет актуальным
      *
      * Source: @see KnockRequest::getStatusLabel()
@@ -880,6 +885,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testGetStatusLabel
      *
      * @tag #test #knockRequest #status #label
      */
@@ -909,9 +916,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `getParams`
-     *
-     *      Проверка получения параметров запроса.
+     * Проверка получения параметров запроса.
      *      Тест ожидает, что параметры запроса будут актуальными
      *
      * Source: @see KnockRequest::getParams()
@@ -919,6 +924,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testGetParams
      *
      * @tag #test #knockRequest #get #params
      */
@@ -934,9 +941,7 @@ class KnockRequestTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `getErrors`
-     *
-     *      Проверка получения ошибок запроса.
+     * Проверка получения ошибок запроса.
      *      Тест ожидает, ожидает получить из запроса все ошибки отправленные в него
      *
      * Source: @see KnockRequest::getErrors()
@@ -944,6 +949,8 @@ class KnockRequestTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testGetErrors
      *
      * @tag #test #knockRequest #get #errors
      */

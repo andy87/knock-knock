@@ -191,7 +191,31 @@ class KnockRequest implements KnockRequestInterface
             $address = trim($this->_host . '/' . $this->_endpoint);
             $address = str_replace( ['//','///'], '/', $address );
 
-            return $this->_protocol . '://' . $address;
+            $query = '';
+
+            if ( isset($this->_data) && LibKnockMethod::GET === $this->_method )
+            {
+                if ( is_array($this->_data) )
+                {
+                    $query = http_build_query( $this->_data );
+
+                } elseif ( is_string($this->_data) ){
+
+                    $query = $this->_data;
+                }
+
+                if ( $query )
+                {
+                    $query = trim( $query, '?' );
+                    $query = trim( $query, '&' );
+
+                    $symbol = ( str_contains($address, '?') ) ? '&' : '?';
+
+                    $query = $symbol . $query;
+                }
+            }
+
+            return $this->_protocol . '://' . $address . $query;
 
         } elseif( !$this->_host ) {
 

@@ -2,39 +2,35 @@
 # Полный список изменений.
 
 ## 99b
-24/05/2024
+24/05/2024 (Глобальная переработка + Покрытие тестами)
 - Добавления:
   - `knockKnock`
+    - добавлены readonly свойства
     - Новые методы:
-      - useCookie( string $cookie, string $jar, ?string $file = null ) Использование cookie, добавляя в запрос параметры: CURLOPT_COOKIE, CURLOPT_COOKIEFILE, CURLOPT_COOKIEJAR
-      - enableRedirect() - включает редиректы, добавляет CURLOPT_FOLLOWLOCATION true
-      - validateHostName
+      - useCookie()
+      - enableRedirect()
+      - validateHostName()
     - Новые события:
-      - EVENT_CURL_HANDLER - вызывается перед выполнением curl запроса, для взаимодействия с $ch
+      - EVENT_CURL_HANDLER
   - `KnockResponse`
+    - добавлены readonly свойства
     - Новые методы:
-      - asArray() - преобразует ответ(content) в массив
-      - validate() - валидация ответа, возвращает true или false
+      - asArray()
+      - validate()
   - `KnockRequest`
     - добавлены readonly свойства
 
 - Изменения:
   - `knockKnock`:
-    - disableSSL($verifyPeer = false, $verifyHost = 0) - теперь может принимать аргументы
-    - enableSSL($verifyPeer = false, $verifyHost = 0) - теперь может принимать аргументы
     - переделаны setter & getter
-    - добавлены readonly свойства:
-      - $host
-      - $commonKnockRequest
-      - $realKnockRequest
+    - disableSSL()
+    - enableSSL()
   - `KnockRequest`:
-    - disableSSL($verifyPeer = true, $verifyHost = 2) - теперь может принимать аргументы
-    - enableSSL($verifyPeer = true, $verifyHost = 2) - теперь может принимать аргументы
     - переделаны setter & getter
+    - disableSSL() - теперь может принимать аргументы
+    - enableSSL() - теперь может принимать аргументы
   - `KnockResponse`:
-    - __construct() - $request стал обязательным параметром
+    - переделаны setter & getter
+    - __construct() - $request стал обязательным
     - getErrors() - теперь возвращает массив собственных ошибок
     - get() - удалено
-    - validate() - удалено
-    - переделаны setter & getter
-    - добавлены readonly свойства

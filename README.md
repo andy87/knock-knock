@@ -55,7 +55,7 @@
 
 ### Условная схема работы приложения
 
-<p align="center"><img src="assets/logicKnockKnock.png" alt="логика схемы работы приложения"></p>
+<p align="center"><img src="assets/logicKnockKnock.png" width="640px" alt="логика схемы работы приложения"></p>
 
 ## Базовый класс: 
 _use [andy87\knock_knock\core\KnockKnock](src/core/KnockKnock.php);_  
@@ -83,8 +83,8 @@ PHP Фасад\Адаптер для отправки запросов чере�
 ```php
 // настройки для отправки запросов
 $knockKnockParams = [
-    KnockRequest::SETUP_PROTOCO => $_ENV['API_PROTOCOL'],
-    KnockRequest::SETUP_CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
+    KnockRequestInterface::SETUP_PROTOCO => $_ENV['API_PROTOCOL'],
+    KnockRequestInterface::SETUP_CONTENT_TYPE => KnockRequest::CONTENT_TYPE_JSON,
     KnockRequestInterface::SETUP_CURL_OPTIONS => [
         CURLOPT_HEADER => false,
         CURLOPT_RETURNTRANSFER => true
@@ -599,6 +599,11 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 ```bash
 ./vendor/bin/phpunit --testdox tests/KnockKnockTest.php
 ```  
+Отдельного теста
+```bash
+./vendor/bin/phpunit --filter testEventChange --testdox tests/KnockKnockTest.php
+
+```
 
 
 ## Лицензия
@@ -612,24 +617,7 @@ https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0
 Для получения полной информации смотрите [CHANGELOG](docs/CHANGELOG.md)
 
 ### Последние изменения
-24/05/2024
-- Большое изменение:
-  - Добавлены UnitTests
-  - `strict_types` добавлен во все файлы
-  - Убраны геттеры
-  - Добавлены ReadOnly свойства
-  - Добавлены новые методы
-    - `asArray()`
-    - `validate()`
-    - `useCookie()`
-    - `enableRedirect()`
-  - Изменены методы:
-    - многие методы переработаны
-    - `disableSSL()` - теперь может принимать аргументы
-    - `enableSSL()` - теперь может принимать аргументы
-    - переименованы некоторые методы
-  - Добавлены события:
-    - `EVENT_CURL_HANDLER`
+24/05/2024 - 99b  
 
 ---
 > ## 🚧 Альфа версия

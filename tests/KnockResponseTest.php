@@ -14,13 +14,10 @@ namespace tests;
 
 use Exception;
 use tests\core\PostmanEcho;
-use andy87\knock_knock\core\KnockKnock;
-use andy87\knock_knock\core\KnockRequest;
-use andy87\knock_knock\interfaces\KnockRequestInterface;
-use andy87\knock_knock\lib\LibKnockMethod;
 use tests\core\UnitTestCore;
-use andy87\knock_knock\core\KnockResponse;
-use andy87\knock_knock\interfaces\KnockResponseInterface;
+use andy87\knock_knock\lib\LibKnockMethod;
+use andy87\knock_knock\core\{ KnockKnock, KnockRequest, KnockResponse };
+use andy87\knock_knock\interfaces\{ KnockRequestInterface, KnockResponseInterface };
 
 /**
  * Class KnockResponseTest
@@ -28,6 +25,10 @@ use andy87\knock_knock\interfaces\KnockResponseInterface;
  * Тесты для методов класса KnockResponse
  *
  * @package tests
+ *
+ * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox
+ *
+ * @tag #test #knockResponse
  */
 class KnockResponseTest extends UnitTestCore
 {
@@ -56,18 +57,20 @@ class KnockResponseTest extends UnitTestCore
         $this->setupObjects();
     }
     /**
-     * Тест конструктора
-     *
-     *      Проверка создания объекта класса `KnockResponse`
+     * Проверка создания объекта класса `KnockResponse`
      *      Тест ожидает, что объект будет создан
      *
      * @see KnockResponse::__construct()
      *
      * @throws Exception
      *
+     * @return void
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testConstructor
+     *
      * @tag #test #knockResponse #constructor
      */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->assertInstanceOf(KnockKnock::class, $this->knockKnock );
         $this->assertInstanceOf(KnockRequest::class, $this->knockRequest );
@@ -75,9 +78,7 @@ class KnockResponseTest extends UnitTestCore
     }
 
     /**
-     * Тест геттеров
-     *
-     *      Проверка геттеров объекта класса `KnockResponse`
+     * Проверка геттеров объекта класса `KnockResponse`
      *      Тест ожидает, что геттеры вернут ожидаемые значения
      *
      * Source: @see KnockResponse::__get()
@@ -85,6 +86,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testMagicGet
      *
      * @tag #test #knockResponse #getter
      */
@@ -110,6 +113,8 @@ class KnockResponseTest extends UnitTestCore
     }
 
     /**
+     * Вспомогательный метод для установки объектов
+     *
      * @return void
      *
      * @throws Exception
@@ -135,9 +140,7 @@ class KnockResponseTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `replace`
-     *
-     *      Проверка замены данных объекта класса `KnockResponse`
+     * Проверка замены данных объекта класса `KnockResponse`
      *      Тест ожидает, что данные объекта будут заменены на новые
      *
      * Source: @see KnockResponse::getHttpCode()
@@ -145,6 +148,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testReplace
      *
      * @tag #test #knockResponse #getHttpCode
      */
@@ -169,11 +174,8 @@ class KnockResponseTest extends UnitTestCore
         $this->assertEquals( $newContent, $knockResponse->content );
     }
 
-    //asArray
     /**
-     * Тест метода `asArray`
-     *
-     *      Проверка метода asArray объекта класса `KnockResponse`
+     * Проверка метода asArray объекта класса `KnockResponse`
      *      Тест ожидает на выходе массив сформированный из данных JSON ответа
      *
      * Source: @see KnockResponse::asArray()
@@ -181,6 +183,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testAsArray
      *
      * @tag #test #knockResponse #asArray
      */
@@ -202,9 +206,7 @@ class KnockResponseTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `getErrors`
-     *
-     *      Проверка метода getErrors объекта класса `KnockResponse`
+     * Проверка метода getErrors объекта класса `KnockResponse`
      *      Тест ожидает, что в начале у объекта нет ошибок, далее добавляет ошибку и проверяет,
      *      что readOnly свойство `errors` содержит одну ошибку
      *
@@ -214,6 +216,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testGetErrors
      *
      * @tag #test #knockResponse #getErrors
      */
@@ -238,11 +242,8 @@ class KnockResponseTest extends UnitTestCore
         $this->assertCount(1, $knockResponse->errors, "Ожидается, что ошибки не добавятся после завершения запроса");
     }
 
-    // validate
     /**
-     * Тест метода `validate`
-     *
-     *      Проверка метода validate объекта класса `KnockResponse`
+     * Проверка метода validate объекта класса `KnockResponse`
      *      Тест ожидает, что валидация при отсутствии ошибок пройдет успешно и вернет true
      *      После добавления ошибки валидация вернет false
      *
@@ -252,6 +253,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testValidate
      *
      * @tag #test #knockResponse #validate
      */
@@ -271,9 +274,7 @@ class KnockResponseTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setupData`
-     *
-     *      Проверка метода setupData объекта класса `KnockResponse`
+     * Проверка метода setupData объекта класса `KnockResponse`
      *      Тест ожидает, что данные объекта будут заменены на новые
      *
      * Source: @see KnockResponse::getData()
@@ -283,6 +284,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testSetupData
      *
      * @tag #test #knockResponse #setupData
      */
@@ -300,9 +303,7 @@ class KnockResponseTest extends UnitTestCore
     }
 
     /**
-     * Тест метода `setupHttpCode`
-     *
-     *      Проверка метода setupHttpCode объекта класса `KnockResponse`
+     * Проверка метода setupHttpCode объекта класса `KnockResponse`
      *      Тест ожидает, что код ответа будет заменен на новый
      *
      * Source: @see KnockResponse::getHttpCode()
@@ -311,6 +312,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testSetupHttpCode
      *
      * @tag #test #knockResponse #setupHttpCode
      */
@@ -327,11 +330,8 @@ class KnockResponseTest extends UnitTestCore
         $this->assertEquals( $newHttpCode, $knockResponse->httpCode, "Ожидается, что код ответа будет равен $newHttpCode");
     }
 
-    // setupRequest
     /**
-     * Тест метода `setupRequest`
-     *
-     *      Проверка метода setupRequest объекта класса `KnockResponse`
+     * Проверка метода setupRequest объекта класса `KnockResponse`
      *      Тест ожидает, что объект запроса будет заменен на новый
      *
      * Source: @see KnockResponse::getRequest()
@@ -340,6 +340,8 @@ class KnockResponseTest extends UnitTestCore
      * @return void
      *
      * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testSetupRequest
      *
      * @tag #test #knockResponse #setupRequest
      */

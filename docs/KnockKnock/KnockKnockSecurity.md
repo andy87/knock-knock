@@ -59,7 +59,7 @@ ___
 
 ```php
 $KnockKnock = new KnockKnockSecurity('https://api.example.com',[
-    KnockRequest::SETUP_CONTENT_TYPE => LibKnockContentType::JSON
+    KnockRequestInterface::SETUP_CONTENT_TYPE => LibKnockContentType::JSON
 ]);
 
 // выполнили первый запрос c типом контента JSON
@@ -84,7 +84,7 @@ $KnockResponseWithContentTypeJSON_2 = $KnockKnock->get( '/product' );
 
 ```php
 $KnockKnock = new KnockKnockSecurity('https://api.example.com',[
-    KnockRequest::SETUP_HEADERS => [
+    KnockRequestInterface::SETUP_HEADERS => [
         'X-Api-Key' => $_ENV['X_API_KEY']
     ]
 ]);

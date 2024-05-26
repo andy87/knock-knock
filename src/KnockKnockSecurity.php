@@ -20,19 +20,12 @@ use andy87\knock_knock\core\{ KnockKnock, KnockRequest, KnockResponse };
  *
  * @package andy87\knock_knock
  *
- * Fix not used:
- * - @see KnockKnockSecurity::TOKEN_BEARER
- * - @see KnockKnockSecurity::TOKEN_BASIC
- *
- * - @see KnockKnockSecurity::setupAuthorization()
- * - @see KnockKnockSecurity::setupHeaders()
- * - @see KnockKnockSecurity::setupContentType()
- *
- * - @see KnockKnockSecurity::useHeaders()
- * - @see KnockKnockSecurity::useContentType()
+ * Покрытие тестами: 100%. @see KnockRequestTest
  */
 class KnockKnockSecurity extends KnockKnockOctopus
 {
+    public const HEADERS_AUTH_KEY = 'Authorization';
+
     /** @var string  */
     public const TOKEN_BEARER = 'Bearer';
     /** @var string  */
@@ -48,6 +41,8 @@ class KnockKnockSecurity extends KnockKnockOctopus
     // === Setup ===
 
     /**
+     * Задаёт для всех запросов, тип авторизации и токен
+     *
      * @param string $token
      * @param string $authType
      *
@@ -55,13 +50,15 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockSecurityTest::testSetupAuthorization()
+     *
      * @tag #security #setup #authorization
      */
     public function setupAuthorization( string $authType, string $token ): KnockKnock
     {
         if ( in_array( $authType, [ self::TOKEN_BEARER, self::TOKEN_BASIC ] ) )
         {
-            $this->getCommonKnockRequest()->setHeader( 'Authorization', "$authType $token" );
+            $this->getCommonKnockRequest()->setHeader( self::HEADERS_AUTH_KEY, "$authType $token" );
 
             return $this;
         }
@@ -70,11 +67,15 @@ class KnockKnockSecurity extends KnockKnockOctopus
     }
 
     /**
+     * Задаёт для всех запросов, данные которые обязательно должны быть в заголовках запроса
+     *
      * @param array $headers
      *
      * @return $this
      *
      * @throws Exception
+     *
+     * Test: @see KnockKnockSecurityTest::testSetupHeaders()
      *
      * @tag #security #setup #headers
      */
@@ -88,11 +89,15 @@ class KnockKnockSecurity extends KnockKnockOctopus
     }
 
     /**
+     * Задаёт для всех запросов, тип контента
+     *
      * @param string $ContentType
      *
      * @return $this
      *
      * @throws Exception
+     *
+     * Test: @see KnockKnockSecurityTest::testSetupContentType()
      *
      * @tag #security #setup #content-type
      */
@@ -104,12 +109,17 @@ class KnockKnockSecurity extends KnockKnockOctopus
     }
 
 
+
     // === Use ===
 
     /**
+     * Задаёт кастомные данные для заголовков следующего запроса
+     *
      * @param array $headers
      *
      * @return $this
+     *
+     * Test: @see KnockKnockSecurityTest::testUseHeaders()
      *
      * @tag #security #use #headers
      */
@@ -121,9 +131,13 @@ class KnockKnockSecurity extends KnockKnockOctopus
     }
 
     /**
+     * Задаёт кастомный тип контента для следующего запроса
+     *
      * @param string $ContentType
      *
      * @return $this
+     *
+     * Test: @see KnockKnockSecurityTest::testUseContentType()
      *
      * @tag #security #use #content-type
      */
@@ -147,6 +161,8 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockSecurityTest::testSend()
+     *
      * @tag #security #use #send
      */
     public function send( array $fakeResponse = [] ): KnockResponse
@@ -167,6 +183,8 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockSecurityTest::testModifyRequestByUse()
+     *
      * @tag #security #use #request #modify
      */
     protected function modifyRequestByUse( KnockRequest $knockRequest ): void
@@ -186,6 +204,8 @@ class KnockKnockSecurity extends KnockKnockOctopus
      * Очистка массива с кастомными данными
      *
      * @return void
+     *
+     * Test: @see KnockKnockSecurityTest::testModifyRequestByUse()
      *
      * @tag #security #use #clear
      */

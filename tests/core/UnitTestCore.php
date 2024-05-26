@@ -55,6 +55,9 @@ abstract class UnitTestCore extends TestCase
         KnockRequestInterface::SETUP_CURL_INFO => self::CURL_INFO,
     ];
 
+    public const DATA_A = [ 'dataA' => 'dataA' ];
+    public const DATA_B = [ 'dataB' => 'dataB' ];
+
 
     /**
      * @param ?string $host

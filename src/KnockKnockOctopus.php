@@ -31,18 +31,34 @@ use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
  * - @see KnockKnockOctopus::options();
  * - @see KnockKnockOctopus::head();
  * - @see KnockKnockOctopus::trace();
+ *
+ * Покрытие тестами: 100%. @see KnockRequestTest
  */
 class KnockKnockOctopus extends KnockKnock
 {
+    /** @var array  */
+    public const HEADERS = [
+        CURLOPT_HEADER => false,
+        CURLOPT_RETURNTRANSFER => true
+    ];
+
+
+
     /**
+     * Инициализация объекта
+     *      Добавление общих параметров для всех запросов
+     *
+     * @return void
+     *
      * @throws Exception
+     *
+     * Test: @see KnockKnockOctopusTest::testInit()
+     *
+     * @tag #octopus #init
      */
     public function init(): void
     {
-        $this->getCommonKnockRequest()->addCurlOptions([
-            CURLOPT_HEADER => false,
-            CURLOPT_RETURNTRANSFER => true
-        ]);
+        $this->getCommonKnockRequest()->addCurlOptions(self::HEADERS );
     }
 
 
@@ -61,6 +77,8 @@ class KnockKnockOctopus extends KnockKnock
      *
      * @throws Exception
      *
+     * Test: @see KnockKnockOctopusTest::testGet()
+     *
      * @tag #octopus #request #get
      */
     public function get( string $endpoint, array $params = [] ): KnockResponse
@@ -78,6 +96,8 @@ class KnockKnockOctopus extends KnockKnock
      * @return KnockResponse
      *
      * @throws Exception
+     *
+     * Test: @see KnockKnockOctopusTest::testPost()
      *
      * @tag #octopus #request #post
      */
@@ -188,6 +208,33 @@ class KnockKnockOctopus extends KnockKnock
         return $this->commonMethod( LibKnockMethod::TRACE, $endpoint, $data );
     }
 
+    /**
+     * Возвращает объект KnockResponse с фейковыми данными
+     *
+     * @param array $fakeResponse
+     * @param array $requestParams
+     *
+     * @return KnockResponse
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockOctopusTest::testFakeResponse()
+     *
+     * @tag #octopus #request #fake
+     */
+    public function fakeResponse( array $fakeResponse, array $requestParams = [] ): KnockResponse
+    {
+        $this->setupRequest(
+            $this->constructRequest(
+                LibKnockMethod::GET,
+                '/',
+                $requestParams
+            )
+        );
+
+        return $this->send( $fakeResponse );
+    }
+
 
 
     // === Private ===
@@ -229,7 +276,7 @@ class KnockKnockOctopus extends KnockKnock
     {
         $knockRequestParams = [];
 
-        if ( $method !== LibKnockMethod::GET && count($data) ) {
+        if ( count($data) ) {
             $knockRequestParams[KnockRequestInterface::SETUP_DATA] = $data;
         }
 
