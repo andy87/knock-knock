@@ -580,34 +580,22 @@ $knockResponse = $knockKnockYandex->send(); // Логирование `afterSend
 ## Тесты
 
 ### Настройка тестов:
- - 89 tests, 
- - 337 assertions
-
-`./vendor/bin/phpunit --migrate-configuration`
+ - 89 tests  
+ - 337 assertions  
 
 ### Запуск тестов:
 Нативный 
 ```bash
-./vendor/bin/phpunit
+vendor/bin/phpunit
 ```  
 Информационный 
 ```bash
-./vendor/bin/phpunit --testdox
+vendor/bin/phpunit --testdox
 ```  
-С лолгированием 
+С логированием 
 ```bash
-./vendor/bin/phpunit --testdox --log-junit "tests/logs/phpunit.xml"
-```  
-Отдельного файла 
-```bash
-./vendor/bin/phpunit --testdox tests/KnockKnockTest.php
-```  
-Отдельного теста
-```bash
-./vendor/bin/phpunit --filter testEventChange --testdox tests/KnockKnockTest.php
-
+vendor/bin/phpunit --log-junit "tests/logs/phpunit.xml"
 ```
-
 
 ## Лицензия
 
