@@ -1,7 +1,7 @@
 {
   "name": "andy87/knockknock",
   "description": "PHP Facade Curl library - developed by and_y87",
-  "version": "0.99.2",
+  "version": "1.0.0",
   "keywords": ["and_y87", "php", "cURL","facade", "knock-knock", "knockknock"],
   "homepage": "https://andy87.ru",
   "license": "CC-BY-SA-4.0",

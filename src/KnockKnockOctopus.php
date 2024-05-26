@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-23
- * @version 0.99c
+ * @version 1.0.0
  */
 
 declare(strict_types=1);
@@ -32,7 +32,7 @@ use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
  * - @see KnockKnockOctopus::head();
  * - @see KnockKnockOctopus::trace();
  *
- * Покрытие тестами: 100%. @see KnockRequestTest
+ * Покрытие тестами: 30%. @see KnockRequestTest
  */
 class KnockKnockOctopus extends KnockKnock
 {
