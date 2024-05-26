@@ -51,11 +51,11 @@
 
 <h1 align="center">KnockKnock</h1>
 
-<p align="center"><img src="assets/docs/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
+<p align="center"><img src="assets/logo/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
 
 ### Условная схема работы приложения
 
-<p align="center"><img src="assets/docs/logicKnockKnock.png"></p>
+<p align="center"><img src="assets/logicKnockKnock.png" alt="логика схемы работы приложения"></p>
 
 ## Базовый класс: 
 _use [andy87\knock_knock\core\KnockKnock](src/core/KnockKnock.php);_  
@@ -410,7 +410,7 @@ $knockKnock->useCookie( $cookie, $jar );
     <a href="docs/KnockKnock/KnockKnockOctopus.md" target="_blank">
         KnockKnockOctopus
         <br>
-        <img src="assets/docs/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnockOctopus php curl facade"/>
+        <img src="assets/logo/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnockOctopus php curl facade"/>
     </a>
 </h3>
 
@@ -446,7 +446,7 @@ $knockKnockOctopus->post( '/new', [
     <a href="docs/KnockKnock/KnockKnockSecurity.md" target="_blank">
         KnockKnockSecurity
         <br>
-        <img src="assets/docs/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnockSecurity php curl facade"/>
+        <img src="assets/logo/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnockSecurity php curl facade"/>
     </a>
 </h3>
 

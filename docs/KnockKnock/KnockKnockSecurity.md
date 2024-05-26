@@ -3,7 +3,7 @@ _[andy87\knock_knock\KnockKnockSecurity](../../src/KnockKnockSecurity.php);_
 
 PHP Фасад для класса `KnockKnock` отправляющего запросы через ext cURL.
 
-<p style="text-align: center"><img src="../../assets/docs/KnockKnockSecurity_280.png" style="height:164px; width:auto" alt="KnockKnock php curl facade"/></p>
+<p style="text-align: center"><img src="../../assets/logo/KnockKnockSecurity_280.png" style="height:164px; width:auto" alt="KnockKnock php curl facade"/></p>
 
 Расширяет класс [KnockKnockOctopus](KnockKnockOctopus.md) и предоставляет доступ к функционалу для простой и  
 быстрой реализации авторизации и настройки запросов.
