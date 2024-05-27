@@ -185,7 +185,7 @@ $knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockConfig );
 - `array $knockKnockConfig` - массив с настройками для всех исходящих запросов.
 
 При создании объекта `KnockKnock` будет вызван метод `init()`, который запускает пользовательские инструкции.  
-После выполнения `init()` запускается обработчик события привязанный к событию `EVENT_AFTER_CONSTRUCT`
+После выполнения `init()` запускается обработчик события привязанный к ключу `EVENT_AFTER_CONSTRUCT`
 
 <h2 align="center" id="knockknock-src-KnockKnock-params">
   Общие настройки запросов
@@ -435,10 +435,7 @@ _use [andy87\knock_knock\core\KnockResponse](src/core/KnockResponse.php);_
 
 Передавая параметры напрямую в конструктор:
 ```php
-$knockResponse = new KnockResponse([
-    KnockResponse::CONTENT => '{"id" => 806034, "name" => "and_y87"}',
-    KnockResponse::HTTP_CODE => 200
-]);
+$knockResponse = new KnockResponse('{"id" => 806034, "name" => "and_y87"}', 200 );
 ```
 Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_RESPONSE`
 ```php
