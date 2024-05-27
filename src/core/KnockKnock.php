@@ -31,18 +31,18 @@ use andy87\knock_knock\interfaces\{ KnockKnockInterface, KnockRequestInterface, 
  */
 class KnockKnock implements KnockKnockInterface
 {
-    /** @var ?KnockKnock $_instance Singleton */
+    /** @var ?KnockKnock $_instance Объект для реализации Singleton */
     protected static ?KnockKnock $_instance = null;
 
 
-    /** @var ?KnockRequest $_commonKnockRequest Общие параметры, назначаемые всем исходящим запросам */
+    /** @var ?KnockRequest $_commonKnockRequest Объект содержащий параметры, назначаемые всем исходящим запросам */
     protected ?KnockRequest $_commonKnockRequest = null;
 
-    /** @var ?KnockRequest $_realKnockRequest Последний используемый запрос */
+    /** @var ?KnockRequest $_realKnockRequest Используемый запрос */
     protected ?KnockRequest $_realKnockRequest = null;
 
 
-    /** @var callable[] Список callback функций, обработчиков событий */
+    /** @var callable[] Список обработчиков событий */
     protected array $_eventHandlers = [
         self::EVENT_AFTER_INIT => null,
         self::EVENT_CONSTRUCT_REQUEST => null,
@@ -59,7 +59,7 @@ class KnockKnock implements KnockKnockInterface
      */
     protected string $_host;
 
-    /** @var array $_log Список логов*/
+    /** @var array $_log Список логов */
     protected array $_log = [];
 
 

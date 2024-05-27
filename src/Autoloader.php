@@ -24,13 +24,14 @@ class Autoloader
     /**
      * @param string $baseDirectory
      */
-    public function __construct($baseDirectory = __DIR__)
+    public function __construct( string $baseDirectory = __DIR__ )
     {
         $this->directory = $baseDirectory;
+
         $this->prefix = __NAMESPACE__ . '\\';
+
         $this->prefixLength = strlen($this->prefix);
     }
-
 
     /**
      * @param bool $prepend
@@ -43,9 +44,9 @@ class Autoloader
     /**
      * @param string $className
      */
-    public function autoload( string $className )
+    public function autoload( string $className ): void
     {
-        if ( str_starts_with($className, $this->prefix) )
+        if ( str_starts_with( $className, $this->prefix ) )
         {
             $parts = explode( '\\', substr($className, $this->prefixLength) );
 
