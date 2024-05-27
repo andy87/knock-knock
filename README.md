@@ -1,7 +1,7 @@
 
 <h1 align="center">KnockKnock</h1>
 
-<p align="center"><img src="assets/logo/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
+<p align="center"><img src="assets/logo/KnockKnockLogo_256.png" style="width:256px; height: auto" alt="KnockKnock php curl facade"/></p>
 
 KnockKnock - это простая библиотека, реализующая Фасад и предоставляющая удобный интерфейс для выполнения запросов в PHP,
 используя расширение cURL.  Она упрощает работу, предоставляя более высокоуровневый API и быстрый доступ к настройкам.
