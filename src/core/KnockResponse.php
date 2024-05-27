@@ -56,7 +56,7 @@ class KnockResponse implements KnockResponseInterface
      *
      * @param string $data
      * @param int $httpCode
-     * @param KnockRequest $knockRequest
+     * @param ?KnockRequest $knockRequest
      *
      * @return void
      * @throws Exception
@@ -65,13 +65,13 @@ class KnockResponse implements KnockResponseInterface
      *
      * @tag #constructor #response
      */
-    public function __construct( string $data, int $httpCode, KnockRequest $knockRequest )
+    public function __construct( string $data, int $httpCode, ?KnockRequest $knockRequest = null )
     {
         $this->setupData( $data );
 
         $this->setupHttpCode( $httpCode );
 
-        $this->setupRequest( $knockRequest );
+        if ( $knockRequest ) $this->setupRequest( $knockRequest );
     }
 
     /**
@@ -101,7 +101,7 @@ class KnockResponse implements KnockResponseInterface
 
             self::ERRORS => $this->getErrors(),
 
-            default => throw new Exception("Property `$name`not found on: " . __CLASS__),
+            default => throw new Exception("Свойство `$name` не найдено в классе " . __CLASS__),
         };
     }
 
@@ -365,6 +365,8 @@ class KnockResponse implements KnockResponseInterface
 
                 $this->addError('JSON decode error: ' . json_last_error_msg());
             }
+        } else {
+
         }
 
         return $resp;
