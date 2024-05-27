@@ -165,7 +165,7 @@ class KnockRequest implements KnockRequestInterface
 
             self::ERRORS => $this->getErrors(),
 
-            default => throw new Exception("Property `$name`not found on: " . __CLASS__),
+            default => throw new Exception("Свойство `$name` не найдено в классе " . __CLASS__),
         };
     }
 
@@ -353,6 +353,8 @@ class KnockRequest implements KnockRequestInterface
      */
     public function setHeader( string $key, string $value ): self
     {
+        if (empty($key) || empty($value)) throw new Exception('Ключ и значение заголовка не могут быть пустыми.');
+
         $this->limiterIsComplete();
 
         $this->_headers[ $key ] = $value;

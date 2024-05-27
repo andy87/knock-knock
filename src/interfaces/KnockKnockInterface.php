@@ -42,12 +42,30 @@ interface KnockKnockInterface
     public function __construct( string $host, array $commonKnockRequestParams = [] );
 
     /**
+     * @param string $paramName
+     *
+     * @return mixed
+     */
+    public function __get( string $paramName );
+
+    /**
      * @param string $host
      * @param array $commonKnockRequestParams
      *
      * @return self
      */
     public static function getInstance( string $host, array $commonKnockRequestParams ): self;
+
+    /**
+     * @return array
+     */
+    public function getParams(): array;
+
+    /**
+     * @return void
+     */
+    public function init(): void;
+
 
     /**
      * @param string $method
@@ -66,6 +84,7 @@ interface KnockKnockInterface
      */
     public function constructResponse( array $responseParams, ?KnockRequest $knockRequest = null ): KnockResponse;
 
+
     /**
      * @param KnockRequest $knockRequest
      * @param array $options
@@ -74,6 +93,7 @@ interface KnockKnockInterface
      */
     public function setupRequest( KnockRequest $knockRequest, array $options = [] ): self;
 
+
     /**
      * @param array $fakeResponse
      *
@@ -81,13 +101,21 @@ interface KnockKnockInterface
      */
     public function send( array $fakeResponse = [] ): KnockResponse;
 
+
     /**
-     * @param string $event
+     * @param string $eventKey
      * @param callable $callbacks
      *
      * @return ?bool
      */
-    public function on(string $event, callable $callbacks ): ?bool;
+    public function on( string $eventKey, callable $callbacks ): ?bool;
+
+    /**
+     * @param string $eventKey
+     *
+     * @return ?bool
+     */
+    public function off( string $eventKey ): ?bool;
 
     /**
      * @param string $eventKey
@@ -96,4 +124,12 @@ interface KnockKnockInterface
      * @return mixed
      */
     public function callEventHandler( string $eventKey, array $args = [] ): mixed;
+
+    /**
+     * @param string $eventKey
+     * @param callable $callback
+     *
+     * @return bool
+     */
+    public function changeEvent( string $eventKey, callable $callback ): bool;
 }
