@@ -4,8 +4,8 @@
  * @description Интерфейс класса запроса
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.0.2
  */
 
 declare(strict_types=1);

@@ -4,8 +4,8 @@
  * @description Тесты для методов класса KnockKnock
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.0.2
  */
 
 declare(strict_types=1);
@@ -65,7 +65,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @return void
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testConstructor
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testConstructor
      *
      * @tag #test #knockResponse #constructor
      */
@@ -86,7 +86,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testMagicGet
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testMagicGet
      *
      * @tag #test #knockResponse #getter
      */
@@ -148,7 +148,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testReplace
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testReplace
      *
      * @tag #test #knockResponse #getHttpCode
      */
@@ -183,7 +183,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testAsArray
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testAsArray
      *
      * @tag #test #knockResponse #asArray
      */
@@ -216,7 +216,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testGetErrors
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testGetErrors
      *
      * @tag #test #knockResponse #getErrors
      */
@@ -253,7 +253,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testValidate
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testValidate
      *
      * @tag #test #knockResponse #validate
      */
@@ -284,7 +284,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testSetupData
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testSetupData
      *
      * @tag #test #knockResponse #setupData
      */
@@ -312,7 +312,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testSetupHttpCode
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testSetupHttpCode
      *
      * @tag #test #knockResponse #setupHttpCode
      */
@@ -340,7 +340,7 @@ class KnockResponseTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --filter testSetupRequest
+     * @cli vendor/bin/phpunit tests/KnockResponseTest.php --testdox --filter testSetupRequest
      *
      * @tag #test #knockResponse #setupRequest
      */

@@ -4,8 +4,8 @@
  * @description Тесты для методов класса KnockKnock
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.0.2
  */
 
 declare(strict_types=1);
@@ -60,7 +60,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testConstructor
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testConstructor
      *
      * @tag #test #knockRequest #constructor
      */
@@ -79,7 +79,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testMagicGet
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testMagicGet
      *
      * @tag #test #knockRequest #magic #get
      */
@@ -136,7 +136,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testConstructUrlOnGet
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testConstructUrlOnGet
      *
      * @tag #test #knockRequest #constructUrl #get
      */
@@ -166,7 +166,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testConstructUrlOnPost
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testConstructUrlOnPost
      *
      * @tag #test #knockRequest #constructUrl #post
      */
@@ -201,7 +201,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testPrepareEndpointOnGet
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testPrepareEndpointOnGet
      *
      * @tag #test #knockRequest #prepare #endpoint #get
      */
@@ -233,7 +233,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testPrepareEndpointOnPost
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testPrepareEndpointOnPost
      *
      * @tag #test #knockRequest #prepare #endpoint #post
      */
@@ -261,7 +261,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetProtocol
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetProtocol
      *
      * @tag #test #knockRequest #set #protocol
      */
@@ -285,7 +285,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetHost
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetHost
      *
      * @tag #test #knockRequest #set #host
      */
@@ -309,7 +309,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetEndpoint
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetEndpoint
      *
      * @tag #test #knockRequest #set #endpoint
      */
@@ -333,7 +333,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetMethod
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetMethod
      *
      * @tag #test #knockRequest #set #method
      */
@@ -356,7 +356,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetHeader
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetHeader
      *
      * @tag #test #knockRequest #set #headers
      */
@@ -383,7 +383,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testAddHeaders
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testAddHeaders
      *
      * @tag #test #knockRequest #headers #add
      */
@@ -412,7 +412,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetContentType
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetContentType
      *
      * @tag #test #knockRequest #set #contentType
      */
@@ -436,7 +436,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetData
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetData
      *
      * @tag #test #knockRequest #set #data
      */
@@ -462,7 +462,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetCurlOptions
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetCurlOptions
      *
      * @tag #test #knockRequest #set #curlOptions
      */
@@ -488,7 +488,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testAddCurlOptions
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testAddCurlOptions
      *
      * @tag #test #knockRequest #add #curlOptions
      */
@@ -517,7 +517,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetCurlInfo
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetCurlInfo
      *
      * @tag #test #knockRequest #set #curlInfo
      */
@@ -547,7 +547,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testAddError
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testAddError
      *
      * @tag #test #knockRequest #add #error
      */
@@ -574,7 +574,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetupStatusProcessing
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetupStatusProcessing
      *
      * @tag #test #knockRequest #status #processing
      */
@@ -602,7 +602,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetupStatusComplete
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetupStatusComplete
      *
      * @tag #test #knockRequest #status #complete
      */
@@ -631,7 +631,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testStatusIsComplete
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testStatusIsComplete
      *
      * @tag #test #knockRequest #status #complete
      */
@@ -658,7 +658,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testStatusIsPrepare
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testStatusIsPrepare
      *
      * @tag #test #knockRequest #status #prepare
      */
@@ -685,7 +685,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testDisableSSL
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testDisableSSL
      *
      * @tag #test #knockRequest #ssl #disable
      */
@@ -714,7 +714,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testEnableSSL
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testEnableSSL
      *
      * @tag #test #knockRequest #ssl #enable
      */
@@ -743,7 +743,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testLimiterIsComplete
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testLimiterIsComplete
      *
      * @tag #test #knockRequest #limiter #status #complete
      */
@@ -776,7 +776,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testPrepareHost
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testPrepareHost
      *
      * @tag #test #knockRequest #prepare #host
      */
@@ -820,7 +820,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetupParamsFromArray
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetupParamsFromArray
      *
      * @tag #test #knockRequest #setup #params
      */
@@ -846,7 +846,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testSetParamsOnStatusPrepare
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testSetParamsOnStatusPrepare
      *
      * @tag #test #knockRequest #set #prepare #params
      */
@@ -886,7 +886,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testGetStatusLabel
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testGetStatusLabel
      *
      * @tag #test #knockRequest #status #label
      */
@@ -925,7 +925,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testGetParams
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testGetParams
      *
      * @tag #test #knockRequest #get #params
      */
@@ -950,7 +950,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testGetErrors
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testGetErrors
      *
      * @tag #test #knockRequest #get #errors
      */
@@ -983,7 +983,7 @@ class KnockRequestTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --filter testClone
+     * @cli vendor/bin/phpunit tests/KnockRequestTest.php --testdox --filter testClone
      *
      * @tag #test #knockRequest #clone
      */

@@ -4,8 +4,8 @@
  * @description Тесты для методов класса KnockKnockOctopus
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.0.2
  */
 
 declare(strict_types=1);
@@ -62,7 +62,7 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --filter testInit
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testInit
      *
      * @tag #test #knockKnock #octopus #init
      */
@@ -103,7 +103,7 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --filter testGet
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testGet
      *
      * @tag #test #knockKnock #octopus #get
      */
@@ -137,7 +137,7 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --filter testPost
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testPost
      *
      * @tag #test #knockKnock #octopus #post
      */
@@ -180,7 +180,7 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --filter testFakeResponse
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testFakeResponse
      *
      * @tag #test #knockKnock #octopus #get #fakeResponse
      */

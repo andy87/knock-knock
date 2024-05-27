@@ -4,8 +4,8 @@
  * @description Тесты для методов класса KnockKnockSecurity
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.0.2
  */
 
 declare(strict_types=1);
@@ -93,7 +93,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @dataProvider SetupAuthProvider
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --filter testSetupAuthorization
+     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSetupAuthorization
      *
      * @tag #security #setup #authorization
      */
@@ -165,7 +165,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * Source: @see KnockKnockSecurity::setupHeaders()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --filter testSetupHeaders
+     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSetupHeaders
      *
      * @tag #security #setup #headers
      */
@@ -217,7 +217,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * Source: @see KnockKnockSecurity::setupContentType()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --filter testSetupContentType
+     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSetupContentType
      *
      * @tag #security #setup #content-type
      */
@@ -259,7 +259,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * Source: @see KnockKnockSecurity::useHeaders()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --filter testUseHeaders
+     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testUseHeaders
      *
      * @tag #security #use #headers
      */
@@ -323,7 +323,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * Source: @see KnockKnockSecurity::send()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --filter testSend
+     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSend
      *
      * @tag #security #send
      */
@@ -390,7 +390,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      * Source: @see KnockKnockSecurity::modifyRequestByUse()
      * Source: @see KnockKnockSecurity::clearUse()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --filter testModifyRequestByUse
+     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testModifyRequestByUse
      *
      * @tag #security #use #request #modify
      */

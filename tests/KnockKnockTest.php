@@ -4,8 +4,8 @@
  * @description Тесты для методов класса KnockKnock
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.0.2
  */
 
 declare(strict_types=1);
@@ -62,7 +62,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testConstructor
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testConstructor
      *
      * @tag #test #knockKnock #constructor
      */
@@ -81,7 +81,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testGetInstance
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testGetInstance
      *
      * @tag #test #knockKnock #get #instance
      */
@@ -120,7 +120,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testValidateHostName
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testValidateHostName
      *
      * @tag #test #knockKnock #validate #hostName
      */
@@ -172,7 +172,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventInit
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testEventInit
      *
      * @tag #test #knockKnock #event #init
      */
@@ -193,7 +193,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testGetter
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testGetter
      *
      * @tag #test #knockKnock #get
      */
@@ -225,7 +225,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testGetParams
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testGetParams
      *
      * @tag #test #knockKnock #get #params
      */
@@ -286,7 +286,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testConstruct
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testConstruct
      *
      * @tag #test #knockKnock #construct
      */
@@ -327,7 +327,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSetupRequest
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testSetupRequest
      *
      * @tag #test #knockKnock #setup #request
      */
@@ -362,7 +362,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSetupEventHandlers
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testSetupEventHandlers
      *
      * @tag #test #knockKnock #setup #eventHandlers
      */
@@ -404,7 +404,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventsOn
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testEventsOn
      *
      * @tag #test #knockKnock #event #on
      */
@@ -426,7 +426,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventCall
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testEventCall
      *
      * @tag #test #knockKnock #event #call
      */
@@ -460,7 +460,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventOff
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testEventOff
      *
      * @tag #test #knockKnock #event #off
      */
@@ -495,7 +495,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEventChange
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testEventChange
      *
      * @tag #test #knockKnock #event #change
      */
@@ -551,7 +551,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testDisableSsl
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testDisableSsl
      *
      * @tag #test #knockKnock #ssl #disable
      */
@@ -578,7 +578,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEnableSsl
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testEnableSsl
      *
      * @tag #test #knockKnock #ssl #enable
      */
@@ -605,7 +605,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testEnableRedirect
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testEnableRedirect
      *
      * @tag #test #knockKnock #redirect #enable
      */
@@ -630,7 +630,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUseCookie
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testUseCookie
      *
      * @tag #test #knockKnock #cookie
      */
@@ -675,7 +675,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSendRequest
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testSendRequest
      *
      * @tag #test #knockKnock #send
      */
@@ -711,7 +711,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSendRequestWithFakeResponse
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testSendRequestWithFakeResponse
      *
      * @tag #test #knockKnock #send #fakeResponse
      */
@@ -746,7 +746,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testSendRequestOnMethodPost
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testSendRequestOnMethodPost
      *
      * @tag #test #knockKnock #send #post
      */
@@ -792,7 +792,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUpdateRequestParams
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testUpdateRequestParams
      *
      * @tag #test #knockKnock #update #requestParams
      */
@@ -858,7 +858,7 @@ class KnockKnockTest extends UnitTestCore
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUpdatePostFields
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testUpdatePostFields
      *
      * @tag #test #knockKnock #update #postFields
      */
@@ -904,41 +904,81 @@ class KnockKnockTest extends UnitTestCore
     /**
      * Ожидается что метод `updateMethod` задаст `CURLOPT_CUSTOMREQUEST` свойство запроса
      *
+     * @dataProvider methodListProvider
+     *
      * Source: @see KnockKnock::updateMethod()
      *
      * @throws Exception
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --filter testUpdateMethod
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testUpdateMethod
      *
      * @tag #test #knockKnock #update #method
      */
-    public function testUpdateMethod()
+    public function testUpdateMethod( string $method )
     {
         $knockKnock = $this->getKnockKnock(self::HOST, []);
-
-        $methodList = [
-            LibKnockMethod::GET,
-            LibKnockMethod::POST,
-            LibKnockMethod::PUT,
-            LibKnockMethod::PATCH,
-            LibKnockMethod::DELETE,
-        ];
 
         $fakeResponse = [
             KnockResponseInterface::CONTENT => self::CONTENT,
             KnockResponseInterface::HTTP_CODE => self::HTTP_CODE_OK,
         ];
 
-        foreach ( $methodList as $method )
-        {
-            $knockRequest = $knockKnock->constructRequest( $method,self::ENDPOINT );
+        $knockRequest = $knockKnock->constructRequest( $method,self::ENDPOINT );
 
-            $knockResponse = $knockKnock->setupRequest( $knockRequest )->send( $fakeResponse );
+        $knockResponse = $knockKnock->setupRequest( $knockRequest )->send( $fakeResponse );
 
-            $this->assertEquals( $method, $knockResponse->request->method );
-        }
+        $this->assertEquals( $method, $knockResponse->request->method );
     }
 
+    /**
+     * Проверка правильного определения валидности метода.
+     *
+     *      Ожидается что метод `validateMethod` вернет true для валидных методов
+     *      Проверка происходит через вызов метода `constructRequest`
+     *
+     * @dataProvider methodListProvider
+     *
+     * Source: @see KnockKnock::validateMethod()
+     *
+     * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockTest.php --testdox --filter testValidateMethod
+     *
+     * @tag #test #knockKnock #validate #method
+     */
+    public function testValidateMethod( string $method )
+    {
+        $knockKnock = new KnockKnock(self::HOST);
+
+        $knockRequest = $knockKnock->constructRequest( $method,self::ENDPOINT );
+
+        $knockKnock->setupRequest( $knockRequest );
+
+        $this->assertEquals( $method, $knockKnock->realKnockRequest->method );
+
+        $this->expectException(Exception::class);
+
+        $knockKnock->constructRequest( 'INVALID_METHOD',self::ENDPOINT );
+    }
+
+    /**
+     * Возвращает список методов из класса `LibKnockMethod`
+     *
+     * @return string[]
+     */
+    public static function methodListProvider(): array
+    {
+        return [
+            [ LibKnockMethod::GET ],
+            [ LibKnockMethod::POST ],
+            [ LibKnockMethod::PUT ],
+            [ LibKnockMethod::DELETE ],
+            [ LibKnockMethod::PATCH ],
+            [ LibKnockMethod::OPTIONS ],
+            [ LibKnockMethod::HEAD ],
+            [ LibKnockMethod::TRACE ]
+        ];
+    }
 
 
 
