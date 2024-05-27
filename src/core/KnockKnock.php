@@ -89,18 +89,89 @@ class KnockKnock implements KnockKnockInterface
     }
 
     /**
-     * Пользовательская инициализация
+     * Подготовка общих параметров запроса
      *
-     * @return void
+     * @param array $commonKnockRequestParams
      *
-     * Test: @see KnockKnockTest::testEventInit()
+     * @return KnockRequest
      *
-     * @tag #knockKnock #init
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testConstructor()
+     *
+     * @tag #knockKnock #prepare #common #request
      */
-    public function init(): void {}
+    private function prepareCommonKnockRequestParams( array $commonKnockRequestParams ): KnockRequest
+    {
+        $domainSeparator = '://';
 
+        if ( str_contains( $this->_host, $domainSeparator ) )
+        {
+            [ $protocol, $this->_host ] = explode( $domainSeparator, $this->_host );
 
-    // --- Getters ---
+            $commonKnockRequestParams = array_merge(
+                [
+                    KnockRequestInterface::SETUP_PROTOCOL => $protocol
+                ],
+                $commonKnockRequestParams
+            );
+        }
+
+        if ( !self::validateHostName( $this->_host ) )
+        {
+            throw new Exception("Хост `$this->_host` не валиден");
+        }
+
+        $commonKnockRequestParams = array_merge(
+            [
+            KnockRequestInterface::SETUP_PROTOCOL => KnockRequest::PROTOCOL_HTTP,
+            KnockRequestInterface::SETUP_HOST => $this->_host,
+        ],
+            $commonKnockRequestParams
+        );
+
+        return new KnockRequest( null, $commonKnockRequestParams );
+    }
+
+    /**
+     * Проверка валидности хоста
+     *
+     * @param string $host
+     *
+     * @return bool
+     *
+     * @throws Exception
+     *
+     * Test: @see KnockKnockTest::testValidateHostName()
+     *
+     * @tag #knockKnock #validate #host
+     */
+    public static function validateHostName( string $host ): bool
+    {
+        if ( strlen($host) < 4 OR strlen($host) > 253  ) return false;
+
+        if ( str_contains($host, '--') OR str_contains($host, '..') ) return false;
+
+        $parts = ( str_contains( $host, '.' ) ) ? explode('.', $host) : [$host];
+        $parts = array_reverse($parts);
+
+        $regexName = '/^(?!-)[A-Za-z0-9-]{1,63}(?<!-)$/';
+        $regexZone = '/^(?!-)[A-Za-z0-9-]{2.63}(?<!-)$/';
+
+        foreach ( $parts as $index => $part )
+        {
+            if ( $index )
+            {
+                if ( !preg_match($regexName, $part)) return false;
+
+            } elseif ( strlen($part) < 2 ){ // проверка доменной зоны
+
+                if ( !preg_match($regexZone, $part)) return false;
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Магический метод для получения свойств
@@ -123,7 +194,7 @@ class KnockKnock implements KnockKnockInterface
             'realKnockRequest' => $this->getRealKnockRequest(),
             'eventHandlers' => $this->getEvents(),
             'logs' => $this->getLogs(),
-            default => throw new Exception("Свойство `$paramName` не найдено в классе " . __CLASS__),
+            default => throw new Exception("Property `$paramName` not found"),
         };
     }
 
@@ -146,10 +217,43 @@ class KnockKnock implements KnockKnockInterface
         ];
     }
 
+    /**
+     * Получение экземпляра класса, используя паттерн Singleton
+     *
+     * @param ?string $host
+     * @param array $commonKnockRequestParams
+     *
+     * @return self
+     *
+     * Test: @see KnockKnockTest::testGetInstance()
+     *
+     * @tag #knockKnock #get #instance
+     */
+    public static function getInstance( string $host = null, array $commonKnockRequestParams = [] ): self
+    {
+        if ( static::$_instance === null )
+        {
+            $classname = static::class;
+
+            static::$_instance = new $classname( $host, $commonKnockRequestParams );
+        }
+
+        return static::$_instance;
+    }
+
+    /**
+     * Пользовательская инициализация
+     *
+     * @return void
+     *
+     * Test: @see KnockKnockTest::testEventInit()
+     *
+     * @tag #knockKnock #init
+     */
+    public function init(): void {}
 
 
-
-    // --- Construct ---
+    // === Construct ===
 
     /**
      * Конструктор запроса
@@ -168,10 +272,6 @@ class KnockKnock implements KnockKnockInterface
      */
     public function constructRequest( string $method, string $endpoint, array $knockRequestConfig = [] ): KnockRequest
     {
-        if (!$this->validateMethod($method)) throw new Exception('Ошибка в методе');
-
-        if (empty($endpoint)) throw new Exception('Endpoint не может быть пустым.');
-
         $knockRequestConfig = array_merge([
             KnockRequestInterface::SETUP_HOST => $this->_host,
             KnockRequestInterface::SETUP_METHOD => $method,
@@ -216,7 +316,7 @@ class KnockKnock implements KnockKnockInterface
     }
 
 
-    // --- Setup ---
+    // === Setup ===
 
     /**
      * @param KnockRequest $knockRequest
@@ -270,8 +370,31 @@ class KnockKnock implements KnockKnockInterface
         return $this->_eventHandlers;
     }
 
+    /**
+     * Добавление Записи в лог ошибок
+     *
+     * @param string $error
+     * @param ?string $key
+     *
+     * @return $this
+     */
+    public function addLog( string $error, ?string $key = null ): self
+    {
+        if ( $key )
+        {
+            $this->_log[$key] = $error;
 
-    // --- Response ---
+        } else {
+
+            $this->_log[] = $error;
+        }
+
+        return $this;
+    }
+
+
+
+    // === Response ===
 
     /**
      * Отправка запроса
@@ -347,9 +470,6 @@ class KnockKnock implements KnockKnockInterface
         return $knockResponse;
     }
 
-
-    // --- Events ---
-
     /**
      * Вызов обработчика события снаружи класса
      *
@@ -369,10 +489,36 @@ class KnockKnock implements KnockKnockInterface
         return null;
     }
 
+    // === Обработчики событий === Event === Behavior === Callbacks ===
+
+    /**
+     * Вызов обработчика события внутри класса
+     *
+     * @param string $eventKey
+     * @param array $args
+     *
+     * @return void
+     *
+     * Test: @see KnockKnockTest::testEventCall()
+     *
+     * @tag #knockKnock #behavior #event #callback
+     */
+    private function event( string $eventKey, array $args = [] ): void
+    {
+        if ( isset( $this->_eventHandlers[ $eventKey ] ) )
+        {
+            $callback = $this->_eventHandlers[ $eventKey ];
+
+            if ( empty($args) ) $args = [ $this ];
+
+            call_user_func_array( $callback, $args );
+        }
+    }
+
     /**
      * Добавление обработчика события
      *
-     * @param string $eventKey
+     * @param string $event
      * @param callable $callbacks
      *
      * @return ?bool
@@ -383,11 +529,11 @@ class KnockKnock implements KnockKnockInterface
      *
      * @tag #knockKnock #behavior #event #callback
      */
-    public function on( string $eventKey, callable $callbacks ): ?bool
+    public function on(string $event, callable $callbacks ): ?bool
     {
-        if ( !isset($this->_eventHandlers[$eventKey]) || $this->_eventHandlers[$eventKey] === null )
+        if ( !isset($this->_eventHandlers[$event]) || $this->_eventHandlers[$event] === null )
         {
-            return $this->changeEvent( $eventKey, $callbacks );
+            return $this->changeEvent( $event, $callbacks );
         }
 
         throw new Exception('Event already exists. Use method change() for change event handler');
@@ -396,7 +542,7 @@ class KnockKnock implements KnockKnockInterface
     /**
      * Изменение обработчика события
      *
-     * @param string $eventKey
+     * @param string $event
      * @param callable $callback
      *
      * @return bool
@@ -405,9 +551,9 @@ class KnockKnock implements KnockKnockInterface
      *
      * @tag #knockKnock #behavior #event #callback
      */
-    public function changeEvent( string $eventKey, callable $callback ): bool
+    public function changeEvent(string $event, callable $callback ): bool
     {
-        $this->_eventHandlers[$eventKey] = $callback;
+        $this->_eventHandlers[$event] = $callback;
 
         return true;
     }
@@ -415,7 +561,7 @@ class KnockKnock implements KnockKnockInterface
     /**
      * Удаление обработчика события
      *
-     * @param string $eventKey
+     * @param string $event
      *
      * @return bool
      *
@@ -423,11 +569,11 @@ class KnockKnock implements KnockKnockInterface
      *
      * @tag #knockKnock #behavior #event #callback
      */
-    public function off( string $eventKey ): bool
+    public function off( string $event ): bool
     {
-        if ( isset( $this->_eventHandlers[$eventKey] ) )
+        if ( isset( $this->_eventHandlers[$event] ) )
         {
-            unset( $this->_eventHandlers[$eventKey] );
+            unset( $this->_eventHandlers[$event] );
 
             return true;
         }
@@ -437,29 +583,77 @@ class KnockKnock implements KnockKnockInterface
 
 
 
-    // --- Features ---
+    // === Get ===
 
     /**
-     * Добавление Записи в лог ошибок
+     * Получение объекта запроса с общими параметрами для всех запросов
      *
-     * @param string $error
-     * @param ?string $key
+     * @return ?KnockRequest
      *
-     * @return $this
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @tag #knockKnock #request #common
      */
-    public function addLog( string $error, ?string $key = null ): self
+    protected function getCommonKnockRequest(): ?KnockRequest
     {
-        if ( $key )
-        {
-            $this->_log[$key] = $error;
-
-        } else {
-
-            $this->_log[] = $error;
-        }
-
-        return $this;
+        return $this->_commonKnockRequest ?? null;
     }
+
+    /**
+     * Получение объекта запроса с параметрами последнего запроса
+     *
+     * @return ?KnockRequest
+     *
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @tag #knockKnock #request #real
+     */
+    protected function getRealKnockRequest(): ?KnockRequest
+    {
+        return $this->_realKnockRequest ?? null;
+    }
+
+    /**
+     * Получение хоста
+     *
+     * @return string
+     *
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @tag #knockKnock #get #host
+     */
+    protected function getHost(): string
+    {
+        return $this->_host;
+    }
+
+    /**
+     * Получение обработчиков событий
+     *
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @return callable[]
+     */
+    protected function getEvents(): array
+    {
+        return $this->_eventHandlers;
+    }
+
+    /**
+     * Получение логов
+     *
+     * Test: @see KnockKnockTest::testGetter()
+     *
+     * @return array
+     */
+    protected function getLogs(): array
+    {
+        return $this->_log;
+    }
+
+
+
+    // === SSL ===
 
     /**
      * Отключение SSL сертификата
@@ -545,146 +739,9 @@ class KnockKnock implements KnockKnockInterface
     }
 
 
-    // ---static ---
-
-    /**
-     * Проверка валидности хоста
-     *
-     * @param string $host
-     *
-     * @return bool
-     *
-     * @throws Exception
-     *
-     * Test: @see KnockKnockTest::testValidateHostName()
-     *
-     * @tag #knockKnock #validate #host
-     */
-    public static function validateHostName( string $host ): bool
-    {
-        if ( strlen($host) < 4 OR strlen($host) > 253  ) return false;
-
-        if ( str_contains($host, '--') OR str_contains($host, '..') ) return false;
-
-        $parts = ( str_contains( $host, '.' ) ) ? explode('.', $host) : [$host];
-        $parts = array_reverse($parts);
-
-        $regexName = '/^(?!-)[A-Za-z0-9-]{1,63}(?<!-)$/';
-        $regexZone = '/^(?!-)[A-Za-z0-9-]{2,63}(?<!-)$/';
-
-        foreach ( $parts as $index => $part )
-        {
-            if ( $index )
-            {
-                if ( !preg_match($regexName, $part)) return false;
-
-            } elseif ( strlen($part) < 2 ){ // проверка доменной зоны
-
-                if ( !preg_match($regexZone, $part)) return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Получение экземпляра класса, используя паттерн Singleton
-     *
-     * @param ?string $host
-     * @param array $commonKnockRequestParams
-     *
-     * @return self
-     *
-     * Test: @see KnockKnockTest::testGetInstance()
-     *
-     * @tag #knockKnock #get #instance
-     */
-    public static function getInstance( string $host = null, array $commonKnockRequestParams = [] ): self
-    {
-        if ( static::$_instance === null )
-        {
-            $classname = static::class;
-
-            static::$_instance = new $classname( $host, $commonKnockRequestParams );
-        }
-
-        return static::$_instance;
-    }
 
 
-
-    // === Protected ===
-
-    // --- Getters ---
-
-    /**
-     * Получение объекта запроса с общими параметрами для всех запросов
-     *
-     * @return ?KnockRequest
-     *
-     * Test: @see KnockKnockTest::testGetter()
-     *
-     * @tag #knockKnock #request #common
-     */
-    protected function getCommonKnockRequest(): ?KnockRequest
-    {
-        return $this->_commonKnockRequest ?? null;
-    }
-
-    /**
-     * Получение объекта запроса с параметрами последнего запроса
-     *
-     * @return ?KnockRequest
-     *
-     * Test: @see KnockKnockTest::testGetter()
-     *
-     * @tag #knockKnock #request #real
-     */
-    protected function getRealKnockRequest(): ?KnockRequest
-    {
-        return $this->_realKnockRequest ?? null;
-    }
-
-    /**
-     * Получение хоста
-     *
-     * @return string
-     *
-     * Test: @see KnockKnockTest::testGetter()
-     *
-     * @tag #knockKnock #get #host
-     */
-    protected function getHost(): string
-    {
-        return $this->_host;
-    }
-
-    /**
-     * Получение обработчиков событий
-     *
-     * Test: @see KnockKnockTest::testGetter()
-     *
-     * @return callable[]
-     */
-    protected function getEvents(): array
-    {
-        return $this->_eventHandlers;
-    }
-
-    /**
-     * Получение логов
-     *
-     * Test: @see KnockKnockTest::testGetter()
-     *
-     * @return array
-     */
-    protected function getLogs(): array
-    {
-        return $this->_log;
-    }
-
-
-    // --- Send ---
+    // === protected ===
 
     /**
      * Отправка запроса
@@ -719,84 +776,8 @@ class KnockKnock implements KnockKnockInterface
     }
 
 
-    // === P R I V A T E ===
 
-    // --- Prepare ---
-
-    /**
-     * Подготовка общих параметров запроса
-     *
-     * @param array $commonKnockRequestParams
-     *
-     * @return KnockRequest
-     *
-     * @throws Exception
-     *
-     * Test: @see KnockKnockTest::testConstructor()
-     *
-     * @tag #knockKnock #prepare #common #request
-     */
-    private function prepareCommonKnockRequestParams( array $commonKnockRequestParams ): KnockRequest
-    {
-        $domainSeparator = '://';
-
-        if ( str_contains( $this->_host, $domainSeparator ) )
-        {
-            [ $protocol, $this->_host ] = explode( $domainSeparator, $this->_host );
-
-            $commonKnockRequestParams = array_merge(
-                [
-                    KnockRequestInterface::SETUP_PROTOCOL => $protocol
-                ],
-                $commonKnockRequestParams
-            );
-        }
-
-        if ( !self::validateHostName( $this->_host ) )
-        {
-            throw new Exception("Хост `$this->_host` не валиден");
-        }
-
-        $commonKnockRequestParams = array_merge(
-            [
-                KnockRequestInterface::SETUP_PROTOCOL => KnockRequest::PROTOCOL_HTTP,
-                KnockRequestInterface::SETUP_HOST => $this->_host,
-            ],
-            $commonKnockRequestParams
-        );
-
-        return new KnockRequest( null, $commonKnockRequestParams );
-    }
-
-
-    // --- Events ---
-
-    /**
-     * Вызов обработчика события внутри класса
-     *
-     * @param string $eventKey
-     * @param array $args
-     *
-     * @return void
-     *
-     * Test: @see KnockKnockTest::testEventCall()
-     *
-     * @tag #knockKnock #behavior #event #callback
-     */
-    private function event( string $eventKey, array $args = [] ): void
-    {
-        if ( isset( $this->_eventHandlers[ $eventKey ] ) )
-        {
-            $callback = $this->_eventHandlers[ $eventKey ];
-
-            if ( empty($args) ) $args = [ $this ];
-
-            call_user_func_array( $callback, $args );
-        }
-    }
-
-
-    // --- Update ---
+    // === Update ===
 
     /**
      * Обновление параметров запроса на основе переданных параметров в
@@ -887,24 +868,13 @@ class KnockKnock implements KnockKnockInterface
                         break;
 
                     case LibKnockContentType::FORM:
+                    case LibKnockContentType::MULTIPART:
                         $data = http_build_query($data);
                         break;
 
-                    case LibKnockContentType::PDF:
-                    case LibKnockContentType::ZIP:
-                    case LibKnockContentType::GZIP:
-                    case LibKnockContentType::TAR:
-                    case LibKnockContentType::RAR:
-                    case LibKnockContentType::SEVEN_ZIP:
-                    case LibKnockContentType::IMAGE:
-                    case LibKnockContentType::AUDIO:
-                    case LibKnockContentType::VIDEO:
-                    case LibKnockContentType::FONT:
-                        $data = file_get_contents($data);
-                        break;
-
-                    default:
-                        break;
+                    case LibKnockContentType::XML:
+                    case LibKnockContentType::TEXT:
+                    default: break;
                 }
 
                 $knockRequest->setCurlOption( CURLOPT_POSTFIELDS, $data );
@@ -913,6 +883,8 @@ class KnockKnock implements KnockKnockInterface
 
         return $this;
     }
+
+
 
     /**
      * Установка метода запроса
@@ -937,32 +909,5 @@ class KnockKnock implements KnockKnockInterface
         }
 
         return $this;
-    }
-
-    /**
-     * Валидация метода
-     *
-     * @param string $methodName
-     *
-     * //TODO: Test
-     *
-     * @return bool
-     *
-     * @tag #validate #method
-     */
-    private function validateMethod( string $methodName ): bool
-    {
-        if ( empty($methodName) ) return false;
-
-        return in_array( $methodName, [
-            LibKnockMethod::GET,
-            LibKnockMethod::POST,
-            LibKnockMethod::PUT,
-            LibKnockMethod::DELETE,
-            LibKnockMethod::PATCH,
-            LibKnockMethod::OPTIONS,
-            LibKnockMethod::HEAD,
-            LibKnockMethod::TRACE
-        ]);
     }
 }

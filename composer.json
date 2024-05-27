@@ -38,10 +38,5 @@
       "app\\": "src/",
       "andy87\\knock_knock\\tests\\": "tests/"
     }
-  },
-
-  "scripts": {
-    "test": "vendor/bin/phpunit"
   }
-
 }
