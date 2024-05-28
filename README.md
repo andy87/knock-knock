@@ -131,7 +131,7 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h2 id="knockknock-src-KnockKnock">
+<h2 align="center" id="knockknock-src-KnockKnock">
     Базовый класс
 </h2>
 
