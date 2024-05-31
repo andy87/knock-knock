@@ -46,28 +46,27 @@ composer require andy87/KnockKnock
 ```bash
 php composer.phar require andy87/KnockKnock
 ```
-Далее: **Обновление зависимостей Composer**
-
-
-
+Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
+  
+...
+  
 <h3 id="knockknock-setup-composer-composer-json">
     Используя: файл `composer.json`
 </h3>
 
-Открыть файла `composer.json`  
-В раздел по ключу `require` добавить строку  
-`"andy87/KnockKnock": ">=1.0.0"`  
+Открыть файл `composer.json`, в раздел по ключу `require` добавить строку  
+`"andy87/KnockKnock": ">=1.0.0"`   
 Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
 
-
+...
 
 <h3 id="knockknock-setup-composer-composer-json">
     Подключение <a href="https://git-scm.com/andy87/KnockKnock">Git</a> репозитория
 </h3>
 
-В файл вашего проекта `composer.json`:
-- добавьте в раздел `require` строку `"andy87/knockknock": ">=1.0.0"`
-- добавьте в раздел `repositories` новый объект:
+В файл вашего проекта `composer.json`:  
+- добавьте в раздел `require` строку `"andy87/knockknock": ">=1.0.0"`  
+- добавьте в раздел `repositories` новый объект:  
 ```
 {
     "type": "vcs",
@@ -76,7 +75,7 @@ php composer.phar require andy87/KnockKnock
 ```
 Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
 
-
+...
 
 <h3 id="knockknock-setup-composer-composer-update">
     Обновление зависимостей Composer

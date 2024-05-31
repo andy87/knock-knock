@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\tests;
 
+use andy87\knock_knock\interfaces\KnockResponseInterface;
 use Exception;
 use andy87\knock_knock\KnockKnockOctopus;
 use andy87\knock_knock\tests\core\{ UnitTestCore, PostmanEcho };
@@ -189,8 +190,8 @@ class KnockKnockOctopusTest extends UnitTestCore
         $knockKnockOctopus = $this->getKnockKnockOctopus();
 
         $fakeResponse = [
-            'content' => 'fake content',
-            'httpCode' => 200,
+            KnockResponseInterface::CONTENT => 'fake content',
+            KnockResponseInterface::HTTP_CODE => KnockResponseInterface::OK,
         ];
 
         $knockResponse = $knockKnockOctopus->fakeResponse($fakeResponse);
