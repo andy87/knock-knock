@@ -1,7 +1,7 @@
 
 <h1 align="center">KnockKnock</h1>
 
-<p align="center"><img src="assets/logo/KnockKnockLogo_256.png" style="width:164px; height: auto" alt="KnockKnock php curl facade"/></p>
+<p align="center"><img src="assets/logo/KnockKnockLogo_256.png" style="width:256px; height: auto" alt="KnockKnock php curl facade"/></p>
 
 KnockKnock - это простая библиотека, реализующая Фасад и предоставляющая удобный интерфейс для выполнения запросов в PHP,
 используя расширение cURL.  Она упрощает работу, предоставляя более высокоуровневый API и быстрый доступ к настройкам.
@@ -46,27 +46,28 @@ composer require andy87/KnockKnock
 ```bash
 php composer.phar require andy87/KnockKnock
 ```
-Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
-  
-...
-  
+Далее: **Обновление зависимостей Composer**
+
+
+
 <h3 id="knockknock-setup-composer-composer-json">
     Используя: файл `composer.json`
 </h3>
 
-Открыть файл `composer.json`, в раздел по ключу `require` добавить строку  
-`"andy87/KnockKnock": ">=1.0.0"`   
+Открыть файла `composer.json`  
+В раздел по ключу `require` добавить строку  
+`"andy87/KnockKnock": ">=1.0.0"`  
 Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
 
-...
+
 
 <h3 id="knockknock-setup-composer-composer-json">
     Подключение <a href="https://git-scm.com/andy87/KnockKnock">Git</a> репозитория
 </h3>
 
-В файл вашего проекта `composer.json`:  
-- добавьте в раздел `require` строку `"andy87/knockknock": ">=1.0.0"`  
-- добавьте в раздел `repositories` новый объект:  
+В файл вашего проекта `composer.json`:
+- добавьте в раздел `require` строку `"andy87/knockknock": ">=1.0.0"`
+- добавьте в раздел `repositories` новый объект:
 ```
 {
     "type": "vcs",
@@ -75,7 +76,7 @@ php composer.phar require andy87/KnockKnock
 ```
 Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
 
-...
+
 
 <h3 id="knockknock-setup-composer-composer-update">
     Обновление зависимостей Composer
@@ -130,7 +131,7 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h2 id="knockknock-src-KnockKnock">
+<h2 align="center" id="knockknock-src-KnockKnock">
     Базовый класс
 </h2>
 
