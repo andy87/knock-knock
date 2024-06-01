@@ -131,15 +131,15 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h2 align="center" id="knockknock-src-KnockKnock">
+<h2 align="center" id="knockknock-src-Handler">
     Базовый класс
 </h2>
 
-_use [andy87\knock_knock\core\KnockKnock](src/core/KnockKnock.php);_  
+_use [andy87\knock_knock\core\Handler](src/core/KnockKnock.php);_  
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
-<h3 id="knockknock-src-KnockKnock-readonly">
+<h3 id="knockknock-src-Handler-readonly">
     ReadOnly свойства:
 </h3>
 
@@ -168,30 +168,30 @@ PHP Фасад\Адаптер для отправки запросов чере�
 
 
 
-<h2 align="center" id="knockknock-src-KnockKnock-construct">
+<h2 align="center" id="knockknock-src-Handler-construct">
     "Получение" объекта/экземпляра класса
 </h2>
 
 Передавая параметры напрямую в конструктор:
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'], $knockKnockConfig );
+$knockKnock = new Handler( $_ENV['API_HOST'], $knockKnockConfig );
 ``` 
 Применяя, паттерн Singleton:
 ```php
-$knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockConfig );
+$knockKnock = Handler::getInstance( $_ENV['API_HOST'], $knockKnockConfig );
 ```
-Методы возвращают объект(экземпляр класса `KnockKnock`), принимая на вход два аргумента:
+Методы возвращают объект(экземпляр класса `Handler`), принимая на вход два аргумента:
 - `string $host` - хост
 - `array $knockKnockConfig` - массив с настройками для всех исходящих запросов.
 
-При создании объекта `KnockKnock` будет вызван метод `init()`, который запускает пользовательские инструкции.  
+При создании объекта `Handler` будет вызван метод `init()`, который запускает пользовательские инструкции.  
 После выполнения `init()` запускается обработчик события привязанный к ключу `EVENT_AFTER_CONSTRUCT`
 
-<h2 align="center" id="knockknock-src-KnockKnock-params">
+<h2 align="center" id="knockknock-src-Handler-params">
   Общие настройки запросов
 </h2>
 Что бы указать настройки применяемые ко всем исходящим запросам,  
-при создании объекта `KnockKnock` передаётся массив (ключ - значение), с необходимыми настройками.
+при создании объекта `Handler` передаётся массив (ключ - значение), с необходимыми настройками.
 
 Пример настройки:
 ```php
@@ -205,10 +205,10 @@ $knockKnockParams = [
     ]
 ];
 // Получаем компонент для отправки запросов
-$knockKnock = new KnockKnock( $_ENV['API_HOST'], $knockKnockParams );
+$knockKnock = new Handler( $_ENV['API_HOST'], $knockKnockParams );
 
 //Применяя, паттерн Singleton:
-$knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockParams );
+$knockKnock = Handler::getInstance( $_ENV['API_HOST'], $knockKnockParams );
 ```
 Доступные ключи для настройки(константы класса `Request`):
 
@@ -222,11 +222,11 @@ $knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockParams );
 - `SETUP_CURL_INFO`
 
 
-<h2 id="knockknock-src-KnockKnock-eventHandlers">
+<h2 id="knockknock-src-Handler-eventHandlers">
     Обработчики событий
 </h2>
 
-<h3 id="knockknock-src-KnockKnock-event-list">
+<h3 id="knockknock-src-Handler-event-list">
     Список событий
 </h3>
 
@@ -237,35 +237,35 @@ $knockKnock = KnockKnock::getInstance( $_ENV['API_HOST'], $knockKnockParams );
 - `EVENT_CREATE_RESPONSE` после создания объекта ответа
 - `EVENT_AFTER_SEND` после получения ответа
 
-<h5 id="knockknock-src-KnockKnock-events-example">
+<h5 id="knockknock-src-Handler-events-example">
     Пример установки обработчиков событий
 </h5>
 
 ```php
 $knockKnock->setupEventHandlers([
-    KnockKnock::EVENT_AFTER_CONSTRUCT => function( static $knockKnock ) => {
+    Handler::EVENT_AFTER_CONSTRUCT => function( static $knockKnock ) => {
         // создание объекта knockKnock, для взаимодействия с $knockKnock
     },
-    KnockKnock::EVENT_CREATE_REQUEST => function( static $knockKnock, Request $Request ) => {
+    Handler::EVENT_CREATE_REQUEST => function( static $knockKnock, Request $Request ) => {
         // создание объекта запроса, для взаимодействия с $Request
     },
-    KnockKnock::EVENT_BEFORE_SEND => function(  static $knockKnock, Request $Request ) => {
+    Handler::EVENT_BEFORE_SEND => function(  static $knockKnock, Request $Request ) => {
         // отправка запроса, для взаимодействия с $Request
     },
-    KnockKnock::EVENT_CURL_HANDLER => function( static $knockKnock, resource $ch ) => {
+    Handler::EVENT_CURL_HANDLER => function( static $knockKnock, resource $ch ) => {
         // перед отправкой curl запроса, для взаимодействия с $ch
     },
-    KnockKnock::EVENT_CREATE_RESPONSE => function( static $knockKnock, Response $Response ) => {
+    Handler::EVENT_CREATE_RESPONSE => function( static $knockKnock, Response $Response ) => {
         // создание объекта ответа, для взаимодействия с $Response
     },
-    KnockKnock::EVENT_AFTER_SEND => function( static $knockKnock, Response $Response ) => {
+    Handler::EVENT_AFTER_SEND => function( static $knockKnock, Response $Response ) => {
         // получение ответа, для взаимодействия с $Response
     }
 ]);
 ```
 Первый аргумент - ключ события, второй - callback функция.
 
-Все callback функции принимают первым аргументом объект/экземпляр класса `KnockKnock`.  
+Все callback функции принимают первым аргументом объект/экземпляр класса `Handler`.  
 Вторым аргументом передаётся объект/экземпляр класса в зависимости от события:
 - `Request` - для событий `EVENT_CREATE_REQUEST`, `EVENT_BEFORE_SEND`
 - `Response` - для событий `EVENT_CREATE_RESPONSE`, `EVENT_AFTER_SEND`
@@ -393,8 +393,8 @@ $host = $Request->getHost(); // String
 
 ```php
 $knockKnock->setupRequest( $Request, [
-    Request::HOST => $_ENV['API_HOST'],
-    KnockKnock::HEADERS => [
+    Request::SETUP_HOST => $_ENV['API_HOST'],
+    Request::SETUP_HEADERS => [
         'api-secret' => $_ENV['API_SECRET_KEY']
     ],
 ]);
@@ -449,7 +449,7 @@ $Response = $knockKnock->constructResponse([
 ```
 `constructResponse( array $ResponseParams, ?Request $Request = null ): Response`
 
-<h2 id="knockknock-src-KnockKnock-send">
+<h2 id="knockknock-src-Handler-send">
     Отправка запроса
 </h2>
 
@@ -464,7 +464,7 @@ $Response = $knockKnock->constructResponse([
  - `EVENT_CURL_HANDLER`
 
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 
 $Request = $knockKnock->constructRequest( 'info/me' );
 
@@ -476,7 +476,7 @@ $Response = $knockKnock->send();
 Если запрос уже был отправлен, повторно отправить его нельзя, выбрасывается `Exception`.  
 Для повторной отправки запроса, необходимо создать новый объект запроса:
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 
 $Request = $knockKnock->constructRequest( 'info/me' );
 
@@ -488,13 +488,13 @@ $Response = $knockKnock->send();
 $Response = $knockKnock->setupRequest( $Request->clone() )->send();
 ```
 
-<h4 id="knockknock-src-KnockKnock-chain-call">
+<h4 id="knockknock-src-Handler-chain-call">
     Цепочка вызовов
 </h4>
 
 Субъективно - более красивый вариант. Пример получения ответа - цепочкой вызовов.  
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 
 $Request = $knockKnock->constructRequest( 'info/me' );
 
@@ -505,7 +505,7 @@ $content = json_decode($Response->content, true);
 ```
 _Разумеется можно миксовать codeStyle кому как больше нравиться_
 
-<h2 id="knockknock-src-KnockKnock-fakeResponse">
+<h2 id="knockknock-src-Handler-fakeResponse">
     Отправка запроса с фэйковым ответом
 </h2>
 
@@ -557,7 +557,7 @@ $Response
 
 Получение компонента запроса:
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 $Response = $knockKnock->setRequest( $knockKnock->constructRequest( 'info/me' ) )->send();
 
 $request = $Response->request;
@@ -567,7 +567,7 @@ $method = $request->method;
 
 Получения свойств cURL запроса 
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 $Response = $knockKnock->setRequest( $knockKnock->constructRequest( 'info/me' ) )->send();
 
 $Response->request;
@@ -606,16 +606,16 @@ ___
     SSL
 </h3>
 
-Функционал включения/отключения SSL верификации в объектах `KnockKnock` & `Request`.  
+Функционал включения/отключения SSL верификации в объектах `Handler` & `Request`.  
 
 В `curlOptions` добавляется ключ `CURLOPT_SSL_VERIFYPEER` и `CURLOPT_SSL_VERIFYHOST`.
 
 `->disableSSL( bool $verifyPeer = false, int $verifyHost = 0 );`  
 `->enableSSL( bool $verifyPeer = true, int $verifyHost = 2 );`  
 
-`KnockKnock` - для всех запросов
+`Handler` - для всех запросов
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 $knockKnock->disableSSL();
 
 $Request = $knockKnock->constructRequest( 'info/me' );
@@ -625,7 +625,7 @@ $Response = $knockKnock->setupRequest( $Request )->send();
 
 `Request` - для конкретного запроса  
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] )->disableSSL();
+$knockKnock = new Handler( $_ENV['API_HOST'] )->disableSSL();
 
 $Request = $knockKnock->constructRequest( 'info/me' );
 $Request->enableSSL();
@@ -636,10 +636,10 @@ $Response = $knockKnock->setupRequest( $Request )->send();
     Cookie
 </h3>
 
-В объекте `KnockKnock` имеется функционал использования cookie.  
-`KnockKnock` - для всех запросов  
+В объекте `Handler` имеется функционал использования cookie.  
+`Handler` - для всех запросов  
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 
 $cookie = $_ENV['COOKIE'];
 $jar = $_ENV['COOKIE_JAR'];
@@ -656,7 +656,7 @@ $knockKnock->useCookie( $cookie, $jar );
 Добавление сообщений в свойство `->logs` 
 
 ```php
-$knockKnock = new KnockKnock( $_ENV['API_HOST'] );
+$knockKnock = new Handler( $_ENV['API_HOST'] );
 
 $$message = 'Какое то сообщение';
 
@@ -739,7 +739,7 @@ $knockKnockSecurity
     ->setupAuthorization( KnockKnockSecurity::TOKEN_BEARER, 'token' )
     ->setupHeaders([ 'X-Api-Key' => $_ENV['X_API_KEY'] ])
     ->setupContentType( ContentType::JSON )
-    ->on( KnockKnock::EVENT_AFTER_SEND, function( KnockKnock $knockKnock, Response $Response ) => 
+    ->on( Handler::EVENT_AFTER_SEND, function( Handler $handler, Response $Response ) => 
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
 
@@ -783,7 +783,7 @@ ___
 
 Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
-class KnockKnockYandex extends KnockKnock
+class KnockKnockYandex extends Handler
 {
     private const LOGGER = 'logger';
 
