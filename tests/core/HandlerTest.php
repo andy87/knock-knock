@@ -48,7 +48,7 @@ class HandlerTest extends UnitTestCore
     {
         parent::setUp();
 
-        $this->Handler = $this->getHandler();
+        $this->handler = $this->getHandler();
     }
 
     /**
@@ -65,7 +65,7 @@ class HandlerTest extends UnitTestCore
      */
     public function testConstructor(): void
     {
-        $this->assertInstanceOf(Handler::class, $this->Handler );
+        $this->assertInstanceOf(Handler::class, $this->handler );
     }
 
     /**
@@ -196,7 +196,7 @@ class HandlerTest extends UnitTestCore
      */
     public function testGetter()
     {
-        $handler = $this->Handler;
+        $handler = $this->handler;
         $this->assertEquals(self::HOST, $handler->host);
         $this->assertInstanceOf(Request::class, $handler->commonRequest);
 
@@ -289,7 +289,7 @@ class HandlerTest extends UnitTestCore
      */
     public function testConstruct():void
     {
-        $handler = $this->Handler;
+        $handler = $this->handler;
 
             $this->assertEquals(self::HOST, $handler->host);
 
@@ -330,7 +330,7 @@ class HandlerTest extends UnitTestCore
      */
     public function testSetupRequest()
     {
-        $handler = $this->Handler;
+        $handler = $this->handler;
 
         $request = $this->getRequest(null, [
             RequestInterface::SETUP_DATA => self::DATA_A

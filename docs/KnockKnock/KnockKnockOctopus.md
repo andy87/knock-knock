@@ -27,13 +27,13 @@ $knockKnockOctopus = new KnockKnockOctopus([
     Request::HOST => 'https://api.example.com',
 ]);
 
-$knockResponse = $knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
+$response = $knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
 ```
 
 #### POST
 Создания новой новости
 ```php
-$knockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->post( '/new', [ 
         'name' => 'Новая новость',
         'content' => 'Текст новости' 
@@ -42,7 +42,7 @@ $knockResponse = $knockKnockOctopus
 #### PATCH
 Обновления данных поста
 ```php
-$knockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->patch( '/post', [ 
         'created_at' => '1987-09-08 12:00:00',
         'title' => 'Важное обновление'
@@ -53,7 +53,7 @@ $knockResponse = $knockKnockOctopus
 #### PUT
 Обновления части данных поста
 ```php
-$knockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->put( '/post', [ 
         'created_at' => '1987-09-08 12:00:00',
         'title' => 'Важное обновление' 
@@ -63,24 +63,24 @@ $knockResponse = $knockKnockOctopus
 #### DELETE
 Удаление поста
 ```php
-$knockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->delete( '/post', [ 'id' => 806034 ]);
 ```
 
 #### HEAD
 Получения заголовков поста
 ```php
-$knockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->head( '/post', [ 'id' => 806034 ]);
 ```
 #### OPTIONS
 Получения доступных методов поста
 ```php
-$knockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->options( '/post', [ 'id' => 806034 ]);
 ```
 #### TRACE
 Получения ответного сообщения от сервера
 ```php
-$knockResponse = $knockKnockOctopus->trace( '/post' );
+$response = $knockKnockOctopus->trace( '/post' );
 ```

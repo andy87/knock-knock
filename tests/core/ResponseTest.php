@@ -33,7 +33,7 @@ use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\Inval
  */
 class ResponseTest extends UnitTestCore
 {
-    /** @var Handler $knocKnock */
+    /** @var Handler $handler */
     private Handler $handler;
 
 
@@ -133,14 +133,14 @@ class ResponseTest extends UnitTestCore
                 CURLOPT_RETURNTRANSFER => true,
             ]
         ]);
-        $this->Handler->disableSSL();
+        $this->handler->disableSSL();
 
-        $this->request = $this->Handler
+        $this->request = $this->handler
             ->constructRequest(Method::GET, PostmanEcho::ENDPOINT_GET, [
                 RequestInterface::SETUP_DATA => PostmanEcho::DATA,
         ]);
 
-        $this->response = $this->Handler->send($this->request);
+        $this->response = $this->handler->send($this->request);
     }
 
     /**
