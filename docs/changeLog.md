@@ -41,10 +41,21 @@
    - Исправлены ошибки в тестах
 
 ### 1.0.2
- - Code Style:
+ - Изменения:
+   - Переименование:
+     - `KnockKnock` -> `Handler`
+     - `KnockRequest` -> `Request`
+     - `KnockResponse` -> `Response`
+   - Упрощена логика(схема) работы
    - Переформатирован код:
+     - Code Style ближе к PSR-4
      - сгруппированы методы и свойства
+   - Handler:
+     - send() - теперь принимает `$request` вместо `$fakeResponse`
  - Добавлено:
    - add `github/workflows` for CI/CD
    - Autoloader
-   - Exception при некоторых empty значениях
+   - `Exception` на многие случаи
+   - Request
+     - добавлен метод `setFakeResponse`
+     - добавлено ReadOnly свойство `$fakeResponse`

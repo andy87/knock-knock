@@ -12,10 +12,10 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock;
 
+use andy87\knock_knock\interfaces\RequestInterface;
 use andy87\knock_knock\core\{ Handler, Request, Response };
-use andy87\knock_knock\exception\extensions\InvalidAuthException;
-use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\request\{ InvalidHeaderException, StatusNotFoundException };
+use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException, extensions\InvalidAuthException };
+use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
 /**
  * Class KnockAuthorization
@@ -154,17 +154,17 @@ class KnockKnockSecurity extends KnockKnockOctopus
     /**
      * Модификация метода send для отправки запроса с кастомными данными (array $use)
      *
-     * @param interfaces\RequestInterface $request
+     * @param ?interfaces\RequestInterface $request
      *
      * @return Response
      *
-     * @throws InvalidHeaderException|StatusNotFoundException|ParamUpdateException|ParamNotFoundException
+     * @throws InvalidHeaderException|StatusNotFoundException|ParamUpdateException|ParamNotFoundException|RequestCompleteException|InvalidRequestException
      *
      * Test: @see KnockKnockSecurityTest::testSend()
      *
      * @tag #security #use #send
      */
-    public function send( interfaces\RequestInterface $request ): Response
+    public function send( ?RequestInterface $request = null ): Response
     {
         if (count($this->use)) {
             $this->modifyRequestByUse($this->getterRealRequest());

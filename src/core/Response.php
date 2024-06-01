@@ -12,8 +12,7 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\core;
 
-use Exception;
-use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
+use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
 use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException };
 
 /**

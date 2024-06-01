@@ -12,15 +12,11 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\lib\{ContentType, Method};
-use andy87\knock_knock\interfaces\{HandlerInterface, RequestInterface, ResponseInterface};
+use andy87\knock_knock\lib\{ Method, ContentType };
 use andy87\knock_knock\exception\handler\{ EventUpdateException, InvalidMethodException };
-use andy87\knock_knock\exception\{InvalidHostException,
-    InvalidEndpointException,
-    ParamUpdateException,
-    ParamNotFoundException,
-    request\InvalidHeaderException,
-    request\StatusNotFoundException};
+use andy87\knock_knock\interfaces\{ HandlerInterface, RequestInterface, ResponseInterface };
+use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamUpdateException, ParamNotFoundException };
+use andy87\knock_knock\exception\request\{InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
 /**
  * Class Handler
@@ -302,19 +298,21 @@ class Handler implements HandlerInterface
     /**
      * Отправка запроса
      *
-     * @param RequestInterface $request
+     * @param ?RequestInterface $request
      *
      * @return Response
      *
-     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * Test: @see KnockKnockTest::testSendRequest()
      *
      * @tag #knockHandler #send #response
      */
-    public function send( RequestInterface $request ): Response
+    public function send( ?RequestInterface $request = null ): Response
     {
-        $this->setupRequest($request);
+        if ( $request ) $this->setupRequest($request);
+
+        if ( !$this->_realRequest ) throw new InvalidRequestException();
         
         return $this->sendRequest( $this->_realRequest );
     }
@@ -702,7 +700,7 @@ class Handler implements HandlerInterface
      *
      * @return Response
      *
-     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
+     * @throws RequestCompleteException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * Test: @see KnockKnockTest::testSendRequest()
      *
@@ -710,20 +708,27 @@ class Handler implements HandlerInterface
      */
     protected function sendRequest(Request $request): Response
     {
-        $request->setupStatusProcessing();
+        if ( $request->statusIsComplete() )
+        {
+            throw new RequestCompleteException();
 
-        $this
-            ->updatePostFields($request)
-            ->updateMethod($request)
-            ->event(self::EVENT_BEFORE_SEND, [$this, $request]);
+        } else {
 
-        $response = ($request->fakeResponse)
-            ? $this->constructResponse($request->fakeResponse, $request)
-            : $this->getResponseOnSendCurlRequest($request);
+            $request->setupStatusProcessing();
 
-        $request->setupStatusComplete();
+            $this
+                ->updatePostFields($request)
+                ->updateMethod($request)
+                ->event(self::EVENT_BEFORE_SEND, [$this, $request]);
 
-        return $response;
+            $response = ($request->fakeResponse)
+                ? $this->constructResponse($request->fakeResponse, $request)
+                : $this->getResponseOnSendCurlRequest($request);
+
+            $request->setupStatusComplete();
+
+            return $response;
+        }
     }
 
     /**

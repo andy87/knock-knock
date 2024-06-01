@@ -15,9 +15,8 @@ namespace andy87\knock_knock;
 use andy87\knock_knock\lib\Method;
 use andy87\knock_knock\core\{ Handler, Response };
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\exception\handler\InvalidMethodException;
-use andy87\knock_knock\exception\request\{ InvalidHeaderException, StatusNotFoundException };
-use andy87\knock_knock\exception\{ ParamUpdateException, ParamNotFoundException, InvalidEndpointException };
+use andy87\knock_knock\exception\{ ParamUpdateException, ParamNotFoundException, InvalidEndpointException, handler\InvalidMethodException };
+use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
 /**
  * Class KnockOctopus
@@ -76,7 +75,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * Test: @see KnockKnockOctopusTest::testGet()
      *
@@ -96,7 +95,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * Test: @see KnockKnockOctopusTest::testPost()
      *
@@ -115,7 +114,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @tag #octopus #request #put
      */
@@ -132,7 +131,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @tag #octopus #request #delete
      */
@@ -149,7 +148,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @tag #octopus #request #patch
      */
@@ -166,7 +165,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @tag #octopus #request #options
      */
@@ -183,7 +182,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @tag #octopus #request #head
      */
@@ -200,7 +199,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @tag #octopus #request #trace
      */
@@ -217,7 +216,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException|RequestCompleteException|InvalidRequestException
      *
      * Test: @see KnockKnockOctopusTest::testFakeResponse()
      *
@@ -248,7 +247,7 @@ class KnockKnockOctopus extends Handler
      *
      * @return Response
      *
-     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @tag #octopus #request #common
      */
