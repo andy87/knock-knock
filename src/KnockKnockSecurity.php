@@ -170,7 +170,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
             $this->modifyRequestByUse($this->getterRealRequest());
         }
 
-        return $this->sendRequest( $this->getterRealRequest() );
+        return parent::send($request);
     }
 
     /**

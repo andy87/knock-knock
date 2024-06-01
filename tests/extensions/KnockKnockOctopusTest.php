@@ -119,15 +119,15 @@ class KnockKnockOctopusTest extends UnitTestCore
             RequestInterface::SETUP_DATA => PostmanEcho::DATA
         ]);
 
-        $response = json_decode( $response->content, true );
+        $content = json_decode( $response->content, true );
 
-        $this->assertArrayHasKey('args', $response);
-        $this->assertArrayHasKey('headers', $response);
-        $this->assertArrayHasKey('url', $response);
+        $this->assertArrayHasKey('args', $content);
+        $this->assertArrayHasKey('headers', $content);
+        $this->assertArrayHasKey('url', $content);
 
-        $this->assertEquals( $response->request->url, $response['url'] );
+        $this->assertEquals( $response->request->url, $content['url'] );
 
-        $this->assertEquals( PostmanEcho::DATA, $response['args']['data']);
+        $this->assertEquals( PostmanEcho::DATA, $content['args']['data']);
     }
 
     /**
@@ -153,22 +153,22 @@ class KnockKnockOctopusTest extends UnitTestCore
 
         $response = $KnockKnockOctopus->post(PostmanEcho::ENDPOINT_POST, PostmanEcho::DATA);
 
-        $response = json_decode( $response->content, true );
+        $content = json_decode( $response->content, true );
 
         //throw new Exception( print_r($response) );
 
         /** @see PostmanEcho::ENDPOINT_POST */
-        $this->assertArrayHasKey('args', $response);
-        $this->assertArrayHasKey('data', $response);
-        $this->assertArrayHasKey('files', $response);
-        $this->assertArrayHasKey('form', $response);
-        $this->assertArrayHasKey('headers', $response);
-        $this->assertArrayHasKey('json', $response);
-        $this->assertArrayHasKey('url', $response);
+        $this->assertArrayHasKey('args', $content);
+        $this->assertArrayHasKey('data', $content);
+        $this->assertArrayHasKey('files', $content);
+        $this->assertArrayHasKey('form', $content);
+        $this->assertArrayHasKey('headers', $content);
+        $this->assertArrayHasKey('json', $content);
+        $this->assertArrayHasKey('url', $content);
 
-        $this->assertEquals( $response->request->url, $response['url'] );
+        $this->assertEquals( $response->request->url, $content['url'] );
 
-        $this->assertEquals( PostmanEcho::DATA, $response['json']);
+        $this->assertEquals( PostmanEcho::DATA, $content['json']);
     }
 
 

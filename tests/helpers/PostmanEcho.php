@@ -75,6 +75,14 @@ abstract class PostmanEcho
         'ab' => 23,
     ];
 
+    public const GET_KEY_ARGS = 'args';
+    public const GET_KEY_DATA = 'data';
+    public const GET_KEY_FILES = 'files';
+    public const GET_KEY_FORM = 'form';
+    public const GET_KEY_HEADERS = 'headers';
+    public const GET_KEY_JSON = 'json';
+    public const GET_KEY_URL = 'url';
+
 
     /** @var Handler $handler */
     public static Handler $handler;

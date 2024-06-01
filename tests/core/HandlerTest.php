@@ -257,18 +257,18 @@ class HandlerTest extends UnitTestCore
 
         $params = $handler->getParams();
 
-        $this->assertArrayHasKey('host', $params );
-        $this->assertEquals( $host, $params['host'] );
+        $this->assertArrayHasKey(HandlerInterface::PARAM_HOST, $params );
+        $this->assertEquals( $host, $params[HandlerInterface::PARAM_HOST] );
         $this->assertEquals( $protocol, $requestReal->protocol );
 
-        $this->assertArrayHasKey('commonRequest', $params );
-        $this->assertInstanceOf(Request::class, $params['commonRequest'] );
+        $this->assertArrayHasKey(HandlerInterface::PARAM_COMMON_REQUEST, $params );
+        $this->assertInstanceOf(Request::class, $params[HandlerInterface::PARAM_COMMON_REQUEST] );
 
-        $this->assertArrayHasKey('realRequest', $params );
-        $this->assertInstanceOf(Request::class, $params['realRequest'] );
+        $this->assertArrayHasKey(HandlerInterface::PARAM_REAL_REQUEST, $params );
+        $this->assertInstanceOf(Request::class, $params[HandlerInterface::PARAM_REAL_REQUEST] );
 
-        $this->assertArrayHasKey('events', $params );
-        $this->assertSameSize($events, $params['events']);
+        $this->assertArrayHasKey(HandlerInterface::PARAM_EVENT_HANDLERS, $params );
+        $this->assertSameSize($events, $params[HandlerInterface::PARAM_EVENT_HANDLERS]);
     }
 
     /**
@@ -432,8 +432,7 @@ class HandlerTest extends UnitTestCore
         $reflection = new ReflectionClass(Handler::class);
         $method = $reflection->getMethod('event');
 
-        // проверка на приватность метода
-        $this->assertTrue($method->isPrivate());
+        $this->assertTrue($method->isPublic());
 
         $handlerExample = $this->getHandlerExample();
 
@@ -686,15 +685,15 @@ class HandlerTest extends UnitTestCore
 
         $response = $handler->send($request);
 
-        $response = json_decode( $response->content, true );
+        $content = json_decode( $response->content, true );
 
-        $this->assertArrayHasKey('args', $response);
-        $this->assertArrayHasKey('headers', $response);
-        $this->assertArrayHasKey('url', $response);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_ARGS, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_HEADERS, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_URL, $content);
 
-        $this->assertEquals( PostmanEcho::DATA, $response['args'] );
+        $this->assertEquals( PostmanEcho::DATA, $content[PostmanEcho::GET_KEY_ARGS] );
 
-        $this->assertEquals( $response->request->url, $response['url'] );
+        $this->assertEquals( $response->request->url, $content[PostmanEcho::GET_KEY_URL] );
     }
 
     /**
@@ -724,6 +723,7 @@ class HandlerTest extends UnitTestCore
             ResponseInterface::CONTENT => json_encode(PostmanEcho::DATA),
             ResponseInterface::HTTP_CODE => 777,
         ];
+        $request->setFakeResponse($fakeResponse);
 
         $response = $handler->send( $request );
         $this->assertInstanceOf(Response::class, $response );
@@ -764,18 +764,18 @@ class HandlerTest extends UnitTestCore
 
         $this->assertInstanceOf(Response::class, $response );
 
-        $response = json_decode( $response->content, true );
+        $content = json_decode( $response->content, true );
 
         /** @see PostmanEcho::ENDPOINT_POST */
-        $this->assertArrayHasKey('args', $response);
-        $this->assertArrayHasKey('data', $response);
-        $this->assertArrayHasKey('files', $response);
-        $this->assertArrayHasKey('form', $response);
-        $this->assertArrayHasKey('headers', $response);
-        $this->assertArrayHasKey('json', $response);
-        $this->assertArrayHasKey('url', $response);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_ARGS, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_DATA, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_FILES, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_FORM, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_HEADERS, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_JSON, $content);
+        $this->assertArrayHasKey(PostmanEcho::GET_KEY_URL, $content);
 
-        $this->assertEquals( $response->request->url, $response['url'] );
+        $this->assertEquals( $response->request->url, $content[PostmanEcho::GET_KEY_URL] );
         $this->assertEquals( Method::POST, $response->request->method );
     }
 

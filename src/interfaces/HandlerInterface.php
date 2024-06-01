@@ -33,6 +33,15 @@ interface HandlerInterface
     /** @var string */
     public const EVENT_AFTER_SEND = 'afterSend';
 
+    public const PARAMS = 'params';
+    public const PARAM_HOST = 'host';
+    public const PARAM_COMMON_REQUEST = 'commonRequest';
+    public const PARAM_REAL_REQUEST = 'realRequest';
+    public const PARAM_EVENT_HANDLERS = 'eventHandlers';
+    public const PARAM_LOGS = 'logs';
+
+
+
 
     /**
      * @param string $host

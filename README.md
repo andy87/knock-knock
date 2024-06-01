@@ -878,8 +878,8 @@ ___
     Тесты
 </h2>
 
- - tests: 105
- - assertions: 367
+ - tests: 106
+ - assertions: 370
 
 <h3 id="knockknock-tests-run">
     Запуск тестов:

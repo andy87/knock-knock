@@ -127,11 +127,11 @@ class Handler implements HandlerInterface
     public function __get(string $paramName): mixed
     {
         return match ($paramName) {
-            'host' => $this->getterHost(),
-            'commonRequest' => $this->getterCommonRequest(),
-            'realRequest' => $this->getterRealRequest(),
-            'eventHandlers' => $this->getterEvents(),
-            'logs' => $this->getterLogs(),
+            self::PARAM_HOST => $this->getterHost(),
+            self::PARAM_COMMON_REQUEST => $this->getterCommonRequest(),
+            self::PARAM_REAL_REQUEST => $this->getterRealRequest(),
+            self::PARAM_EVENT_HANDLERS => $this->getterEvents(),
+            self::PARAM_LOGS => $this->getterLogs(),
             default => throw new ParamNotFoundException("Свойство `$paramName` не найдено в классе " . __CLASS__),
         };
     }
@@ -148,10 +148,10 @@ class Handler implements HandlerInterface
     public function getParams(): array
     {
         return [
-            'host' => $this->_host,
-            'commonRequest' => $this->_commonRequest,
-            'realRequest' => $this->_realRequest,
-            'eventHandlers' => $this->_eventHandlers,
+            self::PARAM_HOST => $this->_host,
+            self::PARAM_COMMON_REQUEST => $this->_commonRequest,
+            self::PARAM_REAL_REQUEST => $this->_realRequest,
+            self::PARAM_EVENT_HANDLERS => $this->_eventHandlers,
         ];
     }
 
@@ -361,7 +361,7 @@ class Handler implements HandlerInterface
             ResponseInterface::HTTP_CODE => curl_getinfo($ch, CURLINFO_HTTP_CODE),
         ];
 
-        $response = $this->constructResponse($response);
+        $response = $this->constructResponse($response, $request);
 
         if (  $error = curl_error($ch) ) {
             $response->addError($error);
@@ -738,7 +738,7 @@ class Handler implements HandlerInterface
      *
      * @tag #knockHandler #behavior #event #callback
      */
-    protected function event(string $eventKey, array $args = []): void
+    public function event(string $eventKey, array $args = []): void
     {
         if (isset($this->_eventHandlers[$eventKey])) {
             $callback = $this->_eventHandlers[$eventKey];
