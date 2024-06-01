@@ -12,49 +12,48 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\interfaces;
 
-use andy87\knock_knock\core\{ KnockRequest, KnockResponse };
+use andy87\knock_knock\core\{Request, Response};
 
 /**
  * Interface KnockSender
  *
  * @package andy87\knock_knock\interfaces
  */
-interface KnockKnockInterface
+interface HandlerInterface
 {
-    /** @var string  */
+    /** @var string */
     public const EVENT_AFTER_INIT = 'afterInit';
     public const EVENT_CONSTRUCT_REQUEST = 'constructRequest';
-    /** @var string  */
+    /** @var string */
     public const EVENT_BEFORE_SEND = 'beforeSend';
-    /** @var string  */
+    /** @var string */
     public const EVENT_CURL_HANDLER = 'curlHandler';
-    /** @var string  */
+    /** @var string */
     public const EVENT_CONSTRUCT_RESPONSE = 'constructResponse';
-    /** @var string  */
+    /** @var string */
     public const EVENT_AFTER_SEND = 'afterSend';
-
 
 
     /**
      * @param string $host
-     * @param array $commonKnockRequestParams
+     * @param array $commonRequestParams
      */
-    public function __construct( string $host, array $commonKnockRequestParams = [] );
+    public function __construct(string $host, array $commonRequestParams = []);
 
     /**
      * @param string $paramName
      *
      * @return mixed
      */
-    public function __get( string $paramName );
+    public function __get(string $paramName);
 
     /**
      * @param string $host
-     * @param array $commonKnockRequestParams
+     * @param array $commonRequestParams
      *
      * @return self
      */
-    public static function getInstance( string $host, array $commonKnockRequestParams ): self;
+    public static function getInstance(string $host, array $commonRequestParams): self;
 
     /**
      * @return array
@@ -70,36 +69,36 @@ interface KnockKnockInterface
     /**
      * @param string $method
      * @param string $endpoint
-     * @param array $knockRequestConfig
+     * @param array $RequestConfig
      *
-     * @return KnockRequest
+     * @return Request
      */
-    public function constructRequest( string $method, string $endpoint, array $knockRequestConfig = [] ): KnockRequest;
+    public function constructRequest(string $method, string $endpoint, array $RequestConfig = []): Request;
 
     /**
      * @param array $responseParams
-     * @param ?KnockRequest $knockRequest
+     * @param ?Request $Request
      *
-     * @return KnockResponse
+     * @return Response
      */
-    public function constructResponse( array $responseParams, ?KnockRequest $knockRequest = null ): KnockResponse;
+    public function constructResponse(array $responseParams, ?Request $Request = null): Response;
 
 
     /**
-     * @param KnockRequest $knockRequest
+     * @param Request $Request
      * @param array $options
      *
      * @return self
      */
-    public function setupRequest( KnockRequest $knockRequest, array $options = [] ): self;
+    public function setupRequest(Request $Request, array $options = []): self;
 
 
     /**
      * @param array $fakeResponse
      *
-     * @return KnockResponse
+     * @return Response
      */
-    public function send( array $fakeResponse = [] ): KnockResponse;
+    public function send(array $fakeResponse = []): Response;
 
 
     /**
@@ -108,14 +107,14 @@ interface KnockKnockInterface
      *
      * @return ?bool
      */
-    public function on( string $eventKey, callable $callbacks ): ?bool;
+    public function on(string $eventKey, callable $callbacks): ?bool;
 
     /**
      * @param string $eventKey
      *
      * @return ?bool
      */
-    public function off( string $eventKey ): ?bool;
+    public function off(string $eventKey): ?bool;
 
     /**
      * @param string $eventKey
@@ -123,7 +122,7 @@ interface KnockKnockInterface
      *
      * @return mixed
      */
-    public function callEventHandler( string $eventKey, array $args = [] ): mixed;
+    public function callEventHandler(string $eventKey, array $args = []): mixed;
 
     /**
      * @param string $eventKey
@@ -131,5 +130,5 @@ interface KnockKnockInterface
      *
      * @return bool
      */
-    public function changeEvent( string $eventKey, callable $callback ): bool;
+    public function changeEvent(string $eventKey, callable $callback): bool;
 }

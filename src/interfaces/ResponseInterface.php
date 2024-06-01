@@ -13,30 +13,24 @@ declare(strict_types=1);
 namespace andy87\knock_knock\interfaces;
 
 /**
- * Interface KnockResponseInterface
+ * Interface ResponseInterface
  *
  * @package andy87\knock_knock\interfaces
  *
  * Fix not used:
- * - @see KnockResponseInterface::OK
- * - @see KnockResponseInterface::ERROR
+ * - @see ResponseInterface::OK
+ * - @see ResponseInterface::ERROR
  */
-interface KnockResponseInterface
+interface ResponseInterface
 {
-    /** @var int  */
+    /** @var int */
     public const OK = 200;
-    /** @var int  */
+    /** @var int */
     public const ERROR = 500;
 
 
-
-    /** @var string  */
+    /** @var string */
     public const CONTENT = 'content';
-    /** @var string  */
+    /** @var string */
     public const HTTP_CODE = 'httpCode';
-    /** @var string  */
-    public const REQUEST = 'request';
-    /** @var string  */
-    public const TRACE = 'trace';
-    public const ERRORS = 'errors';
 }

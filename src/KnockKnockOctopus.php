@@ -12,10 +12,12 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock;
 
-use Exception;
-use andy87\knock_knock\lib\LibKnockMethod;
-use andy87\knock_knock\interfaces\KnockRequestInterface;
-use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
+use andy87\knock_knock\lib\Method;
+use andy87\knock_knock\core\{ Handler, Response };
+use andy87\knock_knock\interfaces\RequestInterface;
+use andy87\knock_knock\exception\handler\InvalidMethodException;
+use andy87\knock_knock\exception\request\{ InvalidHeaderException, StatusNotFoundException };
+use andy87\knock_knock\exception\{ ParamUpdateException, ParamNotFoundException, InvalidEndpointException };
 
 /**
  * Class KnockOctopus
@@ -32,16 +34,15 @@ use andy87\knock_knock\core\{ KnockKnock, KnockResponse };
  * - @see KnockKnockOctopus::head();
  * - @see KnockKnockOctopus::trace();
  *
- * Покрытие тестами: 30%. @see KnockRequestTest
+ * Покрытие тестами: 30%. @see RequestTest
  */
-class KnockKnockOctopus extends KnockKnock
+class KnockKnockOctopus extends Handler
 {
-    /** @var array  */
+    /** @var array */
     public const HEADERS = [
         CURLOPT_HEADER => false,
         CURLOPT_RETURNTRANSFER => true
     ];
-
 
 
     /**
@@ -50,7 +51,7 @@ class KnockKnockOctopus extends KnockKnock
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
      *
      * Test: @see KnockKnockOctopusTest::testInit()
      *
@@ -58,7 +59,7 @@ class KnockKnockOctopus extends KnockKnock
      */
     public function init(): void
     {
-        $this->getCommonKnockRequest()->addCurlOptions(self::HEADERS );
+        $this->getterCommonRequest()->addCurlOptions(self::HEADERS);
     }
 
 
@@ -73,17 +74,17 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint
      * @param array $params
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * Test: @see KnockKnockOctopusTest::testGet()
      *
      * @tag #octopus #request #get
      */
-    public function get( string $endpoint, array $params = [] ): KnockResponse
+    public function get(string $endpoint, array $params = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::GET, $endpoint, $params );
+        return $this->commonMethod(Method::GET, $endpoint, $params);
     }
 
 
@@ -93,17 +94,17 @@ class KnockKnockOctopus extends KnockKnock
      * @param $endpoint
      * @param array $data
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * Test: @see KnockKnockOctopusTest::testPost()
      *
      * @tag #octopus #request #post
      */
-    public function post( $endpoint, array $data = [] ): KnockResponse
+    public function post($endpoint, array $data = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::POST, $endpoint, $data );
+        return $this->commonMethod(Method::POST, $endpoint, $data);
     }
 
     /**
@@ -112,15 +113,15 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint
      * @param array $data
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #put
      */
-    public function put( string $endpoint, array $data = [] ): KnockResponse
+    public function put(string $endpoint, array $data = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::PUT, $endpoint, $data );
+        return $this->commonMethod(Method::PUT, $endpoint, $data);
     }
 
     /**
@@ -129,15 +130,15 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint
      * @param array $data
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #delete
      */
-    public function delete( string $endpoint, array $data = [] ): KnockResponse
+    public function delete(string $endpoint, array $data = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::DELETE, $endpoint, $data );
+        return $this->commonMethod(Method::DELETE, $endpoint, $data);
     }
 
     /**
@@ -146,15 +147,15 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint
      * @param array $data
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #patch
      */
-    public function patch( string $endpoint, array $data = [] ): KnockResponse
+    public function patch(string $endpoint, array $data = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::PATCH, $endpoint, $data );
+        return $this->commonMethod(Method::PATCH, $endpoint, $data);
     }
 
     /**
@@ -163,15 +164,15 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint
      * @param array $data
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #options
      */
-    public function options( string $endpoint, array $data = [] ): KnockResponse
+    public function options(string $endpoint, array $data = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::OPTIONS, $endpoint, $data );
+        return $this->commonMethod(Method::OPTIONS, $endpoint, $data);
     }
 
     /**
@@ -180,15 +181,15 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint
      * @param array $data
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #head
      */
-    public function head( string $endpoint, array $data = [] ): KnockResponse
+    public function head(string $endpoint, array $data = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::HEAD, $endpoint, $data );
+        return $this->commonMethod(Method::HEAD, $endpoint, $data);
     }
 
     /**
@@ -197,42 +198,42 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint
      * @param array $data
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #trace
      */
-    public function trace( string $endpoint, array $data = [] ): KnockResponse
+    public function trace(string $endpoint, array $data = []): Response
     {
-        return $this->commonMethod( LibKnockMethod::TRACE, $endpoint, $data );
+        return $this->commonMethod(Method::TRACE, $endpoint, $data);
     }
 
     /**
-     * Возвращает объект KnockResponse с фейковыми данными
+     * Возвращает объект Response с фейковыми данными
      *
      * @param array $fakeResponse
      * @param array $requestParams
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException
      *
      * Test: @see KnockKnockOctopusTest::testFakeResponse()
      *
      * @tag #octopus #request #fake
      */
-    public function fakeResponse( array $fakeResponse, array $requestParams = [] ): KnockResponse
+    public function fakeResponse(array $fakeResponse, array $requestParams = []): Response
     {
         $this->setupRequest(
             $this->constructRequest(
-                LibKnockMethod::GET,
+                Method::GET,
                 '/',
                 $requestParams
             )
         );
 
-        return $this->send( $fakeResponse );
+        return $this->send($fakeResponse);
     }
 
 
@@ -246,15 +247,15 @@ class KnockKnockOctopus extends KnockKnock
      * @param string $endpoint Эндпоинт запроса
      * @param array $data Данные запроса
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #common
      */
-    private function commonMethod( string $method, string $endpoint, array $data = [] ): KnockResponse
+    private function commonMethod(string $method, string $endpoint, array $data = []): Response
     {
-        $this->validateIssetRealKnockRequest( $method, $endpoint, $data );
+        $this->validateIssetRealRequest($method, $endpoint, $data);
 
         return $this->send();
     }
@@ -268,22 +269,22 @@ class KnockKnockOctopus extends KnockKnock
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|InvalidMethodException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
      * @tag #octopus #request #setup
      */
-    private function validateIssetRealKnockRequest(string $method, string $endpoint, array $data = [] ): void
+    private function validateIssetRealRequest(string $method, string $endpoint, array $data = []): void
     {
-        $knockRequestParams = [];
+        $RequestParams = [];
 
-        if ( count($data) ) {
-            $knockRequestParams[KnockRequestInterface::SETUP_DATA] = $data;
+        if (count($data)) {
+            $RequestParams[RequestInterface::SETUP_DATA] = $data;
         }
 
-        $knockRequestParams[KnockRequestInterface::SETUP_METHOD] = $method;
+        $RequestParams[RequestInterface::SETUP_METHOD] = $method;
 
-        $knockRequest = $this->constructRequest( $method, $endpoint, $knockRequestParams );
+        $Request = $this->constructRequest($method, $endpoint, $RequestParams);
 
-        $this->setupRequest( $knockRequest );
+        $this->setupRequest($Request);
     }
 }

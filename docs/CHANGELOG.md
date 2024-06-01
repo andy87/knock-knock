@@ -12,12 +12,12 @@
       - validateHostName()
     - Новые события:
       - EVENT_CURL_HANDLER
-  - `KnockResponse`
+  - `Response`
     - добавлены readonly свойства
     - Новые методы:
       - asArray()
       - validate()
-  - `KnockRequest`
+  - `Request`
     - добавлены readonly свойства
 
 - Изменения:
@@ -25,11 +25,11 @@
     - переделаны setter & getter
     - disableSSL()
     - enableSSL()
-  - `KnockRequest`:
+  - `Request`:
     - переделаны setter & getter
     - disableSSL() - теперь может принимать аргументы
     - enableSSL() - теперь может принимать аргументы
-  - `KnockResponse`:
+  - `Response`:
     - переделаны setter & getter
     - __construct() - $request стал обязательным
     - getErrors() - теперь возвращает массив собственных ошибок

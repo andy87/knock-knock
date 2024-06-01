@@ -1,0 +1,201 @@
+<?php /**
+ * @name: Handler
+ * @author Andrey and_y87 Kidin
+ * @description Тесты для методов класса KnockKnockOctopus
+ * @homepage: https://github.com/andy87/Handler
+ * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
+ * @date 2024-05-27
+ * @version 1.0.2
+ */
+
+declare(strict_types=1);
+
+namespace andy87\knock_knock\tests\extensions;
+
+use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
+use andy87\knock_knock\KnockKnockOctopus;
+use andy87\knock_knock\lib\ContentType;
+use andy87\knock_knock\tests\helpers\{PostmanEcho, UnitTestCore};
+use Exception;
+
+/**
+ * Class KnockKnockOctopusTest
+ *
+ * Тесты для методов класса KnockKnockOctopus
+ *
+ * @package tests
+ *
+ * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox
+ *
+ * @tag #test #Handler #octopus
+ */
+class KnockKnockOctopusTest extends UnitTestCore
+{
+    /** @var KnockKnockOctopus $KnockKnockOctopus */
+    public static KnockKnockOctopus $KnockKnockOctopus;
+
+
+    /**
+     * Вспомогательный метод для получения объекта KnockKnockOctopus
+     *
+     * @return KnockKnockOctopus
+     *
+     * @throws Exception
+     */
+    private function getKnockKnockOctopus(): KnockKnockOctopus
+    {
+        $KnockKnockOctopus = new KnockKnockOctopus(PostmanEcho::HOST);
+
+        $KnockKnockOctopus->disableSSL();
+
+        return $KnockKnockOctopus;
+    }
+
+    /**
+     * Проверка запуска метод init через событие EVENT_AFTER_INIT
+     *
+     *      Ожидается, что значения свойства curlOptions объекта commonRequest будут равны `KnockKnockOctopus::HEADERS`
+     *
+     * Source : @see KnockKnockOctopus::init()
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testInit
+     *
+     * @tag #test #Handler #octopus #init
+     */
+    public function testInit(): void
+    {
+        $KnockKnockOctopus = $this->getKnockKnockOctopus();
+
+        $this->assertArrayHasKey(
+            CURLOPT_HEADER,
+            $KnockKnockOctopus->commonRequest->curlOptions,
+            "Ожидается, что свойство `CURLOPT_HEADER` объекта `commonRequest->curlOptions` будет существовать"
+        );
+        $this->assertArrayHasKey(
+            CURLOPT_RETURNTRANSFER,
+            $KnockKnockOctopus->commonRequest->curlOptions,
+            "Ожидается, что свойство `CURLOPT_RETURNTRANSFER` объекта `commonRequest->curlOptions` будет существовать"
+        );
+        $this->assertArrayHasKey(
+            CURLOPT_SSL_VERIFYPEER,
+            $KnockKnockOctopus->commonRequest->curlOptions,
+            "Ожидается, что свойство `CURLOPT_SSL_VERIFYPEER` объекта `commonRequest->curlOptions` будет существовать"
+        );
+        $this->assertArrayHasKey(
+            CURLOPT_SSL_VERIFYHOST,
+            $KnockKnockOctopus->commonRequest->curlOptions,
+            "Ожидается, что свойство `CURLOPT_SSL_VERIFYHOST` объекта `commonRequest->curlOptions` будет существовать"
+        );
+    }
+
+    /**
+     * Проверка отправки GET запроса
+     *
+     *      Ожидается, что метод вернет объект Response с актуальными данными
+     *
+     * Source : @see KnockKnockOctopus::get()
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testGet
+     *
+     * @tag #test #Handler #octopus #get
+     */
+    public function testGet(): void
+    {
+        $KnockKnockOctopus = $this->getKnockKnockOctopus();
+
+        $Response = $KnockKnockOctopus->get(PostmanEcho::ENDPOINT_GET, [
+            RequestInterface::SETUP_DATA => PostmanEcho::DATA
+        ]);
+
+        $response = json_decode( $Response->content, true );
+
+        $this->assertArrayHasKey('args', $response);
+        $this->assertArrayHasKey('headers', $response);
+        $this->assertArrayHasKey('url', $response);
+
+        $this->assertEquals( $Response->request->url, $response['url'] );
+
+        $this->assertEquals( PostmanEcho::DATA, $response['args']['data']);
+    }
+
+    /**
+     * Проверка отправки POST запроса
+     *
+     *      Ожидается, что метод вернет объект Response с актуальными данными
+     *
+     * Source : @see KnockKnockOctopus::post()
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testPost
+     *
+     * @tag #test #Handler #octopus #post
+     */
+    public function testPost(): void
+    {
+        $KnockKnockOctopus = $this->getKnockKnockOctopus();
+
+        $KnockKnockOctopus->commonRequest->setContentType(ContentType::FORM);
+
+        $Response = $KnockKnockOctopus->post(PostmanEcho::ENDPOINT_POST, PostmanEcho::DATA);
+
+        $response = json_decode( $Response->content, true );
+
+        //throw new Exception( print_r($response) );
+
+        /** @see PostmanEcho::ENDPOINT_POST */
+        $this->assertArrayHasKey('args', $response);
+        $this->assertArrayHasKey('data', $response);
+        $this->assertArrayHasKey('files', $response);
+        $this->assertArrayHasKey('form', $response);
+        $this->assertArrayHasKey('headers', $response);
+        $this->assertArrayHasKey('json', $response);
+        $this->assertArrayHasKey('url', $response);
+
+        $this->assertEquals( $Response->request->url, $response['url'] );
+
+        $this->assertEquals( PostmanEcho::DATA, $response['json']);
+    }
+
+
+    /**
+     * Проверка возврата фейквого ответа
+     *
+     *      Ожидается, что метод вернет объект Response с актуальными фейковыми данными
+     *      переданными в параметре $fakeResponse
+     *
+     * Source : @see KnockKnockOctopus::fakeResponse()
+     *
+     * @return void
+     *
+     * @throws Exception
+     *
+     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testFakeResponse
+     *
+     * @tag #test #Handler #octopus #get #fakeResponse
+     */
+    public function testFakeResponse(): void
+    {
+        $KnockKnockOctopus = $this->getKnockKnockOctopus();
+
+        $fakeResponse = [
+            ResponseInterface::CONTENT => 'fake content',
+            ResponseInterface::HTTP_CODE => ResponseInterface::OK,
+        ];
+
+        $Response = $KnockKnockOctopus->fakeResponse($fakeResponse);
+
+        $this->assertEquals( $fakeResponse['content'], $Response->content );
+        $this->assertEquals( $fakeResponse['httpCode'], $Response->httpCode );
+    }
+}

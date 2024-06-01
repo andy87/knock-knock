@@ -12,30 +12,30 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock;
 
-use Exception;
-use andy87\knock_knock\core\{ KnockKnock, KnockRequest, KnockResponse };
+use andy87\knock_knock\core\{ Handler, Request, Response };
+use andy87\knock_knock\exception\extensions\InvalidAuthException;
+use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException };
+use andy87\knock_knock\exception\request\{ InvalidHeaderException, StatusNotFoundException };
 
 /**
  * Class KnockAuthorization
  *
  * @package andy87\knock_knock
  *
- * Покрытие тестами: 100%. @see KnockRequestTest
+ * Покрытие тестами: 100%. @see RequestTest
  */
 class KnockKnockSecurity extends KnockKnockOctopus
 {
     public const HEADERS_AUTH_KEY = 'Authorization';
 
-    /** @var string  */
+    /** @var string */
     public const TOKEN_BEARER = 'Bearer';
-    /** @var string  */
+    /** @var string */
     public const TOKEN_BASIC = 'Basic';
-
 
 
     /** @var array Массив с кастомными данными для следующего запроса */
     private array $use = [];
-
 
 
     // === Setup ===
@@ -48,22 +48,21 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @return $this
      *
-     * @throws Exception
+     * @throws InvalidHeaderException|StatusNotFoundException|ParamUpdateException|InvalidAuthException
      *
      * Test: @see KnockKnockSecurityTest::testSetupAuthorization()
      *
      * @tag #security #setup #authorization
      */
-    public function setupAuthorization( string $authType, string $token ): KnockKnock
+    public function setupAuthorization(string $authType, string $token): Handler
     {
-        if ( in_array( $authType, [ self::TOKEN_BEARER, self::TOKEN_BASIC ] ) )
-        {
-            $this->getCommonKnockRequest()->setHeader( self::HEADERS_AUTH_KEY, "$authType $token" );
+        if (in_array($authType, [self::TOKEN_BEARER, self::TOKEN_BASIC])) {
+            $this->getterCommonRequest()->setHeader(self::HEADERS_AUTH_KEY, "$authType $token");
 
             return $this;
         }
 
-        throw new Exception( 'Invalid authorization type' );
+        throw new InvalidAuthException();
     }
 
     /**
@@ -73,17 +72,17 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @return $this
      *
-     * @throws Exception
+     * @throws InvalidHeaderException|StatusNotFoundException|ParamUpdateException
      *
      * Test: @see KnockKnockSecurityTest::testSetupHeaders()
      *
      * @tag #security #setup #headers
      */
-    public function setupHeaders( array $headers ): KnockKnock
+    public function setupHeaders(array $headers): Handler
     {
-        $headers = array_merge( $this->getCommonKnockRequest()->headers, $headers );
+        $headers = array_merge($this->getterCommonRequest()->headers, $headers);
 
-        $this->getCommonKnockRequest()->addHeaders( $headers );
+        $this->getterCommonRequest()->addHeaders($headers);
 
         return $this;
     }
@@ -95,15 +94,15 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @return $this
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * Test: @see KnockKnockSecurityTest::testSetupContentType()
      *
      * @tag #security #setup #content-type
      */
-    public function setupContentType( string $ContentType ): KnockKnock
+    public function setupContentType(string $ContentType): Handler
     {
-        $this->getCommonKnockRequest()->setContentType( $ContentType );
+        $this->getterCommonRequest()->setContentType($ContentType);
 
         return $this;
     }
@@ -123,9 +122,9 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #use #headers
      */
-    public function useHeaders( array $headers ): KnockKnock
+    public function useHeaders(array $headers): Handler
     {
-        $this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ] = $headers;
+        $this->use[interfaces\RequestInterface::SETUP_HEADERS] = $headers;
 
         return $this;
     }
@@ -141,9 +140,9 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #use #content-type
      */
-    public function useContentType( string $ContentType ): KnockKnock
+    public function useContentType(string $ContentType): Handler
     {
-        $this->use[ interfaces\KnockRequestInterface::SETUP_CONTENT_TYPE ] = $ContentType;
+        $this->use[interfaces\RequestInterface::SETUP_CONTENT_TYPE] = $ContentType;
 
         return $this;
     }
@@ -157,44 +156,44 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @param array $fakeResponse
      *
-     * @return KnockResponse
+     * @return Response
      *
-     * @throws Exception
+     * @throws InvalidHeaderException|StatusNotFoundException|ParamUpdateException|ParamNotFoundException
      *
      * Test: @see KnockKnockSecurityTest::testSend()
      *
      * @tag #security #use #send
      */
-    public function send( array $fakeResponse = [] ): KnockResponse
+    public function send(array $fakeResponse = []): Response
     {
-        if ( count( $this->use ) ) {
-            $this->modifyRequestByUse( $this->getRealKnockRequest() );
+        if (count($this->use)) {
+            $this->modifyRequestByUse($this->getterRealRequest());
         }
 
-        return $this->sendRequest( $this->getRealKnockRequest(), $fakeResponse );
+        return $this->sendRequest($this->getterRealRequest(), $fakeResponse);
     }
 
     /**
-     * Применение кастомных данных(array $use) к запросу `$knockRequest`
+     * Применение кастомных данных(array $use) к запросу `$Request`
      *
-     * @param KnockRequest $knockRequest
+     * @param Request $Request
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHeaderException|StatusNotFoundException|ParamUpdateException|ParamNotFoundException
      *
      * Test: @see KnockKnockSecurityTest::testModifyRequestByUse()
      *
      * @tag #security #use #request #modify
      */
-    protected function modifyRequestByUse( KnockRequest $knockRequest ): void
+    protected function modifyRequestByUse(Request $Request): void
     {
-        if ( isset($this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ]) ) {
-            $knockRequest->addHeaders( $this->use[ interfaces\KnockRequestInterface::SETUP_HEADERS ] );
+        if (isset($this->use[interfaces\RequestInterface::SETUP_HEADERS])) {
+            $Request->addHeaders($this->use[interfaces\RequestInterface::SETUP_HEADERS]);
         }
 
-        if ( isset($this->use[ interfaces\KnockRequestInterface::SETUP_CONTENT_TYPE ]) ) {
-            $knockRequest->setContentType( $this->use[ interfaces\KnockRequestInterface::SETUP_CONTENT_TYPE ] );
+        if (isset($this->use[interfaces\RequestInterface::SETUP_CONTENT_TYPE])) {
+            $Request->setContentType($this->use[interfaces\RequestInterface::SETUP_CONTENT_TYPE]);
         }
 
         $this->clearUse();

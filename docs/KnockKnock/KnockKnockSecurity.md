@@ -46,7 +46,7 @@ $KnockKnock = new KnockKnockSecurity('https://api.example.com')
 
 ```php
 $KnockKnock = new KnockKnockSecurity('https://api.example.com')
-    ->setupContentType( LibKnockContentType::JSON );
+    ->setupContentType( ContentType::JSON );
 ```
 
 ___
@@ -59,21 +59,21 @@ ___
 
 ```php
 $KnockKnock = new KnockKnockSecurity('https://api.example.com',[
-    KnockRequestInterface::SETUP_CONTENT_TYPE => LibKnockContentType::JSON
+    RequestInterface::SETUP_CONTENT_TYPE => ContentType::JSON
 ]);
 
 // выполнили первый запрос c типом контента JSON
-$KnockResponseWithContentTypeJSON_1 = $KnockKnock->get( '/product' );
+$ResponseWithContentTypeJSON_1 = $KnockKnock->get( '/product' );
 
 // Установили тип контента для следующего запроса FORM
-$KnockResponseWithContentTypeForm = $KnockKnock
-    ->useContentType( LibKnockContentType::FORM )
+$ResponseWithContentTypeForm = $KnockKnock
+    ->useContentType( ContentType::FORM )
     ->post('/product', [ 
         'name' => 'Product name' 
     ]);
 
 // следующий запрос будет с типом контента JSON
-$KnockResponseWithContentTypeJSON_2 = $KnockKnock->get( '/product' );
+$ResponseWithContentTypeJSON_2 = $KnockKnock->get( '/product' );
 ```
 
 ### useHeaders()
@@ -84,19 +84,19 @@ $KnockResponseWithContentTypeJSON_2 = $KnockKnock->get( '/product' );
 
 ```php
 $KnockKnock = new KnockKnockSecurity('https://api.example.com',[
-    KnockRequestInterface::SETUP_HEADERS => [
+    RequestInterface::SETUP_HEADERS => [
         'X-Api-Key' => $_ENV['X_API_KEY']
     ]
 ]);
 
 // выполнили первый запрос c заголовком X-Api-Key = `headers from construct`
-$KnockResponseWithInitHeaders = $KnockKnock->get( '/product' );
+$ResponseWithInitHeaders = $KnockKnock->get( '/product' );
 
 // Установили заголовок для следующего запроса X-Api-Key
 $KnockKnock->useHeaders( [ 'X-Api-Key' => 'headers from real time' ] );
 
 // запрос будет с заголовком X-Api-Key = `headers from real time`
-$KnockResponseWithRealTimeHeaders = $KnockKnock->post('/product', [ 
+$ResponseWithRealTimeHeaders = $KnockKnock->post('/product', [ 
         'name' => 'Product name' 
     ]);
 
@@ -115,7 +115,7 @@ $knockKnockSecurity = new KnockKnockSecurity($_ENV['API_URL']);
 $knockKnockSecurity
     ->setupAuthorization( 'token', KnockKnockSecurity::TOKEN_BEARER )
     ->setupHeaders( [ 'X-Api-Key' => $_ENV['X_API_KEY'] ] )
-    ->setupContentType( LibKnockContentType::JSON );
+    ->setupContentType( ContentType::JSON );
 ```
 
 Наследование от `KnockKnock` позволяет использовать все методы для настроек запроса.  
@@ -126,27 +126,27 @@ $knockKnockSecurity
     ->setupAuthorization( 'token', KnockKnockSecurity::TOKEN_BEARER )
     ->setupHeaders( [ 'X-Api-Key' => $_ENV['X_API_KEY'] ] )
     ->setupContentType( 'application/json' )
-    ->on( KnockKnock::EVENT_AFTER_SEND, fn( KnockKnock $knockKnock, KnockResponse $knockResponse ) => 
+    ->on( KnockKnock::EVENT_AFTER_SEND, fn( KnockKnock $knockKnock, Response $Response ) => 
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
 
-        file_put_contents( $logFilePath, $knockResponse->content, FILE_APPEND );
+        file_put_contents( $logFilePath, $Response->content, FILE_APPEND );
     });
 
 
-$KnockResponsePatch = $knockKnockSecurity->patch( 'product', [
+$ResponsePatch = $knockKnockSecurity->patch( 'product', [
     'price' => 1000
 ]);
 
-$product = json_decode( $KnockResponsePatch->content, true );
+$product = json_decode( $ResponsePatch->content, true );
 
 $price = $product->price;
 
-$knockKnockSecurity->useContentType( LibKnockContentType::JSON );
-$KnockResponsePost = $knockKnockSecurity->post( 'category', [
+$knockKnockSecurity->useContentType( ContentType::JSON );
+$ResponsePost = $knockKnockSecurity->post( 'category', [
     'name' => 'Фреймворки'
 ]);
 
-$category_id = $KnockResponse_Post->content['id'];
+$category_id = $Response_Post->content['id'];
 
 ```
