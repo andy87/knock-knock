@@ -94,11 +94,11 @@ interface HandlerInterface
 
 
     /**
-     * @param array $fakeResponse
+     * @param RequestInterface $request
      *
      * @return Response
      */
-    public function send(array $fakeResponse = []): Response;
+    public function send(RequestInterface $request): Response;
 
 
     /**

@@ -110,7 +110,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testConstructor()
      *
-     * @tag #constructor
+     * @tag #request #constructor
      */
     public function __construct(?string $endpoint, array $params = [])
     {
@@ -136,7 +136,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #magic #get
+     * @tag #request #magic #get
      */
     public function __get(string $name): mixed
     {
@@ -179,7 +179,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testConstructUrlOnGet()
      *
-     * @tag #get #url
+     * @tag #request #get #url
      */
     public function constructUrl(): string
     {
@@ -234,7 +234,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testPrepareEndpointOnGet()
      *
-     * @tag #endpoint #prepare
+     * @tag #request #endpoint #prepare
      */
     public function prepareEndpoint(): void
     {
@@ -270,7 +270,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetProtocol()
      *
-     * @tag #set #protocol
+     * @tag #request #set #protocol
      */
     public function setProtocol(string $protocol): self
     {
@@ -288,7 +288,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetHost()
      *
-     * @tag #set #host
+     * @tag #request #set #host
      */
     public function setHost(string $host): self
     {
@@ -306,7 +306,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetEndpoint()
      *
-     * @tag #set #endpoint
+     * @tag #request #set #endpoint
      */
     public function setEndpoint(string $endpoint): self
     {
@@ -324,7 +324,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetMethod()
      *
-     * @tag #set #method
+     * @tag #request #set #method
      */
     public function setMethod(string $method): self
     {
@@ -343,7 +343,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetHeader()
      *
-     * @tag #set #headers
+     * @tag #request #set #headers
      */
     public function setHeader(string $key, string $value): self
     {
@@ -368,7 +368,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testAddHeaders()
      *
-     * @tag #add #headers
+     * @tag #request #add #headers
      */
     public function addHeaders(array $headers): self
     {
@@ -390,7 +390,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetContentType()
      *
-     * @tag #set #contentType
+     * @tag #request #set #contentType
      */
     public function setContentType(string $contentType): self
     {
@@ -408,7 +408,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetData()
      *
-     * @tag #set #data
+     * @tag #request #set #data
      */
     public function setData(mixed $data): self
     {
@@ -426,7 +426,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetCurlOptions()
      *
-     * @tag #set #curlOptions
+     * @tag #request #set #curlOptions
      */
     public function setCurlOptions(array $curlOptions): self
     {
@@ -447,7 +447,7 @@ class Request implements RequestInterface
      *
      * @throws StatusNotFoundException|ParamUpdateException
      *
-     * @tag #add #curlOptions
+     * @tag #request #add #curlOptions
      */
     public function setCurlOption(int $key, mixed $value): self
     {
@@ -469,7 +469,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testAddCurlOptions()
      *
-     * @tag #add #curlOptions
+     * @tag #request #add #curlOptions
      */
     public function addCurlOptions(array $curlOptions): self
     {
@@ -491,7 +491,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetCurlInfo()
      *
-     * @tag #set #curlInfo
+     * @tag #request #set #curlInfo
      */
     public function setCurlInfo(array $curlInfo): self
     {
@@ -512,7 +512,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testAddError()
      *
-     * @tag #add #errors
+     * @tag #request #add #errors
      *
      */
     public function addError(string $curlError, ?string $key = null): self
@@ -542,7 +542,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetupStatusComplete()
      *
-     * @tag #set #status #processing
+     * @tag #request #set #status #processing
      */
     public function setupStatusProcessing(): self
     {
@@ -558,7 +558,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetupStatusComplete()
      *
-     * @tag #set #status #complete
+     * @tag #request #set #status #complete
      */
     public function setupStatusComplete(): self
     {
@@ -572,7 +572,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testStatusIsComplete()
      *
-     * @tag #knockKnock #status #not_complete
+     * @tag #request #status #not_complete
      */
     public function statusIsComplete(): bool
     {
@@ -586,7 +586,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testStatusIsPrepare()
      *
-     * @tag #knockKnock #status #prepare
+     * @tag #request #status #prepare
      */
     public function statusIsPrepare(): bool
     {
@@ -609,7 +609,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testDisableSSL()
      *
-     * @tag #knockKnock #ssl #disable
+     * @tag #request #ssl #disable
      */
     public function disableSSL(bool $verifyPeer = false, int $verifyHost = 0): self
     {
@@ -631,7 +631,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testEnableSSL()
      *
-     * @tag #knockKnock #ssl #enable
+     * @tag #request #ssl #enable
      */
     public function enableSSL(bool $verifyPeer = true, int $verifyHost = 2): self
     {
@@ -650,7 +650,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testClone()
      *
-     * @tag #knockKnock #clone
+     * @tag #request #clone
      */
     public function clone(): Request
     {
@@ -672,7 +672,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testLimiterIsComplete()
      *
-     * @tag #knockKnock #limiter #complete
+     * @tag #request #limiter #complete
      */
     public function limiterIsComplete(?string $message = null): void
     {
@@ -696,7 +696,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetupParamsFromArray()
      *
-     * @tag #setup #paramList #on_status
+     * @tag #request #setup #paramList #on_status
      */
     private function setupParamsFromArray(array $params): void
     {
@@ -719,7 +719,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetParamsOnStatusPrepare()
      *
-     * @tag #setup #param #on_status
+     * @tag #request #setup #param #on_status
      */
     private function setParamsOnStatusPrepare(string $param, $value): self
     {
@@ -780,7 +780,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetupStatusComplete()
      *
-     * @tag #set #status
+     * @tag #request #set #status
      */
     private function setStatus(int $status): self
     {
@@ -798,7 +798,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testPrepareHost()
      *
-     * @tag #host #prepare
+     * @tag #request #host #prepare
      */
     private function prepareHost(): void
     {
@@ -819,7 +819,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #status
+     * @tag #request #get #status
      */
     private function getterStatusID(): int
     {
@@ -837,7 +837,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testGetStatusLabel()
      *
-     * @tag #get #status
+     * @tag #request #get #status
      */
     private function getterStatusLabel(?int $status_id = null): string
     {
@@ -860,7 +860,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testGetParams()
      *
-     * @tag #get #params
+     * @tag #request #get #params
      */
     private function getterParams(): array
     {
@@ -896,7 +896,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #protocol
+     * @tag #request #get #protocol
      */
     private function getterProtocol(): ?string
     {
@@ -910,7 +910,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #host
+     * @tag #request #get #host
      */
     private function getterHost(): ?string
     {
@@ -924,7 +924,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #endpoint
+     * @tag #request #get #endpoint
      */
     private function getterEndpoint(): ?string
     {
@@ -940,7 +940,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #url
+     * @tag #request #get #url
      */
     private function getterUrl(): ?string
     {
@@ -955,7 +955,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #method
+     * @tag #request #get #method
      */
     private function getterMethod(): ?string
     {
@@ -969,7 +969,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #headers
+     * @tag #request #get #headers
      */
     private function getterHeaders(): array
     {
@@ -983,7 +983,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #contentType
+     * @tag #request #get #contentType
      */
     private function getterContentType(): ?string
     {
@@ -998,7 +998,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #data
+     * @tag #request #get #data
      */
     private function getterData(): mixed
     {
@@ -1012,7 +1012,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #data #postFields
+     * @tag #request #get #data #postFields
      */
     private function getterPostFields(): mixed
     {
@@ -1028,7 +1028,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #curlParams
+     * @tag #request #get #curlParams
      */
     private function getterCurlParams(): array
     {
@@ -1042,7 +1042,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #curlOptions
+     * @tag #request #get #curlOptions
      */
     private function getterCurlOptions(): ?array
     {
@@ -1056,7 +1056,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testMagicGet()
      *
-     * @tag #get #curlInfo
+     * @tag #request #get #curlInfo
      */
     private function getterCurlInfo(): array
     {
@@ -1069,7 +1069,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testGetErrors()
      *
-     * @tag #get #errors
+     * @tag #request #get #errors
      */
     private function getterErrors(): array
     {

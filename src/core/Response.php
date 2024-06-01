@@ -47,7 +47,7 @@ class Response implements ResponseInterface
      * @param int $_httpCode
      * @param ?Request $_request
      *
-     * @tag #constructor #response
+     * @tag #response #constructor #response
      */
     public function __construct(
         protected mixed    $_data,
@@ -66,7 +66,7 @@ class Response implements ResponseInterface
      *
      * Test: @see ResponseTest::testMagicGet()
      *
-     * @tag #magic #get
+     * @tag #response #magic #get
      */
     public function __get(string $name): mixed
     {
@@ -101,7 +101,7 @@ class Response implements ResponseInterface
      *
      * Test: @see ResponseTest::testSetupHttpCode()
      *
-     * @tag #setter #httpCode
+     * @tag #response #setter #httpCode
      */
     public function setupHttpCode(int $httpCode): void
     {
@@ -119,7 +119,7 @@ class Response implements ResponseInterface
      *
      * Test: @see ResponseTest::setupData()
      *
-     * @tag #setter #data
+     * @tag #response #setter #data
      */
     public function setupData(string $data): void
     {
@@ -137,7 +137,7 @@ class Response implements ResponseInterface
      *
      * Test: @see ResponseTest::testSetupRequest()
      *
-     * @tag #setter #request
+     * @tag #response #setter #request
      */
     public function setupRequest(Request $Request): void
     {
@@ -283,7 +283,7 @@ class Response implements ResponseInterface
      *
      * Test: @see ResponseTest::testSetupRequest()
      *
-     * @tag #getter #request
+     * @tag #response #getter #request
      */
     private function getterRequest(): Request
     {
@@ -298,7 +298,7 @@ class Response implements ResponseInterface
      *
      * Test: @see ResponseTest::testSetupHttpCode()
      *
-     * @tag #getter #httpCode
+     * @tag #response #getter #httpCode
      */
     private function getterHttpCode(): int
     {
@@ -311,7 +311,7 @@ class Response implements ResponseInterface
      *
      * Test: @see ResponseTest::testSetupData()
      *
-     * @tag #getter #data
+     * @tag #response #getter #data
      */
     private function getterData(): mixed
     {
