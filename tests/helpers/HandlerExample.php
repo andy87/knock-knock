@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\helpers;
 
-use andy87\knock_knock\core\Handler;
 use Exception;
+use andy87\knock_knock\core\Handler;
 
 /**
  *  Class HandlerExample

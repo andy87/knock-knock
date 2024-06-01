@@ -69,28 +69,28 @@ interface HandlerInterface
     /**
      * @param string $method
      * @param string $endpoint
-     * @param array $RequestConfig
+     * @param array $requestConfig
      *
      * @return Request
      */
-    public function constructRequest(string $method, string $endpoint, array $RequestConfig = []): Request;
+    public function constructRequest(string $method, string $endpoint, array $requestConfig = []): Request;
 
     /**
      * @param array $responseParams
-     * @param ?Request $Request
+     * @param ?Request $request
      *
      * @return Response
      */
-    public function constructResponse(array $responseParams, ?Request $Request = null): Response;
+    public function constructResponse(array $responseParams, ?Request $request = null): Response;
 
 
     /**
-     * @param Request $Request
+     * @param Request $request
      * @param array $options
      *
      * @return self
      */
-    public function setupRequest(Request $Request, array $options = []): self;
+    public function setupRequest(Request $request, array $options = []): self;
 
 
     /**

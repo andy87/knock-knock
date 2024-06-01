@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\helpers;
 
-use Exception;
+
 use PHPUnit\Framework\TestCase;
 use andy87\knock_knock\interfaces\RequestInterface;
 use andy87\knock_knock\lib\{ Method, ContentType };
 use andy87\knock_knock\core\{ Handler, Request, Response };
+use andy87\knock_knock\exception\{ InvalidHostException, ParamNotFoundException, ParamUpdateException, request\StatusNotFoundException };
 
 /**
  * Class UnitTestCore
@@ -65,7 +66,9 @@ abstract class UnitTestCore extends TestCase
      *
      * @return Handler
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
+     *
+     * @tag #handler #get
      */
     public function getHandler( ?string $host = null, ?array $params = null ): Handler
     {
@@ -78,7 +81,9 @@ abstract class UnitTestCore extends TestCase
      *
      * @return Request
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
+     *
+     * @tag #request #get
      */
     public function getRequest( ?string $endpoint = null, ?array $params = null ): Request
     {
@@ -88,15 +93,18 @@ abstract class UnitTestCore extends TestCase
     /**
      * @param string $content
      * @param int $httpCode
-     * @param ?Handler $Handler
+     * @param ?Handler $handler
+     *
      * @return Response
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
+     *
+     * @tag #response #get
      */
-    public function getResponse( string $content = self::CONTENT, int $httpCode = self::HTTP_CODE_OK, ?Handler $Handler = null ): Response
+    public function getResponse( string $content = self::CONTENT, int $httpCode = self::HTTP_CODE_OK, ?Handler $handler = null ): Response
     {
-        $Handler = $Handler ?? $this->getHandler();
+        $handler = $handler ?? $this->getHandler();
 
-        return new Response( $content, $httpCode, $Handler->commonRequest );
+        return new Response( $content, $httpCode, $handler->commonRequest );
     }
 }

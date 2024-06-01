@@ -129,7 +129,7 @@ class Response implements ResponseInterface
     /**
      * Установка объекта запроса
      *
-     * @param Request $Request
+     * @param Request $request
      *
      * @return void
      *
@@ -139,9 +139,9 @@ class Response implements ResponseInterface
      *
      * @tag #response #setter #request
      */
-    public function setupRequest(Request $Request): void
+    public function setupRequest(Request $request): void
     {
-        $this->setter('_request', $Request);
+        $this->setter('_request', $request);
     }
 
     /**

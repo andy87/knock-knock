@@ -225,15 +225,14 @@ class KnockKnockOctopus extends Handler
      */
     public function fakeResponse(array $fakeResponse, array $requestParams = []): Response
     {
-        $this->setupRequest(
-            $this->constructRequest(
-                Method::GET,
-                '/',
-                $requestParams
-            )
+        $request =  $this->constructRequest(
+            Method::GET,
+            '/',
+            $requestParams
         );
+        $request->setFakeResponse($fakeResponse);
 
-        return $this->send($fakeResponse);
+        return $this->send($request);
     }
 
 
@@ -257,7 +256,7 @@ class KnockKnockOctopus extends Handler
     {
         $this->validateIssetRealRequest($method, $endpoint, $data);
 
-        return $this->send();
+        return $this->send($this->_realRequest);
     }
 
     /**
@@ -275,16 +274,16 @@ class KnockKnockOctopus extends Handler
      */
     private function validateIssetRealRequest(string $method, string $endpoint, array $data = []): void
     {
-        $RequestParams = [];
+        $requestParams = [];
 
         if (count($data)) {
-            $RequestParams[RequestInterface::SETUP_DATA] = $data;
+            $requestParams[RequestInterface::SETUP_DATA] = $data;
         }
 
-        $RequestParams[RequestInterface::SETUP_METHOD] = $method;
+        $requestParams[RequestInterface::SETUP_METHOD] = $method;
 
-        $Request = $this->constructRequest($method, $endpoint, $RequestParams);
+        $request = $this->constructRequest($method, $endpoint, $requestParams);
 
-        $this->setupRequest($Request);
+        $this->setupRequest($request);
     }
 }

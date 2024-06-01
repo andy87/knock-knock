@@ -9,7 +9,7 @@ KnockKnock - это простая библиотека, реализующая 
 Цель: сделать простой и лёгкий в настройке компонента и запроса пакет для реализации разных API на его основе.
 
 P.S. я знаю про существование таких библиотек как: [Guzzle](https://github.com/guzzle/guzzle), [Client](https://github.com/yiisoft/yii2-httpclient) _(в моём любимом Yii2)_, но хотелось попробовать создать свою реализацию.  
-Без "лишних" данных, вызовов и настроек - только то, что нужно: сухо, лаконично, минималистично.  
+Без "лишних" данных, вызовов и настроек, nullWarningStyle - только то, что нужно: сухо, лаконично, минималистично.  
 _Разумеется, это не конкурент, а просто попытка создать что-то своё_
 
 ___
@@ -246,20 +246,20 @@ $knockKnock->setupEventHandlers([
     Handler::EVENT_AFTER_CONSTRUCT => function( static $knockKnock ) => {
         // создание объекта knockKnock, для взаимодействия с $knockKnock
     },
-    Handler::EVENT_CREATE_REQUEST => function( static $knockKnock, Request $Request ) => {
-        // создание объекта запроса, для взаимодействия с $Request
+    Handler::EVENT_CREATE_REQUEST => function( static $knockKnock, Request $request ) => {
+        // создание объекта запроса, для взаимодействия с $request
     },
-    Handler::EVENT_BEFORE_SEND => function(  static $knockKnock, Request $Request ) => {
-        // отправка запроса, для взаимодействия с $Request
+    Handler::EVENT_BEFORE_SEND => function(  static $knockKnock, Request $request ) => {
+        // отправка запроса, для взаимодействия с $request
     },
     Handler::EVENT_CURL_HANDLER => function( static $knockKnock, resource $ch ) => {
         // перед отправкой curl запроса, для взаимодействия с $ch
     },
-    Handler::EVENT_CREATE_RESPONSE => function( static $knockKnock, Response $Response ) => {
-        // создание объекта ответа, для взаимодействия с $Response
+    Handler::EVENT_CREATE_RESPONSE => function( static $knockKnock, Response $response ) => {
+        // создание объекта ответа, для взаимодействия с $response
     },
-    Handler::EVENT_AFTER_SEND => function( static $knockKnock, Response $Response ) => {
-        // получение ответа, для взаимодействия с $Response
+    Handler::EVENT_AFTER_SEND => function( static $knockKnock, Response $response ) => {
+        // получение ответа, для взаимодействия с $response
     }
 ]);
 ```
@@ -307,7 +307,7 @@ _use [andy87\knock_knock\core\Request](src/core/Request.php);_
 
 Передавая параметры напрямую в конструктор:
 ```php
-$Request = new Request( 'info/me', [
+$request = new Request( 'info/me', [
     Request::METHOD => Method::POST,
     Request::DATA => [ 'client_id' => 34 ],
     Request::HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
@@ -322,7 +322,7 @@ $Request = new Request( 'info/me', [
 ```
 Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_REQUEST`
 ```php
-$Request = $knockKnock->constructRequest( 'info/me', [
+$request = $knockKnock->constructRequest( 'info/me', [
     Request::METHOD => Method::POST,
     Request::DATA => [ 'client_id' => 45 ],
     Request::HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
@@ -337,15 +337,15 @@ $Request = $knockKnock->constructRequest( 'info/me', [
 ```
 Клонируя существующий объект запроса:
 ```php
-$Request = $knockKnock->constructRequest( 'info/me' );
+$request = $knockKnock->constructRequest( 'info/me' );
 
-$Response = $knockKnock->setupRequest( $Request )->send();
+$response = $knockKnock->setupRequest( $request )->send();
 
 //Клонирование объекта запроса (без статуса отправки)
-$cloneRequest = $Request->clone();
+$cloneRequest = $request->clone();
 
 // Отправка клона запроса
-$Response = $knockKnock->setupRequest( $cloneRequest )->send();
+$response = $knockKnock->setupRequest( $cloneRequest )->send();
 ```
 
 <h3 id="knockknock-src-Request-setter-getter">
@@ -367,24 +367,24 @@ $Response = $knockKnock->setupRequest( $cloneRequest )->send();
 | Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array     | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                         |
 
 ```php
-$Request = $knockKnock->constructRequest('info/me');
+$request = $knockKnock->constructRequest('info/me');
 
-$Request->setMethod( Method::GET );
-$Request->setData(['client_id' => 67]);
-$Request->setHeaders(['api-secret-key' => 'secretKey67']);
-$Request->setCurlOptions([
+$request->setMethod( Method::GET );
+$request->setData(['client_id' => 67]);
+$request->setHeaders(['api-secret-key' => 'secretKey67']);
+$request->setCurlOptions([
     CURLOPT_TIMEOUT => 10,
     CURLOPT_RETURNTRANSFER => true
 ]);
-$Request->setCurlInfo([
+$request->setCurlInfo([
     CURLINFO_CONTENT_TYPE,
     CURLINFO_HEADER_SIZE,
     CURLINFO_TOTAL_TIME
 ]);
-$Request->setContentType( ContentType::JSON );
+$request->setContentType( ContentType::JSON );
 
-$protocol = $Request->getPrococol(); // String
-$host = $Request->getHost(); // String
+$protocol = $request->getPrococol(); // String
+$host = $request->getHost(); // String
 // ... аналогичным образом доступны и другие подобные методы для получения свойств запроса
 ```
 <h3 id="knockknock-src-Request-setupRequest">
@@ -392,14 +392,14 @@ $host = $Request->getHost(); // String
 </h3>
 
 ```php
-$knockKnock->setupRequest( $Request, [
+$knockKnock->setupRequest( $request, [
     Request::SETUP_HOST => $_ENV['API_HOST'],
     Request::SETUP_HEADERS => [
         'api-secret' => $_ENV['API_SECRET_KEY']
     ],
 ]);
 ```
-`setupRequest( Request $Request, array $options = [] ): self`
+`setupRequest( Request $request, array $options = [] ): self`
 
 
 <p align="center">- - - - -</p>
@@ -435,26 +435,26 @@ _use [andy87\knock_knock\core\Response](src/core/Response.php);_
 
 Передавая параметры напрямую в конструктор:
 ```php
-$Response = new Response('{"id" => 806034, "name" => "and_y87"}', 200 );
+$response = new Response('{"id" => 806034, "name" => "and_y87"}', 200 );
 ```
 Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_RESPONSE`
 ```php
-$Response = $knockKnock->constructResponse([
+$response = $knockKnock->constructResponse([
     Response::CONTENT => [
         'id' => 806034,
         'name' => 'and_y87'
     ],
     Response::HTTP_CODE => 400,
-], $Request );
+], $request );
 ```
-`constructResponse( array $ResponseParams, ?Request $Request = null ): Response`
+`constructResponse( array $responseParams, ?Request $request = null ): Response`
 
 <h2 id="knockknock-src-Handler-send">
     Отправка запроса
 </h2>
 
 `send( array $kafeResponse = [] ): Response`  
-Метод требует наличие объекта запроса установленного методом `setupRequest( Request $Request )`.  
+Метод требует наличие объекта запроса установленного методом `setupRequest( Request $request )`.  
 
 Вызов метода `send()`, возвращает объект/экземпляр класса `Response`.  
 Срабатывает callback функция, привязанная к ключу:
@@ -466,11 +466,11 @@ $Response = $knockKnock->constructResponse([
 ```php
 $knockKnock = new Handler( $_ENV['API_HOST'] );
 
-$Request = $knockKnock->constructRequest( 'info/me' );
+$request = $knockKnock->constructRequest( 'info/me' );
 
-$knockKnock->setupRequest( $Request );
+$knockKnock->setupRequest( $request );
 
-$Response = $knockKnock->send();
+$response = $knockKnock->send();
 ```
 
 Если запрос уже был отправлен, повторно отправить его нельзя, выбрасывается `Exception`.  
@@ -478,14 +478,14 @@ $Response = $knockKnock->send();
 ```php
 $knockKnock = new Handler( $_ENV['API_HOST'] );
 
-$Request = $knockKnock->constructRequest( 'info/me' );
+$request = $knockKnock->constructRequest( 'info/me' );
 
-$knockKnock->setupRequest( $Request );
+$knockKnock->setupRequest( $request );
 
-$Response = $knockKnock->send();
+$response = $knockKnock->send();
 
 // повторная отправка запроса
-$Response = $knockKnock->setupRequest( $Request->clone() )->send();
+$response = $knockKnock->setupRequest( $request->clone() )->send();
 ```
 
 <h4 id="knockknock-src-Handler-chain-call">
@@ -496,12 +496,12 @@ $Response = $knockKnock->setupRequest( $Request->clone() )->send();
 ```php
 $knockKnock = new Handler( $_ENV['API_HOST'] );
 
-$Request = $knockKnock->constructRequest( 'info/me' );
+$request = $knockKnock->constructRequest( 'info/me' );
 
 //Цепочка вызовов
-$Response = $knockKnock->setRequest( $Request )->send();
+$response = $knockKnock->setRequest( $request )->send();
 
-$content = json_decode($Response->content, true);
+$content = json_decode($response->content, true);
 ```
 _Разумеется можно миксовать codeStyle кому как больше нравиться_
 
@@ -517,9 +517,9 @@ $fakeResponse = [
     Response::CONTENT => '{"id" => 8060345, "nickName" => "and_y87"}'
 ];
 
-$Response = $knockKnock->setupRequest( $Request )->send( $fakeResponse );
+$response = $knockKnock->setupRequest( $request )->send( $fakeResponse );
 ```
-объект `$Response` будет содержать в свойствах `content`, `httpCode` данные переданные в аргументе `$fakeResponse`
+объект `$response` будет содержать в свойствах `content`, `httpCode` данные переданные в аргументе `$fakeResponse`
 
 <h2 id="knockknock-src-Response-setter">
     Данные в ответе
@@ -527,9 +527,9 @@ $Response = $knockKnock->setupRequest( $Request )->send( $fakeResponse );
 
 В созданный объект `Response`, чей запрос не был отправлен, разрешено задавать данные, используя методы группы `set`.  
 ```php
-$Response = $knockKnock->setupRequest( $Request )->send();
+$response = $knockKnock->setupRequest( $request )->send();
 
-$Response
+$response
     ->setHttpCode(200)
     ->setContent('{"id" => 8060345, "nickName" => "and_y87"}');
 ```
@@ -541,9 +541,9 @@ $Response
 </h3>
 
 ```php
-$Response = $knockKnock->setupRequest( $Request )->send();
+$response = $knockKnock->setupRequest( $request )->send();
 
-$Response
+$response
     ->replace( Response::HTTP_CODE, 200 )
     ->replace( Response::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}' );
 ```
@@ -558,9 +558,9 @@ $Response
 Получение компонента запроса:
 ```php
 $knockKnock = new Handler( $_ENV['API_HOST'] );
-$Response = $knockKnock->setRequest( $knockKnock->constructRequest( 'info/me' ) )->send();
+$response = $knockKnock->setRequest( $knockKnock->constructRequest( 'info/me' ) )->send();
 
-$request = $Response->request;
+$request = $response->request;
 
 $method = $request->method;
 ```
@@ -568,17 +568,17 @@ $method = $request->method;
 Получения свойств cURL запроса 
 ```php
 $knockKnock = new Handler( $_ENV['API_HOST'] );
-$Response = $knockKnock->setRequest( $knockKnock->constructRequest( 'info/me' ) )->send();
+$response = $knockKnock->setRequest( $knockKnock->constructRequest( 'info/me' ) )->send();
 
-$Response->request;
+$response->request;
 
 // Получение свойств через объект запроса
-$curlOptions =  $Response->request->curlOption;
-$curlInfo =  $Response->request->curlInfo;
+$curlOptions =  $response->request->curlOption;
+$curlInfo =  $response->request->curlInfo;
 
 //Вариант с использованием быстрого доступа
-$curlOptions =  $Response->curlOption;
-$curlInfo =  $Response->curlInfo;
+$curlOptions =  $response->curlOption;
+$curlInfo =  $response->curlInfo;
 ```
 <h3 id="knockknock-src-Response-asArray">
     asArray()
@@ -586,8 +586,8 @@ $curlInfo =  $Response->curlInfo;
 
 Преобразование ответа в массив
 ```php
-$Response = $knockKnock->setupRequest( $Request )->asArray()->send();
-$array = $Response->content; // Array
+$response = $knockKnock->setupRequest( $request )->asArray()->send();
+$array = $response->content; // Array
 ```
 
 
@@ -618,19 +618,19 @@ ___
 $knockKnock = new Handler( $_ENV['API_HOST'] );
 $knockKnock->disableSSL();
 
-$Request = $knockKnock->constructRequest( 'info/me' );
+$request = $knockKnock->constructRequest( 'info/me' );
 
-$Response = $knockKnock->setupRequest( $Request )->send();
+$response = $knockKnock->setupRequest( $request )->send();
 ```
 
 `Request` - для конкретного запроса  
 ```php
 $knockKnock = new Handler( $_ENV['API_HOST'] )->disableSSL();
 
-$Request = $knockKnock->constructRequest( 'info/me' );
-$Request->enableSSL();
+$request = $knockKnock->constructRequest( 'info/me' );
+$request->enableSSL();
 
-$Response = $knockKnock->setupRequest( $Request )->send();
+$response = $knockKnock->setupRequest( $request )->send();
 ```
 <h3 id="knockknock-src-Cookie">
     Cookie
@@ -739,19 +739,19 @@ $knockKnockSecurity
     ->setupAuthorization( KnockKnockSecurity::TOKEN_BEARER, 'token' )
     ->setupHeaders([ 'X-Api-Key' => $_ENV['X_API_KEY'] ])
     ->setupContentType( ContentType::JSON )
-    ->on( Handler::EVENT_AFTER_SEND, function( Handler $handler, Response $Response ) => 
+    ->on( Handler::EVENT_AFTER_SEND, function( Handler $handler, Response $response ) => 
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
 
-        file_put_contents( $logFilePath, $Response->content, FILE_APPEND );
+        file_put_contents( $logFilePath, $response->content, FILE_APPEND );
     });
 
 // Получение ответа на запрос методом `patch`
-$ResponsePatch = $knockKnockSecurity->patch( 'product', [
+$responsePatch = $knockKnockSecurity->patch( 'product', [
     'price' => 1000
 ]);
 
-$product = $ResponsePatch->asArray();
+$product = $responsePatch->asArray();
 
 $price = $product['price'];
 
@@ -759,11 +759,11 @@ $price = $product['price'];
 $knockKnockSecurity->useContentType( ContentType::JSON );
 
 // Отправка POST запроса и получение ответа
-$ResponsePost = $knockKnockSecurity->post( 'category', [
+$responsePost = $knockKnockSecurity->post( 'category', [
     'name' => 'Фреймворки'
 ]);
 
-$response = json_decode( $ResponsePost->content );
+$response = json_decode( $responsePost->content );
 
 $category_id = $response->id;
 
@@ -811,29 +811,29 @@ class KnockKnockYandex extends Handler
      */
     private function setupYandexLoggerEventHandlers( array $callbacks ): self
     {
-        $this->on( self::AFTER_CREATE_REQUEST, function( Request $Request ) => 
+        $this->on( self::AFTER_CREATE_REQUEST, function( Request $request ) => 
         {
-            $logData = $this->getLogDataByRequest( $Request );
+            $logData = $this->getLogDataByRequest( $request );
 
             $this->addYandexLog( $logData );
         };
 
-        $this->on(self::EVENT_AFTER_SEND, function( Response $Response ) => 
+        $this->on(self::EVENT_AFTER_SEND, function( Response $response ) => 
         {
-            $logData = $this->getLogDataByRequest( $Response->request );
+            $logData = $this->getLogDataByRequest( $response->request );
 
             $this->addYandexLog( $logData );
         };
     }
 
     /**
-      * @param Request $Request
+      * @param Request $request
       * 
       * @return array
       */
-    private function getLogDataByRequest( Request $Request ): array
+    private function getLogDataByRequest( Request $request ): array
     {
-        return $Request->getParams();
+        return $request->getParams();
     }
 
     /**
@@ -858,12 +858,12 @@ $knockKnockYandex = KnockKnockYandex::getInstanсe( $_ENV['API_HOST'], [
     KnockKnockYandex::LOGGER => new YandexLogger(),
 ]);
 
-$Response = $knockKnockYandex->setupRequest( 'profile', [ 
+$response = $knockKnockYandex->setupRequest( 'profile', [ 
     Request::METHOD => Method::PATCH,
     Request::DATA => [ 'city' => 'Moscow' ],
 ]); // Логирование `afterCreateRequest`
 
-$Response = $knockKnockYandex->send(); // Логирование `afterSend`
+$response = $knockKnockYandex->send(); // Логирование `afterSend`
 ```
 
 

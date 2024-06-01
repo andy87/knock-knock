@@ -40,6 +40,7 @@ use andy87\knock_knock\exception\{ InvalidEndpointException, InvalidHostExceptio
  * @property-read array $curlOptions
  * @property-read array $curlInfo
  *
+ * @property-read array $fakeResponse
  * @property-read array $errors
  *
  * Покрытие тестами: 100%. @see RequestTest
@@ -86,8 +87,11 @@ class Request implements RequestInterface
     private string $_contentType;
     /** @var array $_headers Заголовки */
     private array $_headers = [];
-    /** @var mixed $_data Данные запроса */
+    /** @var mixed $_data Данные передаваемые запросом */
     private mixed $_data;
+
+    /** @var ?array $_fakeResponse Фэйковые данные ответа */
+    private ?array $_fakeResponse = null;
 
     /** @var array $_errors Ошибки */
     private array $_errors = [];
@@ -163,6 +167,7 @@ class Request implements RequestInterface
 
             self::PARAMS => $this->getterParams(),
 
+            'fakeResponse' => $this->getterFakeResponse(),
             'errors' => $this->getterErrors(),
 
             default => throw new ParamNotFoundException("Свойство `$name` не найдено в классе " . __CLASS__),
@@ -503,6 +508,26 @@ class Request implements RequestInterface
     }
 
     /**
+     * @param array $array
+     *
+     * @return $this
+     *
+     * @throws ParamUpdateException|StatusNotFoundException
+     *
+     * Test: @see RequestTest::testSetFakeResponse()
+     *
+     * @tag #request #setup #fakeResponse
+     */
+    public function setFakeResponse(array $array): static
+    {
+        $this->limiterIsComplete();
+
+        $this->_fakeResponse = $array;
+
+        return $this;
+    }
+
+    /**
      * @param string $curlError
      * @param ?string $key
      *
@@ -719,7 +744,7 @@ class Request implements RequestInterface
      *
      * Test: @see RequestTest::testSetParamsOnStatusPrepare()
      *
-     * @tag #request #setup #param #on_status
+     * @tag #request #set #param #on_status
      */
     private function setParamsOnStatusPrepare(string $param, $value): self
     {
@@ -1063,6 +1088,17 @@ class Request implements RequestInterface
         return $this->_curlParams[self::SETUP_CURL_INFO];
     }
 
+    /**
+     * Получение фэйковых данных ответа
+     *
+     * @return ?array
+     *
+     * Test: @see RequestTest::testMagicGet()
+     */
+    private function getterFakeResponse(): ?array
+    {
+        return $this->_fakeResponse;
+    }
 
     /**
      * @return array

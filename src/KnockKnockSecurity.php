@@ -154,7 +154,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
     /**
      * Модификация метода send для отправки запроса с кастомными данными (array $use)
      *
-     * @param array $fakeResponse
+     * @param interfaces\RequestInterface $request
      *
      * @return Response
      *
@@ -164,19 +164,19 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #use #send
      */
-    public function send(array $fakeResponse = []): Response
+    public function send( interfaces\RequestInterface $request ): Response
     {
         if (count($this->use)) {
             $this->modifyRequestByUse($this->getterRealRequest());
         }
 
-        return $this->sendRequest($this->getterRealRequest(), $fakeResponse);
+        return $this->sendRequest( $this->getterRealRequest() );
     }
 
     /**
-     * Применение кастомных данных(array $use) к запросу `$Request`
+     * Применение кастомных данных(array $use) к запросу `$request`
      *
-     * @param Request $Request
+     * @param Request $request
      *
      * @return void
      *
@@ -186,14 +186,14 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #use #request #modify
      */
-    protected function modifyRequestByUse(Request $Request): void
+    protected function modifyRequestByUse(Request $request): void
     {
         if (isset($this->use[interfaces\RequestInterface::SETUP_HEADERS])) {
-            $Request->addHeaders($this->use[interfaces\RequestInterface::SETUP_HEADERS]);
+            $request->addHeaders($this->use[interfaces\RequestInterface::SETUP_HEADERS]);
         }
 
         if (isset($this->use[interfaces\RequestInterface::SETUP_CONTENT_TYPE])) {
-            $Request->setContentType($this->use[interfaces\RequestInterface::SETUP_CONTENT_TYPE]);
+            $request->setContentType($this->use[interfaces\RequestInterface::SETUP_CONTENT_TYPE]);
         }
 
         $this->clearUse();

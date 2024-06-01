@@ -12,11 +12,13 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\core;
 
-use andy87\knock_knock\core\{Handler, Request};
-use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\lib\{ContentType, Method};
+use andy87\knock_knock\core\{ Handler, Request };
 use andy87\knock_knock\tests\helpers\UnitTestCore;
-use Exception;
+use andy87\knock_knock\interfaces\RequestInterface;
+use andy87\knock_knock\lib\{ ContentType, Method };
+use andy87\knock_knock\interfaces\ResponseInterface;
+use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
+use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\InvalidProtocolException, request\StatusNotFoundException };
 
 /**
  * Class RequestTest
@@ -25,14 +27,14 @@ use Exception;
  *
  * @package tests
  *
- * @cli vendor/bin/phpunit tests/RequestTest.php --testdox
+ * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox
  *
  * @tag #test #Request
  */
 class RequestTest extends UnitTestCore
 {
-    /** @var Request $Request */
-    private Request $Request;
+    /** @var Request $request */
+    private Request $request;
 
 
 
@@ -41,13 +43,15 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
+     *
+     * @tag #test #Request #setUp
      */
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->Request = $this->getRequest(self::ENDPOINT, self::PARAMS);
+        $this->request = $this->getRequest(self::ENDPOINT, self::PARAMS);
     }
 
     /**
@@ -58,15 +62,13 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
-     *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testConstructor
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testConstructor
      *
      * @tag #test #Request #constructor
      */
     public function testConstructor(): void
     {
-        $this->assertInstanceOf(Request::class, $this->Request );
+        $this->assertInstanceOf(Request::class, $this->request );
     }
 
     /**
@@ -77,51 +79,49 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
-     *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testMagicGet
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testMagicGet
      *
      * @tag #test #Request #magic #get
      */
     public function testMagicGet(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertEquals( RequestInterface::STATUS_PREPARE, $Request->status_id );
+        $this->assertEquals( RequestInterface::STATUS_PREPARE, $request->status_id );
         $this->assertEquals(
             Request::LABELS_STATUS[RequestInterface::STATUS_PREPARE],
-            $Request->statusLabel
+            $request->statusLabel
         );
 
-        $this->assertEqualsRequestParams( $Request );
+        $this->assertEqualsRequestParams( $request );
 
-        $this->assertEquals( self::PARAMS, $Request->params );
+        $this->assertEquals( self::PARAMS, $request->params );
     }
 
     /**
      * Вспомогательный метод для проверки параметров запроса
      *
-     * @param Request $Request
+     * @param Request $request
      *
      * @return void
      *
      * @tag #test #Request #helper #requestParams
      */
-    private function assertEqualsRequestParams( Request $Request ): void
+    private function assertEqualsRequestParams( Request $request ): void
     {
-        $this->assertEquals( self::PROTOCOL, $Request->protocol );
-        $this->assertEquals( self::HOST, $Request->host );
-        $this->assertEquals( self::ENDPOINT, $Request->endpoint );
+        $this->assertEquals( self::PROTOCOL, $request->protocol );
+        $this->assertEquals( self::HOST, $request->host );
+        $this->assertEquals( self::ENDPOINT, $request->endpoint );
 
-        $this->assertEquals( self::METHOD, $Request->method );
-        $this->assertEquals( self::HEADERS, $Request->headers );
-        $this->assertEquals( self::CONTENT_TYPE, $Request->contentType );
+        $this->assertEquals( self::METHOD, $request->method );
+        $this->assertEquals( self::HEADERS, $request->headers );
+        $this->assertEquals( self::CONTENT_TYPE, $request->contentType );
 
-        $this->assertEquals( self::DATA, $Request->data );
+        $this->assertEquals( self::DATA, $request->data );
 
-        $this->assertEquals( self::CURL_OPTIONS, $Request->curlOptions );
-        $this->assertEquals( self::CURL_INFO, $Request->curlInfo );
+        $this->assertEquals( self::CURL_OPTIONS, $request->curlOptions );
+        $this->assertEquals( self::CURL_INFO, $request->curlInfo );
     }
 
 
@@ -134,25 +134,25 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testConstructUrlOnGet
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testConstructUrlOnGet
      *
      * @tag #test #Request #constructUrl #get
      */
     public function testConstructUrlOnGet(): void
     {
-        $Request = $this->Request->setMethod(Method::GET );
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request->setMethod(Method::GET );
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertEquals( self::PROTOCOL, $Request->protocol );
-        $this->assertEquals( self::HOST, $Request->host );
-        $this->assertEquals( self::ENDPOINT, $Request->endpoint );
+        $this->assertEquals( self::PROTOCOL, $request->protocol );
+        $this->assertEquals( self::HOST, $request->host );
+        $this->assertEquals( self::ENDPOINT, $request->endpoint );
 
         $url = self::PROTOCOL . '://' . self::HOST . self::ENDPOINT
-            . '?' . http_build_query($Request->data);
+            . '?' . http_build_query($request->data);
 
-        $this->assertEquals( $Request->url, $url );
+        $this->assertEquals( $request->url, $url );
     }
 
     /**
@@ -164,30 +164,30 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidEndpointException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidMethodException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testConstructUrlOnPost
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testConstructUrlOnPost
      *
      * @tag #test #Request #constructUrl #post
      */
     public function testConstructUrlOnPost(): void
     {
-        $Request = (new Handler(self::HOST))
+        $request = (new Handler(self::HOST))
             ->constructRequest(
                 Method::POST,
                 self::ENDPOINT
             );
 
-        $this->assertInstanceOf(Request::class, $Request );
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertEquals( self::PROTOCOL, $Request->protocol );
-        $this->assertEquals( self::HOST, $Request->host );
-        $this->assertEquals( self::ENDPOINT, $Request->endpoint );
+        $this->assertEquals( self::PROTOCOL, $request->protocol );
+        $this->assertEquals( self::HOST, $request->host );
+        $this->assertEquals( self::ENDPOINT, $request->endpoint );
 
         $url = self::PROTOCOL . '://' . self::HOST . self::ENDPOINT;
 
 
-        $this->assertEquals( $Request->url, $url );
+        $this->assertEquals( $request->url, $url );
     }
 
     /**
@@ -199,27 +199,27 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testPrepareEndpointOnGet
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testPrepareEndpointOnGet
      *
      * @tag #test #Request #prepare #endpoint #get
      */
     public function testPrepareEndpointOnGet(): void
     {
-        $Request = $this->Request->setMethod(Method::GET );
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request->setMethod(Method::GET );
+        $this->assertInstanceOf(Request::class, $request );
 
 
         $endpoint = 'newEndpoint';
-        $Request->setEndpoint($endpoint);
-        $Request->setData(self::DATA);
+        $request->setEndpoint($endpoint);
+        $request->setData(self::DATA);
 
-        $Request->prepareEndpoint();
+        $request->prepareEndpoint();
 
         $endpoint = 'newEndpoint?' . http_build_query(self::DATA);
 
-        $this->assertEquals( $endpoint, $Request->endpoint );
+        $this->assertEquals( $endpoint, $request->endpoint );
     }
 
     /**
@@ -231,24 +231,24 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testPrepareEndpointOnPost
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testPrepareEndpointOnPost
      *
      * @tag #test #Request #prepare #endpoint #post
      */
     public function testPrepareEndpointOnPost(): void
     {
-        $Request = $this->Request->setMethod(Method::POST );
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request->setMethod(Method::POST );
+        $this->assertInstanceOf(Request::class, $request );
 
         $endpoint = 'newEndpoint';
-        $Request->setEndpoint($endpoint);
-        $Request->setData(self::DATA);
+        $request->setEndpoint($endpoint);
+        $request->setData(self::DATA);
 
-        $Request->prepareEndpoint();
+        $request->prepareEndpoint();
 
-        $this->assertEquals( $endpoint, $Request->endpoint );
+        $this->assertEquals( $endpoint, $request->endpoint );
     }
 
     /**
@@ -259,20 +259,20 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetProtocol
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetProtocol
      *
      * @tag #test #Request #set #protocol
      */
     public function testSetProtocol(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $protocol = 'wss';
-        $Request->setProtocol($protocol);
-        $this->assertEquals( $protocol, $Request->protocol );
+        $request->setProtocol($protocol);
+        $this->assertEquals( $protocol, $request->protocol );
     }
 
     /**
@@ -283,20 +283,20 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetHost
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetHost
      *
      * @tag #test #Request #set #host
      */
     public function testSetHost(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $host = 'newHost';
-        $Request->setHost($host);
-        $this->assertEquals( $host, $Request->host );
+        $request->setHost($host);
+        $this->assertEquals( $host, $request->host );
     }
 
     /**
@@ -307,20 +307,20 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetEndpoint
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetEndpoint
      *
      * @tag #test #Request #set #endpoint
      */
     public function testSetEndpoint(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $endpoint = 'newEndpoint';
-        $Request->setEndpoint($endpoint);
-        $this->assertEquals( $endpoint, $Request->endpoint );
+        $request->setEndpoint($endpoint);
+        $this->assertEquals( $endpoint, $request->endpoint );
     }
 
     /**
@@ -331,19 +331,19 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetMethod
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetMethod
      *
      * @tag #test #Request #set #method
      */
     public function testSetMethod(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $Request->setMethod(Method::PATCH);
-        $this->assertEquals( Method::PATCH, $Request->method );
+        $request->setMethod(Method::PATCH);
+        $this->assertEquals( Method::PATCH, $request->method );
     }
 
     /**
@@ -354,23 +354,23 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetHeader
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetHeader
      *
      * @tag #test #Request #set #headers
      */
     public function testSetHeader(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $headerKey = 'newHeaderKey';
         $headerValue = 'newHeaderValue';
 
-        $Request->setHeader($headerKey, $headerValue);
+        $request->setHeader($headerKey, $headerValue);
 
-        $this->assertEquals( $headerValue, $Request->headers[$headerKey] );
+        $this->assertEquals( $headerValue, $request->headers[$headerKey] );
     }
 
     /**
@@ -381,25 +381,25 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHeaderException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testAddHeaders
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testAddHeaders
      *
      * @tag #test #Request #headers #add
      */
     public function testAddHeaders(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $headers = [
             'a' => 'c',
             'b' => 'd',
         ];
-        $Request->addHeaders($headers);
+        $request->addHeaders($headers);
 
-        $this->assertEquals( $headers['a'], $Request->headers['a'] );
-        $this->assertEquals( $headers['b'], $Request->headers['b'] );
+        $this->assertEquals( $headers['a'], $request->headers['a'] );
+        $this->assertEquals( $headers['b'], $request->headers['b'] );
     }
 
     /**
@@ -410,20 +410,20 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetContentType
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetContentType
      *
      * @tag #test #Request #set #contentType
      */
     public function testSetContentType(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $Request->setContentType(ContentType::MULTIPART);
+        $request->setContentType(ContentType::MULTIPART);
 
-        $this->assertEquals( ContentType::MULTIPART, $Request->contentType );
+        $this->assertEquals( ContentType::MULTIPART, $request->contentType );
     }
 
     /**
@@ -434,22 +434,22 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetData
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetData
      *
      * @tag #test #Request #set #data
      */
     public function testSetData(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $data = ['newDataKey' => 'newDataValue'];
 
-        $Request->setData($data);
+        $request->setData($data);
 
-        $this->assertEquals( $data, $Request->data );
+        $this->assertEquals( $data, $request->data );
     }
 
     /**
@@ -460,22 +460,22 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetCurlOptions
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetCurlOptions
      *
      * @tag #test #Request #set #curlOptions
      */
     public function testSetCurlOptions(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $curlOptions = [CURLOPT_TIMEOUT => 60];
 
-        $Request->setCurlOptions($curlOptions);
+        $request->setCurlOptions($curlOptions);
 
-        $this->assertEquals( $curlOptions, $Request->curlOptions );
+        $this->assertEquals( $curlOptions, $request->curlOptions );
     }
 
     /**
@@ -486,25 +486,25 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testAddCurlOptions
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testAddCurlOptions
      *
      * @tag #test #Request #add #curlOptions
      */
     public function testAddCurlOptions(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $curlOptions = [
             CURLOPT_TIMEOUT => 60,
             CURLOPT_CONNECTTIMEOUT => 30
         ];
 
-        $Request->addCurlOptions($curlOptions);
+        $request->addCurlOptions($curlOptions);
 
-        $this->assertEquals( $curlOptions, $Request->curlOptions );
+        $this->assertEquals( $curlOptions, $request->curlOptions );
     }
 
     /**
@@ -515,16 +515,16 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetCurlInfo
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetCurlInfo
      *
      * @tag #test #Request #set #curlInfo
      */
     public function testSetCurlInfo(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $curlInfo = [
             CURLINFO_CONTENT_TYPE,
@@ -532,9 +532,44 @@ class RequestTest extends UnitTestCore
             CURLINFO_TOTAL_TIME
         ];
 
-        $Request->setCurlInfo($curlInfo);
+        $request->setCurlInfo($curlInfo);
 
-        $this->assertEquals( $curlInfo, $Request->curlInfo );
+        $this->assertEquals( $curlInfo, $request->curlInfo );
+    }
+
+    //testSetFakeResponse
+
+    /**
+     * Проверка установки фейкового ответа.
+     *
+     * Source: @see Request::setFakeResponse()
+     *
+     * @return void
+     *
+     * @throws ParamUpdateException|StatusNotFoundException
+     *
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetFakeResponse
+     *
+     * @tag #test #Request #set #fakeResponse
+     */
+    public function testSetFakeResponse(): void
+    {
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
+
+        $fakeResponse = [
+            ResponseInterface::HTTP_CODE => ResponseInterface::OK,
+            ResponseInterface::CONTENT => __METHOD__,
+        ];
+
+        $request->setFakeResponse($fakeResponse);
+
+        $this->assertEquals( $fakeResponse, $request->fakeResponse );
+
+        $request->setupStatusComplete();
+
+        $this->expectException(ParamUpdateException::class);
+        $request->setFakeResponse($fakeResponse);
     }
 
     /**
@@ -545,23 +580,23 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamUpdateException|StatusNotFoundException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testAddError
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testAddError
      *
      * @tag #test #Request #add #error
      */
     public function testAddError(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $errorKey = 'errorKey';
         $errorText = 'errorText';
 
-        $Request->addError($errorText, $errorKey);
+        $request->addError($errorText, $errorKey);
 
-        $this->assertEquals( $errorText, $Request->errors[$errorKey] );
+        $this->assertEquals( $errorText, $request->errors[$errorKey] );
     }
 
     /**
@@ -572,23 +607,23 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamUpdateException|StatusNotFoundException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetupStatusProcessing
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetupStatusProcessing
      *
      * @tag #test #Request #status #processing
      */
     public function testSetupStatusProcessing(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $Request->setupStatusProcessing();
+        $request->setupStatusProcessing();
 
-        $this->assertEquals( RequestInterface::STATUS_PROCESSING, $Request->status_id );
+        $this->assertEquals( RequestInterface::STATUS_PROCESSING, $request->status_id );
         $this->assertEquals(
             Request::LABELS_STATUS[RequestInterface::STATUS_PROCESSING],
-            $Request->statusLabel
+            $request->statusLabel
         );
     }
 
@@ -600,23 +635,23 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamUpdateException|StatusNotFoundException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetupStatusComplete
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetupStatusComplete
      *
      * @tag #test #Request #status #complete
      */
     public function testSetupStatusComplete(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
-        $this->assertEquals( RequestInterface::STATUS_COMPLETE, $Request->status_id );
+        $this->assertEquals( RequestInterface::STATUS_COMPLETE, $request->status_id );
         $this->assertEquals(
             Request::LABELS_STATUS[RequestInterface::STATUS_COMPLETE],
-            $Request->statusLabel
+            $request->statusLabel
         );
     }
 
@@ -629,22 +664,22 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamUpdateException|StatusNotFoundException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testStatusIsComplete
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testStatusIsComplete
      *
      * @tag #test #Request #status #complete
      */
     public function testStatusIsComplete(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertFalse( $Request->statusIsComplete() );
+        $this->assertFalse( $request->statusIsComplete() );
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
-        $this->assertTrue( $Request->statusIsComplete() );
+        $this->assertTrue( $request->statusIsComplete() );
     }
 
     /**
@@ -656,22 +691,22 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamUpdateException|StatusNotFoundException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testStatusIsPrepare
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testStatusIsPrepare
      *
      * @tag #test #Request #status #prepare
      */
     public function testStatusIsPrepare(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertTrue( $Request->statusIsPrepare() );
+        $this->assertTrue( $request->statusIsPrepare() );
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
-        $this->assertFalse( $Request->statusIsPrepare() );
+        $this->assertFalse( $request->statusIsPrepare() );
     }
 
     /**
@@ -683,24 +718,24 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamUpdateException|StatusNotFoundException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testDisableSSL
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testDisableSSL
      *
      * @tag #test #Request #ssl #disable
      */
     public function testDisableSSL(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertFalse(isset($Request->curlOptions[CURLOPT_SSL_VERIFYPEER]));
-        $this->assertFalse(isset($Request->curlOptions[CURLOPT_SSL_VERIFYHOST]));
+        $this->assertFalse(isset($request->curlOptions[CURLOPT_SSL_VERIFYPEER]));
+        $this->assertFalse(isset($request->curlOptions[CURLOPT_SSL_VERIFYHOST]));
 
-        $Request->disableSSL();
+        $request->disableSSL();
 
-        $this->assertFalse($Request->curlOptions[CURLOPT_SSL_VERIFYPEER]);
-        $this->assertEquals( 0, $Request->curlOptions[CURLOPT_SSL_VERIFYHOST] );
+        $this->assertFalse($request->curlOptions[CURLOPT_SSL_VERIFYPEER]);
+        $this->assertEquals( 0, $request->curlOptions[CURLOPT_SSL_VERIFYHOST] );
     }
 
     /**
@@ -712,24 +747,24 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamUpdateException|StatusNotFoundException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testEnableSSL
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testEnableSSL
      *
      * @tag #test #Request #ssl #enable
      */
     public function testEnableSSL(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertFalse(isset($Request->curlOptions[CURLOPT_SSL_VERIFYPEER]));
-        $this->assertFalse(isset($Request->curlOptions[CURLOPT_SSL_VERIFYHOST]));
+        $this->assertFalse(isset($request->curlOptions[CURLOPT_SSL_VERIFYPEER]));
+        $this->assertFalse(isset($request->curlOptions[CURLOPT_SSL_VERIFYHOST]));
 
-        $Request->enableSSL();
+        $request->enableSSL();
 
-        $this->assertTrue($Request->curlOptions[CURLOPT_SSL_VERIFYPEER]);
-        $this->assertEquals( 2, $Request->curlOptions[CURLOPT_SSL_VERIFYHOST] );
+        $this->assertTrue($request->curlOptions[CURLOPT_SSL_VERIFYPEER]);
+        $this->assertEquals( 2, $request->curlOptions[CURLOPT_SSL_VERIFYHOST] );
     }
 
     /**
@@ -741,29 +776,29 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testLimiterIsComplete
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testLimiterIsComplete
      *
      * @tag #test #Request #limiter #status #complete
      */
     public function testLimiterIsComplete(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
-        $this->expectException(Exception::class);
-        $Request->setProtocol('newProtocol');
-        $Request->setHost('newHost');
-        $Request->setEndpoint('newEndpoint');
-        $Request->setMethod(Method::PATCH);
-        $Request->setContentType(ContentType::MULTIPART);
-        $Request->setHeader('newHeaderKey', 'newHeaderValue');
-        $Request->setData(['newDataKey' => 'newDataValue']);
-        $Request->setCurlOptions([CURLOPT_TIMEOUT => 60]);
-        $Request->setCurlInfo([CURLINFO_CONTENT_TYPE]);
+        $this->expectException(ParamUpdateException::class);
+        $request->setProtocol('newProtocol');
+        $request->setHost('newHost');
+        $request->setEndpoint('newEndpoint');
+        $request->setMethod(Method::PATCH);
+        $request->setContentType(ContentType::MULTIPART);
+        $request->setHeader('newHeaderKey', 'newHeaderValue');
+        $request->setData(['newDataKey' => 'newDataValue']);
+        $request->setCurlOptions([CURLOPT_TIMEOUT => 60]);
+        $request->setCurlInfo([CURLINFO_CONTENT_TYPE]);
     }
 
     /**
@@ -774,9 +809,9 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHostException|InvalidEndpointException|InvalidProtocolException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testPrepareHost
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testPrepareHost
      *
      * @tag #test #Request #prepare #host
      */
@@ -785,29 +820,29 @@ class RequestTest extends UnitTestCore
         $protocol = 'http';
         $host = 'first.host';
 
-        $Handler = new Handler("$protocol://$host");
-        $this->assertInstanceOf(Handler::class, $Handler );
+        $handler = new Handler("$protocol://$host");
+        $this->assertInstanceOf(Handler::class, $handler );
 
-        $this->assertEquals( $protocol, $Handler->commonRequest->protocol );
-        $this->assertEquals( $host, $Handler->commonRequest->host );
+        $this->assertEquals( $protocol, $handler->commonRequest->protocol );
+        $this->assertEquals( $host, $handler->commonRequest->host );
 
         $protocol = 'wss';
         $host = 'second.host';
-        $Handler->commonRequest->setHost("$protocol://$host");
+        $handler->commonRequest->setHost("$protocol://$host");
 
-        $this->assertEquals( $protocol, $Handler->commonRequest->protocol );
-        $this->assertEquals( $host, $Handler->commonRequest->host );
+        $this->assertEquals( $protocol, $handler->commonRequest->protocol );
+        $this->assertEquals( $host, $handler->commonRequest->host );
 
         $protocol = 'https';
         $host = 'next.host';
         $endpoint = 'endpoint';
-        $Handler->commonRequest->setProtocol($protocol);
-        $Handler->commonRequest->setHost($host);
-        $Handler->commonRequest->setEndpoint($endpoint);
-        $Handler->commonRequest->constructUrl();
+        $handler->commonRequest->setProtocol($protocol);
+        $handler->commonRequest->setHost($host);
+        $handler->commonRequest->setEndpoint($endpoint);
+        $handler->commonRequest->constructUrl();
 
-        $this->assertEquals( $protocol, $Handler->commonRequest->protocol );
-        $this->assertEquals( $host, $Handler->commonRequest->host );
+        $this->assertEquals( $protocol, $handler->commonRequest->protocol );
+        $this->assertEquals( $host, $handler->commonRequest->host );
     }
 
     /**
@@ -818,19 +853,17 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
-     *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetupParamsFromArray
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetupParamsFromArray
      *
      * @tag #test #Request #setup #params
      */
     public function testSetupParamsFromArray(): void
     {
-        $Request = new Request(self::HOST, self::PARAMS );
+        $request = new Request(self::HOST, self::PARAMS );
 
-        $this->assertInstanceOf(Request::class, $Request );
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertEqualsRequestParams( $Request );
+        $this->assertEqualsRequestParams( $request );
     }
 
     /**
@@ -844,36 +877,36 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testSetParamsOnStatusPrepare
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testSetParamsOnStatusPrepare
      *
      * @tag #test #Request #set #prepare #params
      */
     public function testSetParamsOnStatusPrepare(): void
     {
-        $Request = $this->getRequest(self::ENDPOINT, []);
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->getRequest(self::ENDPOINT, []);
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertEquals( RequestInterface::STATUS_PREPARE, $Request->status_id );
+        $this->assertEquals( RequestInterface::STATUS_PREPARE, $request->status_id );
 
-        $this->assertInstanceOf(Request::class, $Request->setProtocol(self::PROTOCOL));
-        $this->assertInstanceOf(Request::class, $Request->setHost(self::HOST));
-        $this->assertInstanceOf(Request::class, $Request->setEndpoint(self::ENDPOINT));
-        $this->assertInstanceOf(Request::class, $Request->setMethod(self::METHOD));
-        $this->assertInstanceOf(Request::class, $Request->setContentType(self::CONTENT_TYPE));
-        $this->assertInstanceOf(Request::class, $Request->setData(self::DATA));
-        $this->assertInstanceOf(Request::class, $Request->setHeader('newHeaderKey', 'newHeaderValue'));
-        $this->assertInstanceOf(Request::class, $Request->addHeaders(self::HEADERS));
-        $this->assertInstanceOf(Request::class, $Request->setCurlOptions(self::CURL_OPTIONS));
-        $this->assertInstanceOf(Request::class, $Request->setCurlInfo(self::CURL_INFO));
+        $this->assertInstanceOf(Request::class, $request->setProtocol(self::PROTOCOL));
+        $this->assertInstanceOf(Request::class, $request->setHost(self::HOST));
+        $this->assertInstanceOf(Request::class, $request->setEndpoint(self::ENDPOINT));
+        $this->assertInstanceOf(Request::class, $request->setMethod(self::METHOD));
+        $this->assertInstanceOf(Request::class, $request->setContentType(self::CONTENT_TYPE));
+        $this->assertInstanceOf(Request::class, $request->setData(self::DATA));
+        $this->assertInstanceOf(Request::class, $request->setHeader('newHeaderKey', 'newHeaderValue'));
+        $this->assertInstanceOf(Request::class, $request->addHeaders(self::HEADERS));
+        $this->assertInstanceOf(Request::class, $request->setCurlOptions(self::CURL_OPTIONS));
+        $this->assertInstanceOf(Request::class, $request->setCurlInfo(self::CURL_INFO));
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
-        $this->assertEquals( RequestInterface::STATUS_COMPLETE, $Request->status_id );
+        $this->assertEquals( RequestInterface::STATUS_COMPLETE, $request->status_id );
 
-        $this->expectException(Exception::class);
-        $Request->setProtocol(self::PROTOCOL);
+        $this->expectException(ParamUpdateException::class);
+        $request->setProtocol(self::PROTOCOL);
     }
 
     /**
@@ -884,34 +917,34 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testGetStatusLabel
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testGetStatusLabel
      *
      * @tag #test #Request #status #label
      */
     public function testGetStatusLabel(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
         $this->assertEquals(
             Request::LABELS_STATUS[RequestInterface::STATUS_PREPARE],
-            $Request->statusLabel
+            $request->statusLabel
         );
 
-        $Request->setupStatusProcessing();
+        $request->setupStatusProcessing();
 
         $this->assertEquals(
             Request::LABELS_STATUS[RequestInterface::STATUS_PROCESSING],
-            $Request->statusLabel
+            $request->statusLabel
         );
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
         $this->assertEquals(
             Request::LABELS_STATUS[RequestInterface::STATUS_COMPLETE],
-            $Request->statusLabel
+            $request->statusLabel
         );
     }
 
@@ -923,19 +956,17 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
-     *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testGetParams
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testGetParams
      *
      * @tag #test #Request #get #params
      */
     public function testGetParams(): void
     {
-        $Request = new Request(self::HOST, self::PARAMS);
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = new Request(self::HOST, self::PARAMS);
+        $this->assertInstanceOf(Request::class, $request );
 
         $originalJson = json_encode(self::PARAMS);
-        $resultJson = json_encode($Request->params);
+        $resultJson = json_encode($request->params);
 
         $this->assertEquals( $originalJson, $resultJson );
     }
@@ -948,29 +979,29 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testGetErrors
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testGetErrors
      *
      * @tag #test #Request #get #errors
      */
     public function testGetErrors(): void
     {
-        $Request = $this->Request;
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = $this->request;
+        $this->assertInstanceOf(Request::class, $request );
 
-        $this->assertEquals( [], $Request->errors );
+        $this->assertEquals( [], $request->errors );
 
         $errorKey = 'errorKey';
         $errorText = 'errorText';
 
-        $Request->addError( $errorText, $errorKey );
+        $request->addError( $errorText, $errorKey );
 
-        $this->assertEquals( [$errorKey => $errorText], $Request->errors );
+        $this->assertEquals( [$errorKey => $errorText], $request->errors );
 
-        $Request->addError( 'next Error' );
+        $request->addError( 'next Error' );
 
-        $this->assertCount( 2, $Request->errors );
+        $this->assertCount( 2, $request->errors );
     }
 
     /**
@@ -981,34 +1012,34 @@ class RequestTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/RequestTest.php --testdox --filter testClone
+     * @cli vendor/bin/phpunit tests/core/RequestTest.php --testdox --filter testClone
      *
      * @tag #test #Request #clone
      */
     public function testClone(): void
     {
-        $Request = new Request(self::HOST, self::PARAMS);
-        $this->assertInstanceOf(Request::class, $Request );
+        $request = new Request(self::HOST, self::PARAMS);
+        $this->assertInstanceOf(Request::class, $request );
 
-        $RequestClone = $Request->clone();
+        $requestClone = $request->clone();
 
-        $this->assertEquals( $Request->protocol, $RequestClone->protocol, "у клона не совпадает `protocol` " );
-        $this->assertEquals( $Request->host, $RequestClone->host, "у клона не совпадает `host` " );
-        $this->assertEquals( $Request->endpoint, $RequestClone->endpoint, "у клона не совпадает `endpoint` " );
+        $this->assertEquals( $request->protocol, $requestClone->protocol, "у клона не совпадает `protocol` " );
+        $this->assertEquals( $request->host, $requestClone->host, "у клона не совпадает `host` " );
+        $this->assertEquals( $request->endpoint, $requestClone->endpoint, "у клона не совпадает `endpoint` " );
 
-        $this->assertEquals( $Request->method, $RequestClone->method, "у клона не совпадает `method` " );
-        $this->assertEquals( $Request->headers, $RequestClone->headers,  "у клона не совпадает `headers` " );
-        $this->assertEquals( $Request->contentType, $RequestClone->contentType, "у клона не совпадает `contentType` ");
+        $this->assertEquals( $request->method, $requestClone->method, "у клона не совпадает `method` " );
+        $this->assertEquals( $request->headers, $requestClone->headers,  "у клона не совпадает `headers` " );
+        $this->assertEquals( $request->contentType, $requestClone->contentType, "у клона не совпадает `contentType` ");
 
-        $this->assertEquals( $Request->data, $RequestClone->data, "у клона не совпадает `data` ");
+        $this->assertEquals( $request->data, $requestClone->data, "у клона не совпадает `data` ");
 
-        $this->assertEquals( $Request->curlOptions, $RequestClone->curlOptions, "у клона не совпадает `curlOptions` ");
-        $this->assertEquals( $Request->curlInfo, $RequestClone->curlInfo, "у клона не совпадает `curlInfo` ");
+        $this->assertEquals( $request->curlOptions, $requestClone->curlOptions, "у клона не совпадает `curlOptions` ");
+        $this->assertEquals( $request->curlInfo, $requestClone->curlInfo, "у клона не совпадает `curlInfo` ");
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
-        $this->assertEquals( RequestInterface::STATUS_PREPARE, $RequestClone->status_id );
+        $this->assertEquals( RequestInterface::STATUS_PREPARE, $requestClone->status_id );
     }
 }

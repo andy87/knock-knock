@@ -12,11 +12,13 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\extensions;
 
-use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
-use andy87\knock_knock\KnockKnockOctopus;
+
 use andy87\knock_knock\lib\ContentType;
-use andy87\knock_knock\tests\helpers\{PostmanEcho, UnitTestCore};
-use Exception;
+use andy87\knock_knock\KnockKnockOctopus;
+use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
+use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
+use andy87\knock_knock\exception\{ InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
+use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException };
 
 /**
  * Class KnockKnockOctopusTest
@@ -25,7 +27,7 @@ use Exception;
  *
  * @package tests
  *
- * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox
+ * @cli vendor/bin/phpunit tests/extensions/KnockKnockOctopusTest.php --testdox
  *
  * @tag #test #Handler #octopus
  */
@@ -40,7 +42,9 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @return KnockKnockOctopus
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
+     *
+     * @tag #extension #octopus #get
      */
     private function getKnockKnockOctopus(): KnockKnockOctopus
     {
@@ -60,9 +64,9 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testInit
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockOctopusTest.php --testdox --filter testInit
      *
      * @tag #test #Handler #octopus #init
      */
@@ -101,9 +105,9 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException|ParamNotFoundException|InvalidHeaderException
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testGet
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockOctopusTest.php --testdox --filter testGet
      *
      * @tag #test #Handler #octopus #get
      */
@@ -111,17 +115,17 @@ class KnockKnockOctopusTest extends UnitTestCore
     {
         $KnockKnockOctopus = $this->getKnockKnockOctopus();
 
-        $Response = $KnockKnockOctopus->get(PostmanEcho::ENDPOINT_GET, [
+        $response = $KnockKnockOctopus->get(PostmanEcho::ENDPOINT_GET, [
             RequestInterface::SETUP_DATA => PostmanEcho::DATA
         ]);
 
-        $response = json_decode( $Response->content, true );
+        $response = json_decode( $response->content, true );
 
         $this->assertArrayHasKey('args', $response);
         $this->assertArrayHasKey('headers', $response);
         $this->assertArrayHasKey('url', $response);
 
-        $this->assertEquals( $Response->request->url, $response['url'] );
+        $this->assertEquals( $response->request->url, $response['url'] );
 
         $this->assertEquals( PostmanEcho::DATA, $response['args']['data']);
     }
@@ -135,9 +139,9 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException|ParamNotFoundException|InvalidHeaderException
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testPost
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockOctopusTest.php --testdox --filter testPost
      *
      * @tag #test #Handler #octopus #post
      */
@@ -147,9 +151,9 @@ class KnockKnockOctopusTest extends UnitTestCore
 
         $KnockKnockOctopus->commonRequest->setContentType(ContentType::FORM);
 
-        $Response = $KnockKnockOctopus->post(PostmanEcho::ENDPOINT_POST, PostmanEcho::DATA);
+        $response = $KnockKnockOctopus->post(PostmanEcho::ENDPOINT_POST, PostmanEcho::DATA);
 
-        $response = json_decode( $Response->content, true );
+        $response = json_decode( $response->content, true );
 
         //throw new Exception( print_r($response) );
 
@@ -162,7 +166,7 @@ class KnockKnockOctopusTest extends UnitTestCore
         $this->assertArrayHasKey('json', $response);
         $this->assertArrayHasKey('url', $response);
 
-        $this->assertEquals( $Response->request->url, $response['url'] );
+        $this->assertEquals( $response->request->url, $response['url'] );
 
         $this->assertEquals( PostmanEcho::DATA, $response['json']);
     }
@@ -178,9 +182,9 @@ class KnockKnockOctopusTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException|ParamNotFoundException|InvalidHeaderException
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockOctopusTest.php --testdox --filter testFakeResponse
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockOctopusTest.php --testdox --filter testFakeResponse
      *
      * @tag #test #Handler #octopus #get #fakeResponse
      */
@@ -193,9 +197,9 @@ class KnockKnockOctopusTest extends UnitTestCore
             ResponseInterface::HTTP_CODE => ResponseInterface::OK,
         ];
 
-        $Response = $KnockKnockOctopus->fakeResponse($fakeResponse);
+        $response = $KnockKnockOctopus->fakeResponse($fakeResponse);
 
-        $this->assertEquals( $fakeResponse['content'], $Response->content );
-        $this->assertEquals( $fakeResponse['httpCode'], $Response->httpCode );
+        $this->assertEquals( $fakeResponse['content'], $response->content );
+        $this->assertEquals( $fakeResponse['httpCode'], $response->httpCode );
     }
 }

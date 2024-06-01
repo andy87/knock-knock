@@ -63,17 +63,17 @@ $KnockKnock = new KnockKnockSecurity('https://api.example.com',[
 ]);
 
 // выполнили первый запрос c типом контента JSON
-$ResponseWithContentTypeJSON_1 = $KnockKnock->get( '/product' );
+$responseWithContentTypeJSON_1 = $KnockKnock->get( '/product' );
 
 // Установили тип контента для следующего запроса FORM
-$ResponseWithContentTypeForm = $KnockKnock
+$responseWithContentTypeForm = $KnockKnock
     ->useContentType( ContentType::FORM )
     ->post('/product', [ 
         'name' => 'Product name' 
     ]);
 
 // следующий запрос будет с типом контента JSON
-$ResponseWithContentTypeJSON_2 = $KnockKnock->get( '/product' );
+$responseWithContentTypeJSON_2 = $KnockKnock->get( '/product' );
 ```
 
 ### useHeaders()
@@ -90,13 +90,13 @@ $KnockKnock = new KnockKnockSecurity('https://api.example.com',[
 ]);
 
 // выполнили первый запрос c заголовком X-Api-Key = `headers from construct`
-$ResponseWithInitHeaders = $KnockKnock->get( '/product' );
+$responseWithInitHeaders = $KnockKnock->get( '/product' );
 
 // Установили заголовок для следующего запроса X-Api-Key
 $KnockKnock->useHeaders( [ 'X-Api-Key' => 'headers from real time' ] );
 
 // запрос будет с заголовком X-Api-Key = `headers from real time`
-$ResponseWithRealTimeHeaders = $KnockKnock->post('/product', [ 
+$responseWithRealTimeHeaders = $KnockKnock->post('/product', [ 
         'name' => 'Product name' 
     ]);
 
@@ -126,27 +126,27 @@ $knockKnockSecurity
     ->setupAuthorization( 'token', KnockKnockSecurity::TOKEN_BEARER )
     ->setupHeaders( [ 'X-Api-Key' => $_ENV['X_API_KEY'] ] )
     ->setupContentType( 'application/json' )
-    ->on( KnockKnock::EVENT_AFTER_SEND, fn( KnockKnock $knockKnock, Response $Response ) => 
+    ->on( KnockKnock::EVENT_AFTER_SEND, fn( KnockKnock $knockKnock, Response $response ) => 
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
 
-        file_put_contents( $logFilePath, $Response->content, FILE_APPEND );
+        file_put_contents( $logFilePath, $response->content, FILE_APPEND );
     });
 
 
-$ResponsePatch = $knockKnockSecurity->patch( 'product', [
+$responsePatch = $knockKnockSecurity->patch( 'product', [
     'price' => 1000
 ]);
 
-$product = json_decode( $ResponsePatch->content, true );
+$product = json_decode( $responsePatch->content, true );
 
 $price = $product->price;
 
 $knockKnockSecurity->useContentType( ContentType::JSON );
-$ResponsePost = $knockKnockSecurity->post( 'category', [
+$responsePost = $knockKnockSecurity->post( 'category', [
     'name' => 'Фреймворки'
 ]);
 
-$category_id = $Response_Post->content['id'];
+$category_id = $response_Post->content['id'];
 
 ```

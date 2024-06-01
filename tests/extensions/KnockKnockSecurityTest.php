@@ -12,11 +12,12 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\extensions;
 
-use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
 use andy87\knock_knock\KnockKnockSecurity;
-use andy87\knock_knock\lib\{ContentType, Method};
-use andy87\knock_knock\tests\helpers\{PostmanEcho, UnitTestCore};
-use Exception;
+use andy87\knock_knock\lib\{ ContentType, Method };
+use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
+use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
+use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
+use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException, extensions\InvalidAuthException };
 
 /**
  * Class KnockKnockSecurityTest
@@ -25,7 +26,7 @@ use Exception;
  *
  * @package tests
  *
- * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox
+ * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox
  *
  * @tag #test #Handler #security
  */
@@ -64,7 +65,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @return KnockKnockSecurity
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @tag #security #setup #authorization
      */
@@ -87,13 +88,13 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidAuthException|InvalidEndpointException|InvalidMethodException
      *
      * Source: @see KnockKnockSecurity::setupAuthorization()
      *
      * @dataProvider SetupAuthProvider
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSetupAuthorization
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSetupAuthorization
      *
      * @tag #security #setup #authorization
      */
@@ -161,11 +162,11 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException
      *
      * Source: @see KnockKnockSecurity::setupHeaders()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSetupHeaders
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSetupHeaders
      *
      * @tag #security #setup #headers
      */
@@ -213,11 +214,11 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException
      *
      * Source: @see KnockKnockSecurity::setupContentType()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSetupContentType
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSetupContentType
      *
      * @tag #security #setup #content-type
      */
@@ -255,11 +256,11 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException
      *
      * Source: @see KnockKnockSecurity::useHeaders()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testUseHeaders
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testUseHeaders
      *
      * @tag #security #use #headers
      */
@@ -319,11 +320,11 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException
      *
      * Source: @see KnockKnockSecurity::send()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testSend
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSend
      *
      * @tag #security #send
      */
@@ -332,7 +333,7 @@ class KnockKnockSecurityTest extends UnitTestCore
         $KnockKnockSecurity = $this->getKnockKnockOctopus();
 
         // Проверка отправки запроса без фейкового ответа
-        $Request = $KnockKnockSecurity
+        $request = $KnockKnockSecurity
             ->constructRequest(
                 Method::GET,
                 PostmanEcho::ENDPOINT_GET,
@@ -342,16 +343,16 @@ class KnockKnockSecurityTest extends UnitTestCore
                     ],
                 ]
             );
-        $Response = $KnockKnockSecurity->setupRequest($Request)->send();
+        $response = $KnockKnockSecurity->send($request);
 
-        $content = json_decode($Response->content, true);
+        $content = json_decode($response->content, true);
 
         $this->assertArrayHasKey( 'args', $content,"Ожидается, что в ответе будет ключ 'args'");
         $this->assertArrayHasKey( 'headers', $content,"Ожидается, что в ответе будет ключ 'headers'");
         $this->assertArrayHasKey( 'url', $content,"Ожидается, что в ответе будет значение 'url'");
 
         // Проверка отправки запроса с фейковым ответом
-        $Request = $KnockKnockSecurity
+        $request = $KnockKnockSecurity
             ->constructRequest(
                 Method::GET,
                 PostmanEcho::ENDPOINT_GET,
@@ -361,18 +362,19 @@ class KnockKnockSecurityTest extends UnitTestCore
                     ],
                 ]
             );
-        $Response = $KnockKnockSecurity
-            ->setupRequest($Request)
-            ->send( self::FAKE_RESPONSE );
+
+        $request->setFakeResponse(self::FAKE_RESPONSE);
+
+        $response = $KnockKnockSecurity->send($request);
 
         $this->assertEquals(
             self::FAKE_RESPONSE[ ResponseInterface::CONTENT ],
-            $Response->content,
+            $response->content,
             "Ожидается, что контент будет равен '" . self::FAKE_RESPONSE[ ResponseInterface::CONTENT ] . "'"
         );
         $this->assertEquals(
             self::FAKE_RESPONSE[ ResponseInterface::HTTP_CODE ],
-            $Response->httpCode,
+            $response->httpCode,
             "Ожидается, что код ответа будет равен '" . self::FAKE_RESPONSE[ ResponseInterface::HTTP_CODE ] . "'"
         );
     }
@@ -385,12 +387,12 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws Exception
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidHeaderException|InvalidEndpointException|InvalidMethodException|InvalidAuthException
      *
      * Source: @see KnockKnockSecurity::modifyRequestByUse()
      * Source: @see KnockKnockSecurity::clearUse()
      *
-     * @cli vendor/bin/phpunit tests/KnockKnockSecurityTest.php --testdox --filter testModifyRequestByUse
+     * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testModifyRequestByUse
      *
      * @tag #security #use #request #modify
      */
@@ -432,30 +434,30 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC . "'"
         );
 
-        $Response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
 
         $this->assertEquals(ContentType::JSON,
-            $Response->request->contentType,
+            $response->request->contentType,
             "Ожидается, что тип контента БУДЕТ равен " . ContentType::JSON
         );
         $this->assertArrayHasKey('X-Test-Header-old',
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключа 'X-Test-Header-old'"
         );
         $this->assertArrayHasKey(KnockKnockSecurity::HEADERS_AUTH_KEY,
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключа 'Authorization'"
         );
         $this->assertArrayNotHasKey('X-Test-Header-new',
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках НЕ будет ключ 'X-Test-Header-new'"
         );
         $this->assertArrayHasKey(KnockKnockSecurity::HEADERS_AUTH_KEY,
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertEquals(KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC,
-            $Response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
+            $response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC . "'"
         );
 
@@ -463,55 +465,55 @@ class KnockKnockSecurityTest extends UnitTestCore
         $KnockKnockSecurity->useContentType(ContentType::XML);
         $KnockKnockSecurity->setupAuthorization(KnockKnockSecurity::TOKEN_BEARER, self::TOKEN_BEARER );
 
-        $Response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
 
         $this->assertEquals(ContentType::XML,
-            $Response->request->contentType,
+            $response->request->contentType,
             "Ожидается, что тип контента БУДЕТ равен " . ContentType::XML
         );
         $this->assertArrayHasKey('X-Test-Header-new',
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключ 'X-Test-Header-new'"
         );
         $this->assertArrayHasKey(KnockKnockSecurity::HEADERS_AUTH_KEY,
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertArrayHasKey('X-Test-Header-old',
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключ 'X-Test-Header-old'"
         );
         $this->assertArrayHasKey(KnockKnockSecurity::HEADERS_AUTH_KEY,
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertEquals(KnockKnockSecurity::TOKEN_BEARER . ' ' . self::TOKEN_BEARER,
-            $Response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
+            $response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BEARER . ' ' . self::TOKEN_BEARER . "'"
         );
 
         $KnockKnockSecurity->setupAuthorization(KnockKnockSecurity::TOKEN_BASIC, self::TOKEN_BASIC );
 
-        $Response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
 
         $this->assertEquals(ContentType::JSON,
-            $Response->request->contentType,
+            $response->request->contentType,
             "Ожидается, что тип контента БУДЕТ равен " . ContentType::JSON
         );
         $this->assertArrayHasKey('X-Test-Header-old',
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключ 'X-Test-Header-old'"
         );
         $this->assertArrayNotHasKey('X-Test-Header-new',
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках НЕ будет ключ 'X-Test-Header-new'"
         );
         $this->assertArrayHasKey(KnockKnockSecurity::HEADERS_AUTH_KEY,
-            $Response->request->headers,
+            $response->request->headers,
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertEquals(KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC,
-            $Response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
+            $response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC . "'"
         );
     }

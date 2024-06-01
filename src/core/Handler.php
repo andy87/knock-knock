@@ -82,7 +82,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testConstructor()
      *
-     * @tag #kanockHhandler #magic #construct
+     * @tag #knockHandler #magic #construct
      */
     public function __construct(string $host, array $commonRequestParams = [])
     {
@@ -102,7 +102,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEventInit()
      *
-     * @tag #kanockHhandler #init
+     * @tag #knockHandler #init
      */
     public function init(): void
     {
@@ -122,7 +122,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testGetter()
      *
-     * @tag #kanockHhandler #magic #get
+     * @tag #knockHandler #magic #get
      */
     public function __get(string $paramName): mixed
     {
@@ -143,7 +143,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testGetParams()
      *
-     * @tag #kanockHhandler #get #params
+     * @tag #knockHandler #get #params
      */
     public function getParams(): array
     {
@@ -165,7 +165,7 @@ class Handler implements HandlerInterface
      *
      * @param string $method
      * @param string $endpoint
-     * @param array $RequestConfig
+     * @param array $requestConfig
      *
      * @return Request
      *
@@ -173,28 +173,28 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testConstruct()
      *
-     * @tag #kanockHhandler #construct #request
+     * @tag #knockHandler #construct #request
      */
-    public function constructRequest(string $method, string $endpoint, array $RequestConfig = []): Request
+    public function constructRequest(string $method, string $endpoint, array $requestConfig = []): Request
     {
         if ($this->validateMethod($method))
         {
             if (empty($endpoint)) throw new InvalidEndpointException();
 
-            $RequestConfig = array_merge([
+            $requestConfig = array_merge([
                 RequestInterface::SETUP_HOST => $this->_host,
                 RequestInterface::SETUP_METHOD => $method,
-            ], $RequestConfig);
+            ], $requestConfig);
 
             $commonRequestParams = $this->getterCommonRequest()->params;
 
-            $RequestParams = array_merge($RequestConfig, $commonRequestParams);
+            $requestParams = array_merge($requestConfig, $commonRequestParams);
 
-            $Request = new Request($endpoint, $RequestParams);
+            $request = new Request($endpoint, $requestParams);
 
-            $this->event(self::EVENT_CONSTRUCT_REQUEST, [$this, $Request]);
+            $this->event(self::EVENT_CONSTRUCT_REQUEST, [$this, $request]);
 
-            return $Request;
+            return $request;
         }
 
         throw new InvalidMethodException();
@@ -204,21 +204,23 @@ class Handler implements HandlerInterface
      * Конструктор ответа
      *
      * @param array $responseParams
-     * @param ?Request $Request
+     * @param ?Request $request
      *
      * @return Response
      *
      * Test: @see KnockKnockTest::testConstruct()
      *
-     * @tag #kanockHhandler #construct #response
+     * @tag #knockHandler #construct #response
      */
-    public function constructResponse(array $responseParams, ?Request $Request = null): Response
+    public function constructResponse(array $responseParams, ?Request $request = null): Response
     {
+        $responseParams = $request->fakeResponse ?? $responseParams;
+
         $content = $responseParams[ResponseInterface::CONTENT] ?? null;
 
         $httpCode = $responseParams[ResponseInterface::HTTP_CODE] ?? ResponseInterface::OK;
 
-        $response = new Response($content, $httpCode, $Request);
+        $response = new Response($content, $httpCode, $request);
 
         $this->event(self::EVENT_CONSTRUCT_RESPONSE, [$this, $response]);
 
@@ -246,7 +248,7 @@ class Handler implements HandlerInterface
         return $this;
     }
     /**
-     * @param Request $Request
+     * @param Request $request
      * @param array $options
      *
      * @return $this
@@ -255,15 +257,15 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testSetupRequest()
      *
-     * @tag #kanockHhandler #setup #request
+     * @tag #knockHandler #setup #request
      */
-    public function setupRequest(Request $Request, array $options = []): static
+    public function setupRequest(Request $request, array $options = []): static
     {
         if (count($options)) {
-            $Request = $this->updateRequestParams($Request, $options);
+            $request = $this->updateRequestParams($request, $options);
         }
 
-        $this->_realRequest = $Request;
+        $this->_realRequest = $request;
 
         return $this;
     }
@@ -279,7 +281,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testSetupEventHandlers()
      *
-     * @tag #kanockHhandler #setup #event #callback #behavior
+     * @tag #knockHandler #setup #event #callback #behavior
      */
     public function setupEventHandlers(array $callbacks): array
     {
@@ -308,7 +310,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testSendRequest()
      *
-     * @tag #kanockHhandler #send #response
+     * @tag #knockHandler #send #response
      */
     public function send( RequestInterface $request ): Response
     {
@@ -320,7 +322,7 @@ class Handler implements HandlerInterface
     /**
      * Получение ответа на отправку запроса через cURL
      *
-     * @param Request $Request
+     * @param Request $request
      *
      * @return Response
      *
@@ -328,13 +330,13 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testSendRequest()
      *
-     * @tag #kanockHhandler #send #request #query #response
+     * @tag #knockHandler #send #request #query #response
      */
-    public function getResponseOnSendCurlRequest(Request $Request): Response
+    public function getResponseOnSendCurlRequest(Request $request): Response
     {
-        $ch = curl_init($Request->url);
+        $ch = curl_init($request->url);
 
-        $curlParams = $Request->curlParams;
+        $curlParams = $request->curlParams;
 
         $options = $curlParams[RequestInterface::SETUP_CURL_OPTIONS];
 
@@ -351,17 +353,19 @@ class Handler implements HandlerInterface
                 $curlInfo[$info] = curl_getinfo($ch, $info);
             }
 
-            $Request->setCurlInfo($curlInfo);
+            $request->setCurlInfo($curlInfo);
         }
 
-        $ResponseParams = [
+        $response = [
             ResponseInterface::CONTENT => $response,
             ResponseInterface::HTTP_CODE => curl_getinfo($ch, CURLINFO_HTTP_CODE),
         ];
 
-        $response = $this->constructResponse($ResponseParams, $Request);
+        $response = $this->constructResponse($response);
 
-        $response->addError(curl_error($ch));
+        if (  $error = curl_error($ch) ) {
+            $response->addError($error);
+        }
 
         $this->event(self::EVENT_CURL_HANDLER, [$this, $ch]);
 
@@ -383,7 +387,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEventCall()
      *
-     * @tag #kanockHhandler #behavior #event #callback
+     * @tag #knockHandler #behavior #event #callback
      */
     public function callEventHandler(string $eventKey, array $args = []): mixed
     {
@@ -404,7 +408,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEventsOn()
      *
-     * @tag #kanockHhandler #behavior #event #callback
+     * @tag #knockHandler #behavior #event #callback
      */
     public function on(string $eventKey, callable $callbacks): ?bool
     {
@@ -425,7 +429,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEventChange()
      *
-     * @tag #kanockHhandler #behavior #event #callback
+     * @tag #knockHandler #behavior #event #callback
      */
     public function changeEvent(string $eventKey, callable $callback): bool
     {
@@ -443,7 +447,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEventOff()
      *
-     * @tag #kanockHhandler #behavior #event #callback
+     * @tag #knockHandler #behavior #event #callback
      */
     public function off(string $eventKey): bool
     {
@@ -488,7 +492,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testDisableSsl()
      *
-     * @tag #kanockHhandler #disable #ssl
+     * @tag #knockHandler #disable #ssl
      */
     public function disableSSL(bool $verifyPeer = false, int $verifyHost = 0): static
     {
@@ -508,7 +512,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEnableSsl()
      *
-     * @tag #kanockHhandler #enable #ssl
+     * @tag #knockHandler #enable #ssl
      */
     public function enableSSL(bool $verifyPeer = true, int $verifyHost = 2): static
     {
@@ -526,7 +530,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEnableRedirect()
      *
-     * @tag #kanockHhandler #enable #redirect
+     * @tag #knockHandler #enable #redirect
      */
     public function enableRedirect(): static
     {
@@ -545,7 +549,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testUseCookie()
      *
-     * @tag #kanockHhandler #use #cookie
+     * @tag #knockHandler #use #cookie
      */
     public function useCookie(string $cookie, string $jar, ?string $file = null): static
     {
@@ -572,7 +576,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testValidateHostName()
      *
-     * @tag #kanockHhandler #validate #host
+     * @tag #knockHandler #validate #host
      */
     public static function validateHostName(string $host): bool
     {
@@ -607,16 +611,16 @@ class Handler implements HandlerInterface
      *
      * @return self
      *
+     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
+     *
      * Test: @see KnockKnockTest::testGetInstance()
      *
-     * @tag #kanockHhandler #get #instance
+     * @tag #knockHandler #get #instance
      */
     public static function getInstance(string $host = null, array $commonRequestParams = []): static
     {
         if (static::$_instance === null) {
-            $classname = static::class;
-
-            static::$_instance = new $classname($host, $commonRequestParams);
+            static::$_instance = new Handler( $host, $commonRequestParams );
         }
 
         return static::$_instance;
@@ -633,7 +637,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testGetter()
      *
-     * @tag #kanockHhandler #get #host
+     * @tag #knockHandler #get #host
      */
     protected function getterHost(): string
     {
@@ -647,7 +651,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testGetter()
      *
-     * @tag #kanockHhandler #request #common
+     * @tag #knockHandler #request #common
      */
     protected function getterCommonRequest(): ?Request
     {
@@ -661,7 +665,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testGetter()
      *
-     * @tag #kanockHhandler #request #real
+     * @tag #knockHandler #request #real
      */
     protected function getterRealRequest(): ?Request
     {
@@ -694,8 +698,7 @@ class Handler implements HandlerInterface
     /**
      * Отправка запроса
      *
-     * @param Request $Request
-     * @param ?array $fakeResponseParams
+     * @param Request $request
      *
      * @return Response
      *
@@ -703,24 +706,24 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testSendRequest()
      *
-     * @tag #kanockHhandler #send #request
+     * @tag #knockHandler #send #request
      */
-    protected function sendRequest(Request $Request, ?array $fakeResponseParams = null): Response
+    protected function sendRequest(Request $request): Response
     {
-        $Request->setupStatusProcessing();
+        $request->setupStatusProcessing();
 
         $this
-            ->updatePostFields($Request)
-            ->updateMethod($Request)
-            ->event(self::EVENT_BEFORE_SEND, [$this, $Request]);
+            ->updatePostFields($request)
+            ->updateMethod($request)
+            ->event(self::EVENT_BEFORE_SEND, [$this, $request]);
 
-        $Response = ($fakeResponseParams)
-            ? $this->constructResponse($fakeResponseParams, $Request)
-            : $this->getResponseOnSendCurlRequest($Request);
+        $response = ($request->fakeResponse)
+            ? $this->constructResponse($request->fakeResponse, $request)
+            : $this->getResponseOnSendCurlRequest($request);
 
-        $Request->setupStatusComplete();
+        $request->setupStatusComplete();
 
-        return $Response;
+        return $response;
     }
 
     /**
@@ -733,7 +736,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testEventCall()
      *
-     * @tag #kanockHhandler #behavior #event #callback
+     * @tag #knockHandler #behavior #event #callback
      */
     protected function event(string $eventKey, array $args = []): void
     {
@@ -753,7 +756,7 @@ class Handler implements HandlerInterface
     /**
      * Обновление параметров запроса на основе переданных параметров в
      *
-     * @param Request $Request
+     * @param Request $request
      * @param array $params
      *
      * @return Request
@@ -762,30 +765,30 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testUpdateRequestParams()
      *
-     * @tag #kanockHhandler #update #request
+     * @tag #knockHandler #update #request
      */
-    private function updateRequestParams(Request $Request, array $params): Request
+    private function updateRequestParams(Request $request, array $params): Request
     {
         foreach ($params as $key => $value) {
             match ($key) {
-                RequestInterface::SETUP_PROTOCOL => $Request->setProtocol($value),
-                RequestInterface::SETUP_HOST => $Request->setHost($value),
-                RequestInterface::SETUP_METHOD => $Request->setMethod($value),
-                RequestInterface::SETUP_HEADERS => $Request->addHeaders($value),
-                RequestInterface::SETUP_DATA => $Request->setData($value),
-                RequestInterface::SETUP_CURL_OPTIONS => $Request->setCurlOptions($value),
-                RequestInterface::SETUP_CURL_INFO => $Request->setCurlInfo($value),
-                RequestInterface::SETUP_CONTENT_TYPE => $Request->setContentType($value),
+                RequestInterface::SETUP_PROTOCOL => $request->setProtocol($value),
+                RequestInterface::SETUP_HOST => $request->setHost($value),
+                RequestInterface::SETUP_METHOD => $request->setMethod($value),
+                RequestInterface::SETUP_HEADERS => $request->addHeaders($value),
+                RequestInterface::SETUP_DATA => $request->setData($value),
+                RequestInterface::SETUP_CURL_OPTIONS => $request->setCurlOptions($value),
+                RequestInterface::SETUP_CURL_INFO => $request->setCurlInfo($value),
+                RequestInterface::SETUP_CONTENT_TYPE => $request->setContentType($value),
             };
         }
 
-        return $Request;
+        return $request;
     }
 
     /**
      * Установка POST-полей
      *
-     * @param Request $Request
+     * @param Request $request
      *
      * @return $this
      *
@@ -793,26 +796,26 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testUpdatePostFields()
      *
-     * @tag #kanockHhandler #update #post
+     * @tag #knockHandler #update #post
      */
-    private function updatePostFields(Request $Request): static
+    private function updatePostFields(Request $request): static
     {
-        $data = $Request->data;
+        $data = $request->data;
 
         if ($data && count($data)) {
-            if ($Request->method === Method::GET) {
-                $Request->prepareEndpoint();
+            if ($request->method === Method::GET) {
+                $request->prepareEndpoint();
 
             } else {
 
-                $data = match ($Request->contentType) {
+                $data = match ($request->contentType) {
                     ContentType::JSON => json_encode($data),
                     ContentType::FORM => http_build_query($data),
                     default => null,
                 };
 
                 if ($data) {
-                    $Request->setCurlOption(CURLOPT_POSTFIELDS, $data);
+                    $request->setCurlOption(CURLOPT_POSTFIELDS, $data);
                 }
             }
         }
@@ -823,7 +826,7 @@ class Handler implements HandlerInterface
     /**
      * Установка метода запроса
      *
-     * @param Request $Request
+     * @param Request $request
      *
      * @return $this
      *
@@ -831,11 +834,11 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testUpdateMethod()
      *
-     * @tag #kanockHhandler #update #method
+     * @tag #knockHandler #update #method
      */
-    private function updateMethod(Request $Request): static
+    private function updateMethod(Request $request): static
     {
-        $method = $Request->method;
+        $method = $request->method;
 
         if ($method !== Method::GET) {
             $this->getterRealRequest()->setMethod($method);
@@ -858,7 +861,7 @@ class Handler implements HandlerInterface
      *
      * Test: @see KnockKnockTest::testConstructor()
      *
-     * @tag #kanockHhandler #prepare #common #request
+     * @tag #knockHandler #prepare #common #request
      */
     private function prepareCommonRequestParams(array $commonRequestParams): Request
     {
