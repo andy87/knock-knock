@@ -120,7 +120,7 @@ ___
 </h2>
 
 <p align="center">
-    <img src="assets/logicKnockKnock.png" id="knockknock-logic-schema-img" width="640px" alt="логика схемы работы приложения">
+    <img src="assets/logicHandler.png" id="knockknock-logic-schema-img" width="640px" alt="логика схемы работы приложения">
 </p>
 
 
