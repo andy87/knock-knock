@@ -12,12 +12,12 @@
       - validateHostName()
     - Новые события:
       - EVENT_CURL_HANDLER
-  - `KnockResponse`
+  - `Response`
     - добавлены readonly свойства
     - Новые методы:
       - asArray()
       - validate()
-  - `KnockRequest`
+  - `Request`
     - добавлены readonly свойства
 
 - Изменения:
@@ -25,12 +25,37 @@
     - переделаны setter & getter
     - disableSSL()
     - enableSSL()
-  - `KnockRequest`:
+  - `Request`:
     - переделаны setter & getter
     - disableSSL() - теперь может принимать аргументы
     - enableSSL() - теперь может принимать аргументы
-  - `KnockResponse`:
+  - `Response`:
     - переделаны setter & getter
     - __construct() - $request стал обязательным
     - getErrors() - теперь возвращает массив собственных ошибок
     - get() - удалено
+
+### 1.0.1
+   - Исправлены ошибки в документации
+   - Исправлены ошибки в коде
+   - Исправлены ошибки в тестах
+
+### 1.0.2
+ - Изменения:
+   - Переименование:
+     - `KnockKnock` -> `Handler`
+     - `KnockRequest` -> `Request`
+     - `KnockResponse` -> `Response`
+   - Упрощена логика(схема) работы
+   - Переформатирован код:
+     - Code Style ближе к PSR-4
+     - сгруппированы методы и свойства
+   - Handler:
+     - send() - теперь принимает `$request` вместо `$fakeResponse`
+ - Добавлено:
+   - add `github/workflows` for CI/CD
+   - Autoloader
+   - `Exception` на многие случаи
+   - Request
+     - добавлен метод `setFakeResponse`
+     - добавлено ReadOnly свойство `$fakeResponse`

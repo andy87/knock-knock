@@ -4,8 +4,8 @@
  * @description Интерфейс класса запроса
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.1.0
  */
 
 declare(strict_types=1);
@@ -13,43 +13,41 @@ declare(strict_types=1);
 namespace andy87\knock_knock\interfaces;
 
 /**
- * Interface KnockRequestInterface
+ * Interface RequestInterface
  *
  * @package andy87\knock_knock\interfaces
  */
-interface KnockRequestInterface
+interface RequestInterface
 {
-    /** @var int  */
+    /** @var int */
     public const STATUS_PREPARE = 0;
-    /** @var int  */
+    /** @var int */
     public const STATUS_PROCESSING = 1;
-    /** @var int  */
+    /** @var int */
     public const STATUS_COMPLETE = 2;
 
 
-
-    /** @var string  */
+    /** @var string */
     public const SETUP_HOST = 'host';
 
-    /** @var string  */
+    /** @var string */
     public const SETUP_PROTOCOL = 'protocol';
-    /** @var string  */
+    /** @var string */
     public const SETUP_ENDPOINT = 'endpoint';
-    /** @var string  */
+    /** @var string */
     public const SETUP_METHOD = 'method';
-    /** @var string  */
+    /** @var string */
     public const SETUP_CONTENT_TYPE = 'contentType';
-    /** @var string  */
+    /** @var string */
     public const SETUP_DATA = 'data';
-    /** @var string  */
+    /** @var string */
     public const SETUP_POST_FIELD = 'postField';
-    /** @var string  */
+    /** @var string */
     public const SETUP_HEADERS = 'headers';
-    /** @var string  */
+    /** @var string */
     public const SETUP_CURL_OPTIONS = 'curlOptions';
-    /** @var string  */
+    /** @var string */
     public const SETUP_CURL_INFO = 'curlInfo';
-
 
 
     /**
@@ -57,28 +55,28 @@ interface KnockRequestInterface
      *
      * @return self
      */
-    public function setProtocol( string $protocol ): self;
+    public function setProtocol(string $protocol): self;
 
     /**
      * @param string $host
      *
      * @return self
      */
-    public function setHost(string $host ): self;
+    public function setHost(string $host): self;
 
     /**
      * @param string $endpoint
      *
      * @return self
      */
-    public function setEndpoint( string $endpoint ): self;
+    public function setEndpoint(string $endpoint): self;
 
     /**
      * @param string $method
      *
      * @return self
      */
-    public function setMethod( string $method ): self;
+    public function setMethod(string $method): self;
 
 
     /**
@@ -87,21 +85,21 @@ interface KnockRequestInterface
      *
      * @return self
      */
-    public function setHeader( string $key, string $value  ): self;
+    public function setHeader(string $key, string $value): self;
 
     /**
      * @param array $headers
      *
      * @return self
      */
-    public function addHeaders( array $headers ): self;
+    public function addHeaders(array $headers): self;
 
     /**
      * @param string $contentType
      *
      * @return self
      */
-    public function setContentType( string $contentType ): self;
+    public function setContentType(string $contentType): self;
 
 
     /**
@@ -109,7 +107,7 @@ interface KnockRequestInterface
      *
      * @return self
      */
-    public function setData( mixed $data ): self;
+    public function setData(mixed $data): self;
 
 
     /**
@@ -118,19 +116,19 @@ interface KnockRequestInterface
      *
      * @return self
      */
-    public function setCurlOption( int $key, mixed $value): self;
+    public function setCurlOption(int $key, mixed $value): self;
 
     /**
      * @param array $curlOptions
      *
      * @return self
      */
-    public function addCurlOptions( array $curlOptions ): self;
+    public function addCurlOptions(array $curlOptions): self;
 
     /**
      * @param array $curlInfo
      *
      * @return self
      */
-    public function setCurlInfo( array $curlInfo ): self;
+    public function setCurlInfo(array $curlInfo): self;
 }

@@ -4,8 +4,8 @@
  * @description Библиотека содержащая константы методов запросов
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-23
- * @version 1.0.0
+ * @date 2024-05-27
+ * @version 1.1.0
  */
 
 declare(strict_types=1);
@@ -16,11 +16,8 @@ namespace andy87\knock_knock\lib;
  * Class KnockMethod
  *
  * @package andy87\knock_knock\query
- *
- * Fix not used:
- * - @see LibKnockMethod::GET;
  */
-class LibKnockMethod
+class Method
 {
     public const GET = 'GET';
     public const POST = 'POST';

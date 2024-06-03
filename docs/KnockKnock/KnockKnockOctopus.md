@@ -24,16 +24,16 @@ PHP Фасад для класса `KnockKnock` отправляющего за�
 Получения профиля пользователя
 ```php
 $knockKnockOctopus = new KnockKnockOctopus([
-    KnockRequest::HOST => 'https://api.example.com',
+    Request::HOST => 'https://api.example.com',
 ]);
 
-$knockKnockResponse = $knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
+$response = $knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
 ```
 
 #### POST
 Создания новой новости
 ```php
-$knockKnockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->post( '/new', [ 
         'name' => 'Новая новость',
         'content' => 'Текст новости' 
@@ -42,7 +42,7 @@ $knockKnockResponse = $knockKnockOctopus
 #### PATCH
 Обновления данных поста
 ```php
-$knockKnockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->patch( '/post', [ 
         'created_at' => '1987-09-08 12:00:00',
         'title' => 'Важное обновление'
@@ -53,7 +53,7 @@ $knockKnockResponse = $knockKnockOctopus
 #### PUT
 Обновления части данных поста
 ```php
-$knockKnockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->put( '/post', [ 
         'created_at' => '1987-09-08 12:00:00',
         'title' => 'Важное обновление' 
@@ -63,24 +63,24 @@ $knockKnockResponse = $knockKnockOctopus
 #### DELETE
 Удаление поста
 ```php
-$knockKnockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->delete( '/post', [ 'id' => 806034 ]);
 ```
 
 #### HEAD
 Получения заголовков поста
 ```php
-$knockKnockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->head( '/post', [ 'id' => 806034 ]);
 ```
 #### OPTIONS
 Получения доступных методов поста
 ```php
-$knockKnockResponse = $knockKnockOctopus
+$response = $knockKnockOctopus
     ->options( '/post', [ 'id' => 806034 ]);
 ```
 #### TRACE
 Получения ответного сообщения от сервера
 ```php
-$knockKnockResponse = $knockKnockOctopus->trace( '/post' );
+$response = $knockKnockOctopus->trace( '/post' );
 ```
