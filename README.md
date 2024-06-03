@@ -243,23 +243,23 @@ $handler = Handler::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 
 ```php
 $handler->setupEventHandlers([
-    Handler::EVENT_AFTER_CONSTRUCT => function( static $knockKnock ) => {
-        // создание объекта knockKnock, для взаимодействия с $knockKnock
+    Handler::EVENT_AFTER_CONSTRUCT => function( Handler $handler ) {
+        // ...
     },
-    Handler::EVENT_CREATE_REQUEST => function( static $knockKnock, Request $request ) => {
-        // создание объекта запроса, для взаимодействия с $request
+    Handler::EVENT_CREATE_REQUEST => function( Handler $handler, Request $request ) {
+        // ...
     },
-    Handler::EVENT_BEFORE_SEND => function(  static $knockKnock, Request $request ) => {
-        // отправка запроса, для взаимодействия с $request
+    Handler::EVENT_BEFORE_SEND => function( Handler $handler, Request $request ) {
+        // ...
     },
-    Handler::EVENT_CURL_HANDLER => function( static $knockKnock, resource $ch ) => {
-        // перед отправкой curl запроса, для взаимодействия с $ch
+    Handler::EVENT_CURL_HANDLER => function( Handler $handler, resource $ch ) {
+        // ...
     },
-    Handler::EVENT_CREATE_RESPONSE => function( static $knockKnock, Response $response ) => {
-        // создание объекта ответа, для взаимодействия с $response
+    Handler::EVENT_CREATE_RESPONSE => function( Handler $handler, Response $response ) {
+        // ...
     },
-    Handler::EVENT_AFTER_SEND => function( static $knockKnock, Response $response ) => {
-        // получение ответа, для взаимодействия с $response
+    Handler::EVENT_AFTER_SEND => function( Handler $handler, Response $response ) {
+        // ...
     }
 ]);
 ```
