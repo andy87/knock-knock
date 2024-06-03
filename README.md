@@ -135,7 +135,7 @@ ___
     Базовый класс
 </h2>
 
-_use [andy87\knock_knock\core\Handler](src/core/KnockKnock.php);_  
+_use [andy87\knock_knock\core\Handler](src/core/Handler.php);_  
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
