@@ -205,7 +205,7 @@ $commonRequestParams = [
     ]
 ];
 // Получаем компонент для отправки запросов
-$handler = new Handler( $_ENV['API_HOST'], $handlerConfig );
+$handler = new Handler( $_ENV['API_HOST'], $commonRequestParams );
 
 //Применяя, паттерн Singleton:
 $handler = Handler::getInstance( $_ENV['API_HOST'], $commonRequestParams );
