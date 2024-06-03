@@ -27,15 +27,13 @@
 
   "autoload": {
     "psr-4": {
-      "andy87\\knock_knock\\": "src/",
-      "app\\": "src/"
+      "andy87\\knock_knock\\": "src/"
     }
   },
 
   "autoload-dev": {
     "psr-4": {
       "andy87\\knock_knock\\": "src/",
-      "app\\": "src/",
       "andy87\\knock_knock\\tests\\": "tests/"
     }
   },
