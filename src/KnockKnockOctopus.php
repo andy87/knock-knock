@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-27
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 declare(strict_types=1);
@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace andy87\knock_knock;
 
 use andy87\knock_knock\lib\Method;
-use andy87\knock_knock\core\{ Handler, Response };
+use andy87\knock_knock\core\{ Operator, Response };
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\exception\{ ParamUpdateException, ParamNotFoundException, InvalidEndpointException, handler\InvalidMethodException };
+use andy87\knock_knock\exception\{ ParamUpdateException, ParamNotFoundException, InvalidEndpointException, operator\InvalidMethodException };
 use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
 /**
@@ -35,7 +35,7 @@ use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidReques
  *
  * Покрытие тестами: 30%. @see RequestTest
  */
-class KnockKnockOctopus extends Handler
+class KnockKnockOctopus extends Operator
 {
     /** @var array */
     public const HEADERS = [

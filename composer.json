@@ -5,7 +5,7 @@
   "homepage": "https://andy87.ru",
   "license": "CC-BY-SA-4.0",
 
-  "version": "1.1.0",
+  "version": "1.2.0",
   "minimum-stability": "stable",
 
   "authors": [
@@ -27,15 +27,13 @@
 
   "autoload": {
     "psr-4": {
-      "andy87\\knock_knock\\": "src/",
-      "app\\": "src/"
+      "andy87\\knock_knock\\": "src/"
     }
   },
 
   "autoload-dev": {
     "psr-4": {
       "andy87\\knock_knock\\": "src/",
-      "app\\": "src/",
       "andy87\\knock_knock\\tests\\": "tests/"
     }
   },

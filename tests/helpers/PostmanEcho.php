@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/Handler
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-27
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 declare(strict_types=1);
@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace andy87\knock_knock\tests\helpers;
 
 use andy87\knock_knock\lib\Method;
-use andy87\knock_knock\core\{ Handler, Request };
+use andy87\knock_knock\core\{ Operator, Request };
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\StatusNotFoundException };
+use andy87\knock_knock\exception\{ operator\InvalidMethodException, request\StatusNotFoundException };
 use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException, InvalidEndpointException, InvalidHostException };
 
 /**
@@ -84,24 +84,24 @@ abstract class PostmanEcho
     public const GET_KEY_URL = 'url';
 
 
-    /** @var Handler $handler */
-    public static Handler $handler;
+    /** @var Operator $operator */
+    public static Operator $operator;
 
 
 
     /**
      * Возвращает объект `Handler` для работы с запросами к `postman-echo.com`
      *
-     * @return Handler
+     * @return Operator
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      */
-    public static function getHandlerInstance(): Handler
+    public static function getOperatorInstance(): Operator
     {
-        if ( !isset(self::$handler) )
+        if ( !isset(self::$operator) )
         {
-            self::$handler = new Handler( self::HOST, [
+            self::$operator = new Operator( self::HOST, [
                 RequestInterface::SETUP_PROTOCOL  => self::PROTOCOL,
                 RequestInterface::SETUP_CURL_OPTIONS => [
                     CURLOPT_HEADER => false,
@@ -109,10 +109,10 @@ abstract class PostmanEcho
                 ]
             ]);
 
-            self::$handler->disableSSL();
+            self::$operator->disableSSL();
         }
 
-        return self::$handler;
+        return self::$operator;
     }
 
 
@@ -129,7 +129,7 @@ abstract class PostmanEcho
      */
     public static function constructRequest( string $method, string $endpoint, array $params = [] ): Request
     {
-        return self::getHandlerInstance()
+        return self::getOperatorInstance()
             ->constructRequest( $method, $endpoint, $params );
     }
 

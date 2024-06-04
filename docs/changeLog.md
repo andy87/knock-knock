@@ -43,7 +43,7 @@
 ### 1.0.2
  - Изменения:
    - Переименование:
-     - `KnockKnock` -> `Handler`
+     - `KnockKnock` -> `Operator`
      - `KnockRequest` -> `Request`
      - `KnockResponse` -> `Response`
    - Упрощена логика(схема) работы

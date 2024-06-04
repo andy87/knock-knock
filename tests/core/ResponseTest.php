@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/Handler
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-27
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 declare(strict_types=1);
@@ -13,12 +13,16 @@ declare(strict_types=1);
 namespace andy87\knock_knock\tests\core;
 
 use andy87\knock_knock\lib\Method;
-use andy87\knock_knock\core\{ Handler, Request, Response };
+use andy87\knock_knock\core\{ Operator, Request, Response };
 use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
 use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
 use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException };
-
+use andy87\knock_knock\exception\{ operator\InvalidMethodException,
+    request\InvalidHeaderException,
+    request\InvalidRequestException,
+    request\RequestCompleteException,
+    request\StatusNotFoundException
+};
 
 /**
  * Class ResponseTest
@@ -33,8 +37,8 @@ use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\Inval
  */
 class ResponseTest extends UnitTestCore
 {
-    /** @var Handler $handler */
-    private Handler $handler;
+    /** @var Operator $operator */
+    private Operator $operator;
 
 
     /** @var Request $request */
@@ -51,7 +55,10 @@ class ResponseTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|ParamNotFoundException|InvalidMethodException|InvalidHeaderException|InvalidHostException
+     * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|ParamNotFoundException|InvalidMethodException|
+     * @throws InvalidHeaderException|InvalidHostException|RequestCompleteException|InvalidRequestException
+     *
+     * @tag #test #response #setup
      */
     public function setUp(): void
     {
@@ -76,7 +83,7 @@ class ResponseTest extends UnitTestCore
      */
     public function testConstructor(): void
     {
-        $this->assertInstanceOf(Handler::class, $this->handler );
+        $this->assertInstanceOf(Operator::class, $this->operator );
         $this->assertInstanceOf(Request::class, $this->request );
         $this->assertInstanceOf(Response::class, $this->response );
     }
@@ -121,26 +128,27 @@ class ResponseTest extends UnitTestCore
      *
      * @return void
      *
-     * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|ParamNotFoundException|InvalidMethodException|InvalidHeaderException|InvalidHostException
+     * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|ParamNotFoundException|InvalidMethodException|
+     * @throws InvalidHeaderException|InvalidHostException|RequestCompleteException|InvalidRequestException
      * 
      * @tag #test #response #setup #objects
      */
     private function setupObjects(): void
     {
-        $this->handler = new Handler(PostmanEcho::HOST,[
+        $this->operator = new Operator(PostmanEcho::HOST,[
             RequestInterface::SETUP_CURL_OPTIONS => [
                 CURLOPT_HEADER => false,
                 CURLOPT_RETURNTRANSFER => true,
             ]
         ]);
-        $this->handler->disableSSL();
+        $this->operator->disableSSL();
 
-        $this->request = $this->handler
+        $this->request = $this->operator
             ->constructRequest(Method::GET, PostmanEcho::ENDPOINT_GET, [
                 RequestInterface::SETUP_DATA => PostmanEcho::DATA,
         ]);
 
-        $this->response = $this->handler->send($this->request);
+        $this->response = $this->operator->send($this->request);
     }
 
     /**

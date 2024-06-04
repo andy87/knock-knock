@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/Handler
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-27
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 declare(strict_types=1);
@@ -18,7 +18,7 @@ use andy87\knock_knock\KnockKnockOctopus;
 use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
 use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
 use andy87\knock_knock\exception\{ InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException };
+use andy87\knock_knock\exception\{ operator\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException };
 
 /**
  * Class KnockKnockOctopusTest

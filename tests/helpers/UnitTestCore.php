@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/Handler
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-27
- * @version 1.1.0
+ * @version 1.2.0
  */
 
 declare(strict_types=1);
@@ -16,7 +16,7 @@ namespace andy87\knock_knock\tests\helpers;
 use PHPUnit\Framework\TestCase;
 use andy87\knock_knock\interfaces\RequestInterface;
 use andy87\knock_knock\lib\{ Method, ContentType };
-use andy87\knock_knock\core\{ Handler, Request, Response };
+use andy87\knock_knock\core\{ Operator, Request, Response };
 use andy87\knock_knock\exception\{ InvalidHostException, ParamNotFoundException, ParamUpdateException, request\StatusNotFoundException };
 
 /**
@@ -64,15 +64,15 @@ abstract class UnitTestCore extends TestCase
      * @param ?string $host
      * @param ?array $params
      *
-     * @return Handler
+     * @return Operator
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @tag #handler #get
      */
-    public function getHandler( ?string $host = null, ?array $params = null ): Handler
+    public function getHandler( ?string $host = null, ?array $params = null ): Operator
     {
-        return new Handler($host ?? self::HOST, $params ?? self::PARAMS );
+        return new Operator($host ?? self::HOST, $params ?? self::PARAMS );
     }
 
     /**
@@ -93,7 +93,7 @@ abstract class UnitTestCore extends TestCase
     /**
      * @param string $content
      * @param int $httpCode
-     * @param ?Handler $handler
+     * @param ?Operator $operator
      *
      * @return Response
      *
@@ -101,10 +101,10 @@ abstract class UnitTestCore extends TestCase
      *
      * @tag #response #get
      */
-    public function getResponse( string $content = self::CONTENT, int $httpCode = self::HTTP_CODE_OK, ?Handler $handler = null ): Response
+    public function getResponse( string $content = self::CONTENT, int $httpCode = self::HTTP_CODE_OK, ?Operator $operator = null ): Response
     {
-        $handler = $handler ?? $this->getHandler();
+        $operator = $operator ?? $this->getHandler();
 
-        return new Response( $content, $httpCode, $handler->commonRequest );
+        return new Response( $content, $httpCode, $operator->commonRequest );
     }
 }

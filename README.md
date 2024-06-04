@@ -6,37 +6,38 @@
 KnockKnock - это простая библиотека, реализующая Фасад и предоставляющая удобный интерфейс для выполнения запросов в PHP,
 используя расширение cURL.  Она упрощает работу, предоставляя более высокоуровневый API и быстрый доступ к настройкам.
 
-Цель: сделать простой и лёгкий в настройке компонента и запроса пакет для реализации разных API на его основе.
+Цель: сделать простой и лёгкий в настройке компонента и запроса пакет.
 
 P.S. я знаю про существование таких библиотек как: [Guzzle](https://github.com/guzzle/guzzle), [Client](https://github.com/yiisoft/yii2-httpclient) _(в моём любимом Yii2)_, но хотелось попробовать создать свою реализацию.  
 Без "лишних" данных, вызовов и настроек, nullWarningStyle - только то, что нужно: сухо, лаконично, минималистично.  
 _Разумеется, это не конкурент, а просто попытка создать что-то своё_
 
+### Содержание:
+
+ - [Установка](#knockknock-setup)
+ - - Требования
+
 ___
 
-<h2 align="center" id="knockknock-setup">
+<h2 align="center"> <span id="knockknock-setup"></span>
     Установка
 </h2>
 
 
-<h3 id="knockknock-setup-require">
-    Требования
-</h3>
+<h3>Требования</h3> <span id="knockknock-setup-require"></span>
 
 - php 8.0
 - ext cURL
 - ext JSON
 
 
-<h3 id="knockknock-setup-composer">
+<h3>
     <a href="https://getcomposer.org/download/">Composer</a>
-</h3>
+</h3> <span id="knockknock-setup-composer"></span>
 
 ## Добавление пакета в проект
 
-<h3 id="knockknock-setup-composer-cli">
-    Используя: консольные команды. <i>(Предпочтительней)</i>
-</h3>
+<h3>Используя: консольные команды. <i>(Предпочтительней)</i></h3><span id="knockknock-setup-composer-cli"></span>
 
 - при composer, установленном локально:
 ```bash
@@ -46,58 +47,21 @@ composer require andy87/KnockKnock
 ```bash
 php composer.phar require andy87/KnockKnock
 ```
-Далее: **Обновление зависимостей Composer**
+**Далее:** обновление зависимостей `composer update`
 
 
+<h3>Используя: файл `composer.json`</h3><span id="knockknock-setup-composer-composer-json"></span>
 
-<h3 id="knockknock-setup-composer-composer-json">
-    Используя: файл `composer.json`
-</h3>
+Открыть файл `composer.json`  
+В раздел, ключ `require` добавить строку  
+`"andy87/knockknock": ">=1.0.0"`  
+**Далее:** обновление зависимостей `composer update`
 
-Открыть файла `composer.json`  
-В раздел по ключу `require` добавить строку  
-`"andy87/KnockKnock": ">=1.0.0"`  
-Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
-
-
-
-<h3 id="knockknock-setup-composer-composer-json">
-    Подключение <a href="https://git-scm.com/andy87/KnockKnock">Git</a> репозитория
-</h3>
-
-В файл вашего проекта `composer.json`:
-- добавьте в раздел `require` строку `"andy87/knockknock": ">=1.0.0"`
-- добавьте в раздел `repositories` новый объект:
-```
-{
-    "type": "vcs",
-    "url": "https://github.com/andy87/KnockKnock"
-}
-```
-Далее: <a href="#knockknock-setup-composer-composer-update">Обновление зависимостей Composer</a>
-
-
-
-<h3 id="knockknock-setup-composer-composer-update">
-    Обновление зависимостей Composer
-</h3>
-
-Выполните в консоли (находясь в корневом каталоге вашего проекта) одну из команд:
-- при composer, установленном локально:
-```bash
-composer update
-````  
-- при использовании composer.phar:
-```bash
-php composer.phar update
-```
 
 <p align="center">- - - - -</p>
 
 
-<h2 id="knockknock-setup-composer-autoload">
-    Используя: подключение авто загрузчика
-</h2>
+<h2>Используя: подключение авто загрузчика</h2><span id="knockknock-setup-composer-autoload"></span>
 
 В месте, где необходимо использовать библиотеку, подключите авто загрузчик:
 ```php
@@ -112,42 +76,66 @@ require_once 'путь/к/корню/проекта/autoload.php';
 
 ___
 
-<p align="center">- - - - -</p>
 
 
-<h2 id="knockknock-logic-schema">
-    Логика работы библиотеки (блок-схема)  
-</h2>
+<h2>Логика работы библиотеки (блок-схема)</h2> <span id="knockknock-logic-schema"></span>
 
 <p align="center">
-    <img src="assets/logicHandler.png" id="knockknock-logic-schema-img" width="640px" alt="логика схемы работы приложения">
+    <img src="assets/logicOperator.png" id="knockknock-logic-schema-img" width="640px" alt="логика схемы работы приложения">
 </p>
+
+### Простой пример работы.
+
+```php
+use andy87\knock_knock\lib\Method;
+use andy87\knock_knock\lib\ContentType;
+use andy87\knock_knock\core\Operator;
+use andy87\knock_knock\core\Response;
+
+// Получаем компонент реализующий отправку запросов
+$operator = new Operator( $_ENV['API_HOST'] )->disableSSL();  
+
+/**
+ * Краткая форма записи (с не очевидным объектом запроса) 
+ */
+$content = $operator->send( $operator->constructRequest(Method::GET, 'info/me') )->content;
+
+/** 
+ * Детальная форма записи с дополнительными возможностями
+ */
+$request = $operator->constructRequest(Method::GET, 'info/me'); // Создаём объект запроса
+$request->setCurlInfo([ CURLINFO_CONTENT_TYPE ]); // Назначаем опции cURL
+$response = $operator->send($request); // Отправляем запрос и получаем ответ
+
+$content = $response->content; // Получаем данные ответа
+$curlOptions = $response->request->curlOptions; // Получаем опции cURL
+
+$output = ( $curlOptions[CURLINFO_CONTENT_TYPE] === ContentType::JSON ) ? json_decode( $content ) : $content;
+
+print_r( $output );
+
+```
 
 
 <p align="center">- - - - -</p>
 
 ___
 
-<p align="center">- - - - -</p>
 
 
-<h2 align="center" id="knockknock-src-Handler">
-    Базовый класс
-</h2>
+<h2 align="center">Базовый класс</h2> <span id="knockknock-src-Operator"></span>
 
-_use [andy87\knock_knock\core\Handler](src/core/Handler.php);_  
+_use [andy87\knock_knock\core\Operator](src/core/Operator.php);_  
 
 PHP Фасад\Адаптер для отправки запросов через ext cURL
 
-<h3 id="knockknock-src-Handler-readonly">
-    ReadOnly свойства:
-</h3>
+<h3>ReadOnly свойства:</h3> <span id="knockknock-src-Operator-readonly"></span>
 
 - **commonRequest** 
   - _Объект содержащий параметры, назначаемые всем исходящим запросам_
 - **realRequest** 
   - _Используемый запрос_
-- **eventHandlers** 
+- **eventOperators** 
   - _Список обработчиков событий_
 - **host** 
   - _Хост, на который будет отправляться запросы_
@@ -168,30 +156,28 @@ PHP Фасад\Адаптер для отправки запросов чере�
 
 
 
-<h2 align="center" id="knockknock-src-Handler-construct">
-    "Получение" объекта/экземпляра класса
-</h2>
+<h2 align="center">"Получение" объекта/экземпляра класса</h2> <span id="knockknock-src-Operator-construct"></span>
 
 Передавая параметры напрямую в конструктор:
 ```php
-$handler = new Handler( $_ENV['API_HOST'], $commonRequestParams );
+$operator = new Operator( $_ENV['API_HOST'], $commonRequestParams );
 ``` 
 Применяя, паттерн Singleton:
 ```php
-$handler = Handler::getInstance( $_ENV['API_HOST'], $commonRequestParams );
+$operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 ```
-Методы возвращают объект(экземпляр класса `Handler`), принимая на вход два аргумента:
+Методы возвращают объект(экземпляр класса `Operator`), принимая на вход два аргумента:
 - `string $host` - хост
-- `array $handlerConfig` - массив с настройками для всех исходящих запросов.
+- `array $operatorConfig` - массив с настройками для всех исходящих запросов.
 
-При создании объекта `Handler` будет вызван метод `init()`, который запускает пользовательские инструкции.  
+При создании объекта `Operator` будет вызван метод `init()`, который запускает пользовательские инструкции.  
 После выполнения `init()` запускается обработчик события привязанный к ключу `EVENT_AFTER_CONSTRUCT`
 
-<h2 align="center" id="knockknock-src-Handler-params">
+<h2 align="center" id="knockknock-src-Operator-params">
   Общие настройки запросов
 </h2>
 Что бы указать настройки применяемые ко всем исходящим запросам,  
-при создании объекта `Handler` передаётся массив (ключ - значение), с необходимыми настройками.
+при создании объекта `Operator` передаётся массив (ключ - значение), с необходимыми настройками.
 
 Пример настройки:
 ```php
@@ -205,10 +191,10 @@ $commonRequestParams = [
     ]
 ];
 // Получаем компонент для отправки запросов
-$handler = new Handler( $_ENV['API_HOST'], $commonRequestParams );
+$operator = new Operator( $_ENV['API_HOST'], $commonRequestParams );
 
 //Применяя, паттерн Singleton:
-$handler = Handler::getInstance( $_ENV['API_HOST'], $commonRequestParams );
+$operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 ```
 Доступные ключи для настройки(константы класса `Request`):
 
@@ -222,43 +208,37 @@ $handler = Handler::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 - `SETUP_CURL_INFO`
 
 
-<h2 id="knockknock-src-Handler-eventHandlers">
-    Обработчики событий
-</h2>
+<h2>Обработчики событий</h2> <span id="knockknock-src-events-setupEvents"></span>
 
-<h3 id="knockknock-src-Handler-event-list">
-    Список событий
-</h3>
+<h3>Список событий</h3> <span id="knockknock-src-events-list"></span>
 
 - `EVENT_AFTER_CONSTRUCT` после создания объекта knockKnock
 - `EVENT_CREATE_REQUEST` после создания объекта запроса
 - `EVENT_BEFORE_SEND` перед отправкой запроса
-- `EVENT_CURL_HANDLER` перед отправкой curl запроса
+- `EVENT_CURL_Operator` перед отправкой curl запроса
 - `EVENT_CREATE_RESPONSE` после создания объекта ответа
 - `EVENT_AFTER_SEND` после получения ответа
 
-<h5 id="knockknock-src-Handler-events-example">
-    Пример установки обработчиков событий
-</h5>
+<h5>Пример установки обработчиков событий</h5> <span id="knockknock-src-Handler-events-example"></span>
 
 ```php
-$handler->setupEventHandlers([
-    Handler::EVENT_AFTER_CONSTRUCT => function( Handler $handler ) {
+$operator->setupEvents([
+    Handler::EVENT_AFTER_CONSTRUCT => function( Handler $operator ) {
         // ...
     },
-    Handler::EVENT_CREATE_REQUEST => function( Handler $handler, Request $request ) {
+    Handler::EVENT_CREATE_REQUEST => function( Handler $operator, Request $request ) {
         // ...
     },
-    Handler::EVENT_BEFORE_SEND => function( Handler $handler, Request $request ) {
+    Handler::EVENT_BEFORE_SEND => function( Handler $operator, Request $request ) {
         // ...
     },
-    Handler::EVENT_CURL_HANDLER => function( Handler $handler, resource $ch ) {
+    Handler::EVENT_CURL_HANDLER => function( Handler $operator, resource $ch ) {
         // ...
     },
-    Handler::EVENT_CREATE_RESPONSE => function( Handler $handler, Response $response ) {
+    Handler::EVENT_CREATE_RESPONSE => function( Handler $operator, Response $response ) {
         // ...
     },
-    Handler::EVENT_AFTER_SEND => function( Handler $handler, Response $response ) {
+    Handler::EVENT_AFTER_SEND => function( Handler $operator, Response $response ) {
         // ...
     }
 ]);
@@ -275,7 +255,6 @@ $handler->setupEventHandlers([
 
 ___
 
-<p align="center">- - - - -</p>
 
 
 <h1 align="center">Запрос</h1>
@@ -284,9 +263,7 @@ _use [andy87\knock_knock\core\Request](src/core/Request.php);_
 
 Объект запроса, содержащий данные для отправки запроса.
 
-<h3 id="knockknock-src-Request-readonly">
-    ReadOnly свойства:
-</h3>
+<h3>ReadOnly свойства:</h3> <span id="knockknock-src-Request-readonly"></span>
 
 - **protocol** - _протокол_
 - **host** - _хост_
@@ -301,9 +278,7 @@ _use [andy87\knock_knock\core\Request](src/core/Request.php);_
 - **url** - _полный URL_
 - **params** - _все свойства в виде массива_
 
-<h3 align="center" id="knockknock-src-Request-construct">
-    Создание объекта запроса
-</h3>
+<h3 align="center">Создание объекта запроса</h3> <span id="knockknock-src-Request-construct"></span>
 
 Передавая параметры напрямую в конструктор:
 ```php
@@ -322,7 +297,7 @@ $request = new Request( 'info/me', [
 ```
 Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_REQUEST`
 ```php
-$request = $handler->constructRequest( 'info/me', [
+$request = $operator->constructRequest(Method::GET, 'info/me', [
     Request::METHOD => Method::POST,
     Request::DATA => [ 'client_id' => 45 ],
     Request::HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
@@ -337,20 +312,20 @@ $request = $handler->constructRequest( 'info/me', [
 ```
 Клонируя существующий объект запроса:
 ```php
-$request = $handler->constructRequest( 'info/me' );
+$request = $operator->constructRequest(Method::GET, 'info/me');
 
-$response = $handler->setupRequest( $request )->send();
+$response = $operator->send($request);
 
 //Клонирование объекта запроса (без статуса отправки)
 $cloneRequest = $request->clone();
 
 // Отправка клона запроса
-$response = $handler->setupRequest( $cloneRequest )->send();
+$response = $operator->setupRequest( $cloneRequest )->send();
 ```
 
-<h3 id="knockknock-src-Request-setter-getter">
+<h3>
     Назначение/Изменение/Получение отдельных параметров запроса (set/get)
-</h3>
+</h3> <span id="knockknock-src-Request-setter-getter"></span>
 
 Таблица set/get методов для взаимодействия с отдельными свойствами запроса
 
@@ -367,7 +342,7 @@ $response = $handler->setupRequest( $cloneRequest )->send();
 | Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array     | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                         |
 
 ```php
-$request = $handler->constructRequest('info/me');
+$request = $operator->constructRequest(Method::GET, 'info/me');
 
 $request->setMethod( Method::GET );
 $request->setData(['client_id' => 67]);
@@ -387,12 +362,10 @@ $protocol = $request->getPrococol(); // String
 $host = $request->getHost(); // String
 // ... аналогичным образом доступны и другие подобные методы для получения свойств запроса
 ```
-<h3 id="knockknock-src-Request-setupRequest">
-    Назначение запроса с переназначением свойств
-</h3>
+<h3>Назначение запроса с переназначением свойств</h3> <span id="knockknock-src-Request-setupRequest"></span>
 
 ```php
-$handler->setupRequest( $request, [
+$operator->setupRequest( $request, [
     Request::SETUP_HOST => $_ENV['API_HOST'],
     Request::SETUP_HEADERS => [
         'api-secret' => $_ENV['API_SECRET_KEY']
@@ -406,7 +379,6 @@ $handler->setupRequest( $request, [
 
 ___
 
-<p align="center">- - - - -</p>
 
 
 <h1 align="center">Ответ</h1>
@@ -414,9 +386,7 @@ ___
 _use [andy87\knock_knock\core\Response](src/core/Response.php);_  
 
 Объект ответа, содержащий данные ответа на запрос.
-<h3 id="knockknock-src-Response-readonly">
-    ReadOnly свойства
-</h3>
+<h3>ReadOnly свойства</h3> <span id="knockknock-src-Response-readonly"></span>
 
 - **content**
   - _данные ответа_
@@ -429,9 +399,7 @@ _use [andy87\knock_knock\core\Response](src/core/Response.php);_
 - **curlInfo**
   - _быстрый доступ к request->curlInfo_
 
-<h3 align="center" id="knockknock-src-Response-construct">
-    Создание объекта ответа
-</h3>
+<h3 align="center">Создание объекта ответа</h3> <span id="knockknock-src-Response-construct"></span>
 
 Передавая параметры напрямую в конструктор:
 ```php
@@ -439,7 +407,7 @@ $response = new Response('{"id" => 806034, "name" => "and_y87"}', 200 );
 ```
 Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_RESPONSE`
 ```php
-$response = $handler->constructResponse([
+$response = $operator->constructResponse([
     Response::CONTENT => [
         'id' => 806034,
         'name' => 'and_y87'
@@ -449,9 +417,7 @@ $response = $handler->constructResponse([
 ```
 `constructResponse( array $responseParams, ?Request $request = null ): Response`
 
-<h2 id="knockknock-src-Handler-send">
-    Отправка запроса
-</h2>
+<h2>Отправка запроса</h2> <span id="knockknock-src-Handler-send"></span>
 
 `send( array $kafeResponse = [] ): Response`  
 Метод требует наличие объекта запроса установленного методом `setupRequest( Request $request )`.  
@@ -465,29 +431,26 @@ $response = $handler->constructResponse([
 
 ```php
 // "Долгий путь"
-$handler = new Handler( $_ENV['API_HOST'] );
-$request = $handler->constructRequest( 'info/me' );
-$handler->setupRequest( $request );
-$response = $handler->send();
+$operator = new Handler( $_ENV['API_HOST'] );
+$request = $operator->constructRequest(Method::GET, 'info/me');
+$response = $operator->send($request);
 
 // "Короткий путь"
-$handler = new Handler( $_ENV['API_HOST'] );
-$response = $handler->send( $handler->constructRequest( 'info/me' ) );
+$operator = new Handler( $_ENV['API_HOST'] );
+$response = $operator->send( $operator->constructRequest(Method::GET, 'info/me') );
 ```
 Нельзя повторно отправить запрос, выбрасывается `RequestCompleteException`.
 Для повторной отправки запроса, необходимо создать новый:
 ```php
-$handler = new Handler( $_ENV['API_HOST'] );
-$request = $handler->constructRequest( 'info/me' );
-$response = $handler->send($request);
+$operator = new Handler( $_ENV['API_HOST'] );
+$request = $operator->constructRequest(Method::GET, 'info/me');
+$response = $operator->send($request);
 
 // повторная отправка запроса
-$response = $handler->send($request->clone());
+$response = $operator->send($request->clone());
 ```
 
-<h2 id="knockknock-src-Handler-fakeResponse">
-    Отправка запроса с фэйковым ответом
-</h2>
+<h2>Отправка запроса с фэйковым ответом</h2> <span id="knockknock-src-Handler-fakeResponse"></span>
 
 Получение подготовленного(фэйкового) ответа
 ```php
@@ -498,17 +461,15 @@ $fakeResponse = [
 ];
 $request->setFakeResponse( $fakeResponse );
 
-$response = $handler->send( $request );
+$response = $operator->send( $request );
 ```
 объект `$response` будет содержать в свойствах `content`, `httpCode` данные переданные в аргументе `$fakeResponse`
 
-<h2 id="knockknock-src-Response-setter">
-    Данные в ответе
-</h2>
+<h2>Данные в ответе</h2> <span id="knockknock-src-Response-setter"></span>
 
 В созданный объект `Response`, чей запрос не был отправлен, разрешено задавать данные, используя методы группы `set`.  
 ```php
-$response = $handler->send($request);
+$response = $operator->send($request);
 
 $response
     ->setHttpCode(200)
@@ -519,26 +480,24 @@ $response
 
 <h3 id="knockknock-src-Response-replace">
     Подмена данных
-</h3>
+</h3> <span></span>
 Это сделано для явного действия, когда необходимо заменить данные в объекте `Response`.
 
 ```php
-$response = $handler->send($request);
+$response = $operator->send($request);
 
 $response
     ->replace( Response::HTTP_CODE, 200 )
     ->replace( Response::CONTENT, '{"id" => 8060345, "nickName" => "and_y87"}' );
 ```
 
-<h2 id="knockknock-src-Response-request">
-    Данные запроса из ответа
-</h2>
+<h2>Данные запроса из ответа</h2> <span id="knockknock-src-Response-request"></span>
 
 Для получения из объекта `Response` данных запроса, необходимо обратиться к ReadOnly свойству `request`  
 и далее взаимодействовать с ним аналогично объекту `Request`    
 ```php
-$handler = new Handler( $_ENV['API_HOST'] );
-$response = $handler->setRequest( $handler->constructRequest( 'info/me' ) )->send();
+$operator = new Handler( $_ENV['API_HOST'] );
+$response = $operator->setRequest( $operator->constructRequest(Method::GET, 'info/me') )->send();
 
 // Получение компонента запроса
 $request = $response->request;
@@ -548,8 +507,8 @@ $method = $request->method; // получение метода запроса
 
 Получения свойств cURL запроса 
 ```php
-$handler = new Handler( $_ENV['API_HOST'] );
-$response = $handler->setRequest( $handler->constructRequest( 'info/me' ) )->send();
+$operator = new Handler( $_ENV['API_HOST'] );
+$response = $operator->setRequest( $operator->constructRequest(Method::GET, 'info/me') )->send();
 
 $response->request;
 
@@ -561,15 +520,13 @@ $curlInfo =  $response->request->curlInfo;
 $curlOptions =  $response->curlOption;
 $curlInfo =  $response->curlInfo;
 ```
-<h3 id="knockknock-src-Response-asArray">
-    asArray()
-</h3>
+<h3>asArray()</h3> <span id="knockknock-src-Response-asArray"></span>
 
 Преобразование в массив.  
  - преобразование данных ответа на запрос `asArray()`
  - преобразование всего объекта в массив `asArray(true)`
 ```php
-$response = $handler->send($request)->asArray(); // $response
+$response = $operator->send($request)->asArray(); // $response
 $array = $response->content; // Array$response
 ```
 
@@ -581,13 +538,11 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h1 align="center" id="knockknock-src-feature">
+<h1 align="center" >
     Функциональная часть
-</h1>
+</h1> <span id="knockknock-src-feature"></span>
 
-<h3 id="knockknock-src-ssl">
-    SSL
-</h3>
+<h3>SSL</h3> <span id="knockknock-src-ssl"></span>
 
 Функционал включения/отключения SSL верификации в объектах `Handler` & `Request`.  
 
@@ -598,54 +553,50 @@ ___
 
 `Handler` - для всех запросов
 ```php
-$handler = new Handler( $_ENV['API_HOST'] );
-$handler->disableSSL();
+$operator = new Handler( $_ENV['API_HOST'] );
+$operator->disableSSL();
 
-$request = $handler->constructRequest( 'info/me' );
+$request = $operator->constructRequest(Method::GET, 'info/me');
 
-$response = $handler->setupRequest( $request )->send();
+$response = $operator->setupRequest( $request )->send();
 ```
 
 `Request` - для конкретного запроса  
 ```php
-$handler = new Handler( $_ENV['API_HOST'] )->disableSSL();
+$operator = new Handler( $_ENV['API_HOST'] )->disableSSL();
 
-$request = $handler->constructRequest( 'info/me' );
+$request = $operator->constructRequest(Method::GET, 'info/me');
 $request->enableSSL();
 
-$response = $handler->setupRequest( $request )->send();
+$response = $operator->setupRequest( $request )->send();
 ```
-<h3 id="knockknock-src-Cookie">
-    Cookie
-</h3>
+<h3>Cookie</h3> <span id="knockknock-src-Cookie"></span>
 
 В объекте `Handler` имеется функционал использования cookie.  
 `Handler` - для всех запросов  
 ```php
-$handler = new Handler( $_ENV['API_HOST'] );
+$operator = new Handler( $_ENV['API_HOST'] );
 
 $cookie = $_ENV['COOKIE'];
 $jar = $_ENV['COOKIE_JAR'];
 
-$handler->useCookie( $cookie, $jar );
+$operator->useCookie( $cookie, $jar );
 ```  
-`$handler->useCookie( string $cookie, string $jar, ?string $file = null )`  
+`$operator->useCookie( string $cookie, string $jar, ?string $file = null )`  
 по умолчанию `$file = null` и  `$file` приравнивается к `$jar`  
 
-<h3 id="knockknock-src-logs">
-    Логирование
-</h3>
+<h3>Логирование</h3> <span id="knockknock-src-logs"></span>
 
 Добавление сообщений в свойство `->logs` 
 
 ```php
-$handler = new Handler( $_ENV['API_HOST'] );
+$operator = new Handler( $_ENV['API_HOST'] );
 
 $$message = 'Какое то сообщение';
 
-$handler->addLog( $message );
+$operator->addLog( $message );
 ```
-`$handler->addLog( string $message )`  
+`$operator->addLog( string $message )`  
 
 
 <p align="center">- - - - -</p>
@@ -657,26 +608,22 @@ ___
 
 <h1 align="center" id="knockknock-extends">Расширения на основе базового класса</h1>
 
-<h3 align="center" id="knockknock-Octopus">
+<h3 align="center">
     <a href="docs/KnockKnock/KnockKnockOctopus.md" target="_blank">
         KnockKnockOctopus
         <br>
         <img src="assets/logo/KnockKnockOctopus_320.png" style="width:200px; height: auto" alt="KnockKnockOctopus php curl facade"/>
     </a>
-</h3>
+</h3> <span id="knockknock-Octopus"></span>
 
 Класс с функционалом простой реализации отправки запросов и минимальными настройками
 
-<h4 id="knockknock-Octopus-methods">
-    Доступные методы.
-</h4>
+<h4>Доступные методы.</h4> <span id="knockknock-Octopus-methods"></span>
 
 | get() | post() | put() | patch() | delete() | head() | options() | trace() |
 |-------|--------|-------|---------|----------|--------|-----------|---------|
 
-<h4 id="knockknock-Octopus-methods-args">
-    Каждый метод принимает два аргумента:
-</h4>
+<h4>Каждый метод принимает два аргумента:</h4> <span id="knockknock-Octopus-methods-args"></span>
 
 | Аргумент  |   Тип   | Обязательный  | Описание                       |
 |:----------|:-------:|:-------------:|:-------------------------------|
@@ -684,9 +631,7 @@ ___
 | $params   |  array  |      Нет      | Данные запроса в виде массива  |
 _P.S. host задаётся в конструкторе_
 
-<h4 id="knockknock-Octopus-methods-example">
-    Простой пример использования
-</h4>
+<h4>Простой пример использования</h4> <span id="knockknock-Octopus-methods-example"></span>
 
 ```php
 //GET запрос
@@ -702,13 +647,13 @@ $knockKnockOctopus->post( '/new', [
 
 <p align="center"> - - - - - </p>
 
-<h3 align="center" id="knockknock-security">
+<h3 align="center">
     <a href="docs/KnockKnock/KnockKnockSecurity.md" target="_blank">
         KnockKnockSecurity
         <br>
         <img src="assets/logo/KnockKnockSecurity_280.png" style="width:auto; height: 128px" alt="KnockKnockSecurity php curl facade"/>
     </a>
-</h3>
+</h3> <span id="knockknock-security"></span>
 
 Расширяет класс [KnockKnockOctopus](docs/KnockKnock/KnockKnockOctopus.md), предоставляя доступ к функционалу для простой и  
 быстрой реализации авторизации, и настройки запросов.
@@ -722,7 +667,7 @@ $knockKnockSecurity
     ->setupAuthorization( KnockKnockSecurity::TOKEN_BEARER, 'token' )
     ->setupHeaders([ 'X-Api-Key' => $_ENV['X_API_KEY'] ])
     ->setupContentType( ContentType::JSON )
-    ->on( Handler::EVENT_AFTER_SEND, function( Handler $handler, Response $response ) => 
+    ->on( Handler::EVENT_AFTER_SEND, function( Handler $operator, Response $response ) => 
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
 
@@ -760,9 +705,9 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h1 id="knockknock-Custom">
+<h1>
     Custom реализация
-</h1>
+</h1> <span id="knockknock-Custom"></span>
 
 Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
@@ -831,9 +776,9 @@ class KnockKnockYandex extends Handler
 }
 
 ```
-<h3 id="knockknock-Custom-use">
+<h3>
     Пример использования custom реализации
-</h3>
+</h3> <span id="knockknock-Custom-use"></span>
 
 ```php
 
@@ -857,16 +802,16 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h2 id="knockknock-tests">
+<h2>
     Тесты
-</h2>
+</h2> <span id="knockknock-tests"></span>
 
  - tests: 106
  - assertions: 370
 
-<h3 id="knockknock-tests-run">
+<h3>
     Запуск тестов:
-</h3>
+</h3> <span id="knockknock-tests-run"></span>
 
 Нативный  
 ```bash
@@ -881,24 +826,24 @@ vendor/bin/phpunit --testdox
 vendor/bin/phpunit --log-junit "tests/logs/phpunit.xml"
 ```
 
-<h2 id="knockknock-license">
+<h2>
     Лицензия
-</h2>
+</h2> <span id="knockknock-license"></span>
 
 https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0  
 Для получения дополнительной информации смотрите http://creativecommons.org/licenses/by-sa/4.0/  
 Свободно для не коммерческого использования  
 С указанием авторства для коммерческого использования  
 
-<h2 id="knockknock-changelog">
+<h2>
     Изменения
-</h2>
+</h2> <span id="knockknock-changelog"></span>
 
 Для получения полной информации смотрите [CHANGELOG](docs/CHANGELOG.md)
 
-<h3 id="knockknock-changes">
+<h3>
     Последние изменения
-</h3>
+</h3> <span id="knockknock-changes"></span>
 
 24/05/2024 - 99b  
 26/05/2024 - v1.0.0  
