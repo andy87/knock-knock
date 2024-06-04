@@ -208,7 +208,7 @@ $operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 - `SETUP_CURL_INFO`
 
 
-<h2>Обработчики событий</h2> <span id="knockknock-src-events-setupEvents"></span>
+<h2>Обработчики событий</h2> <span id="knockknock-src-events-setupEventHandlers"></span>
 
 <h3>Список событий</h3> <span id="knockknock-src-events-list"></span>
 
@@ -222,7 +222,7 @@ $operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 <h5>Пример установки обработчиков событий</h5> <span id="knockknock-src-Handler-events-example"></span>
 
 ```php
-$operator->setupEvents([
+$operator->setupEventHandlers([
     Handler::EVENT_AFTER_CONSTRUCT => function( Handler $operator ) {
         // ...
     },
@@ -806,8 +806,8 @@ ___
     Тесты
 </h2> <span id="knockknock-tests"></span>
 
- - tests: 106
- - assertions: 370
+ - tests: 100+
+ - assertions: 350+
 
 <h3>
     Запуск тестов:

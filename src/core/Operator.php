@@ -19,7 +19,7 @@ use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointExceptio
 use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
 /**
- * Class Handler
+ * Class Operator
  *
  * @package andy87\knock_knock
  *
@@ -279,7 +279,7 @@ class Operator implements HandlerInterface
      *
      * @tag #knockHandler #setup #event #callback #behavior
      */
-    public function setupEvents(array $callbacks): array
+    public function setupEventHandlers(array $callbacks): array
     {
         $events = [];
 
