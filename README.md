@@ -229,23 +229,23 @@ $operator->setupEventHandlers([
     Operator::EVENT_CREATE_REQUEST => function( Operator $operator, Request $request ) {
         // ...
     },
-    Operator::EVENT_BEFORE_SEND => function( Handler $operator, Request $request ) {
+    Operator::EVENT_BEFORE_SEND => function( Operator $operator, Request $request ) {
         // ...
     },
-    Handler::EVENT_CURL_HANDLER => function( Handler $operator, resource $ch ) {
+    Operator::EVENT_CURL_HANDLER => function( Operator $operator, resource $ch ) {
         // ...
     },
-    Handler::EVENT_CREATE_RESPONSE => function( Handler $operator, Response $response ) {
+    Operator::EVENT_CREATE_RESPONSE => function( Operator $operator, Response $response ) {
         // ...
     },
-    Handler::EVENT_AFTER_SEND => function( Handler $operator, Response $response ) {
+    Operator::EVENT_AFTER_SEND => function( Operator $operator, Response $response ) {
         // ...
     }
 ]);
 ```
 Первый аргумент - ключ события, второй - callback функция.
 
-Все callback функции принимают первым аргументом объект/экземпляр класса `Handler`.  
+Все callback функции принимают первым аргументом объект/экземпляр класса `Operaotr`.  
 Вторым аргументом передаётся объект/экземпляр класса в зависимости от события:
 - `Request` - для событий `EVENT_CREATE_REQUEST`, `EVENT_BEFORE_SEND`
 - `Response` - для событий `EVENT_CREATE_RESPONSE`, `EVENT_AFTER_SEND`
@@ -544,14 +544,14 @@ ___
 
 <h3>SSL</h3> <span id="knockknock-src-ssl"></span>
 
-Функционал включения/отключения SSL верификации в объектах `Handler` & `Request`.  
+Функционал включения/отключения SSL верификации в объектах `Operaotr` & `Request`.  
 
 В `curlOptions` добавляется ключ `CURLOPT_SSL_VERIFYPEER` и `CURLOPT_SSL_VERIFYHOST`.
 
 `->disableSSL( bool $verifyPeer = false, int $verifyHost = 0 );`  
 `->enableSSL( bool $verifyPeer = true, int $verifyHost = 2 );`  
 
-`Handler` - для всех запросов
+`Operaotr` - для всех запросов
 ```php
 $operator = new Handler( $_ENV['API_HOST'] );
 $operator->disableSSL();
@@ -572,8 +572,8 @@ $response = $operator->setupRequest( $request )->send();
 ```
 <h3>Cookie</h3> <span id="knockknock-src-Cookie"></span>
 
-В объекте `Handler` имеется функционал использования cookie.  
-`Handler` - для всех запросов  
+В объекте `Operaotr` имеется функционал использования cookie.  
+`Operaotr` - для всех запросов  
 ```php
 $operator = new Handler( $_ENV['API_HOST'] );
 
