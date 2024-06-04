@@ -431,18 +431,18 @@ $response = $operator->constructResponse([
 
 ```php
 // "Долгий путь"
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 $request = $operator->constructRequest(Method::GET, 'info/me');
 $response = $operator->send($request);
 
 // "Короткий путь"
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 $response = $operator->send( $operator->constructRequest(Method::GET, 'info/me') );
 ```
 Нельзя повторно отправить запрос, выбрасывается `RequestCompleteException`.
 Для повторной отправки запроса, необходимо создать новый:
 ```php
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 $request = $operator->constructRequest(Method::GET, 'info/me');
 $response = $operator->send($request);
 
@@ -496,7 +496,7 @@ $response
 Для получения из объекта `Response` данных запроса, необходимо обратиться к ReadOnly свойству `request`  
 и далее взаимодействовать с ним аналогично объекту `Request`    
 ```php
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 $response = $operator->setRequest( $operator->constructRequest(Method::GET, 'info/me') )->send();
 
 // Получение компонента запроса
@@ -507,7 +507,7 @@ $method = $request->method; // получение метода запроса
 
 Получения свойств cURL запроса 
 ```php
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 $response = $operator->setRequest( $operator->constructRequest(Method::GET, 'info/me') )->send();
 
 $response->request;
@@ -553,7 +553,7 @@ ___
 
 `Operaotr` - для всех запросов
 ```php
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 $operator->disableSSL();
 
 $request = $operator->constructRequest(Method::GET, 'info/me');
@@ -563,7 +563,7 @@ $response = $operator->setupRequest( $request )->send();
 
 `Request` - для конкретного запроса  
 ```php
-$operator = new Handler( $_ENV['API_HOST'] )->disableSSL();
+$operator = new Operator( $_ENV['API_HOST'] )->disableSSL();
 
 $request = $operator->constructRequest(Method::GET, 'info/me');
 $request->enableSSL();
@@ -575,7 +575,7 @@ $response = $operator->setupRequest( $request )->send();
 В объекте `Operaotr` имеется функционал использования cookie.  
 `Operaotr` - для всех запросов  
 ```php
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 
 $cookie = $_ENV['COOKIE'];
 $jar = $_ENV['COOKIE_JAR'];
@@ -590,7 +590,7 @@ $operator->useCookie( $cookie, $jar );
 Добавление сообщений в свойство `->logs` 
 
 ```php
-$operator = new Handler( $_ENV['API_HOST'] );
+$operator = new Operator( $_ENV['API_HOST'] );
 
 $$message = 'Какое то сообщение';
 
@@ -667,7 +667,7 @@ $knockKnockSecurity
     ->setupAuthorization( KnockKnockSecurity::TOKEN_BEARER, 'token' )
     ->setupHeaders([ 'X-Api-Key' => $_ENV['X_API_KEY'] ])
     ->setupContentType( ContentType::JSON )
-    ->on( Handler::EVENT_AFTER_SEND, function( Handler $operator, Response $response ) => 
+    ->on( Operator::EVENT_AFTER_SEND, function( Operator $operator, Response $response ) => 
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
 
@@ -711,7 +711,7 @@ ___
 
 Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
-class KnockKnockYandex extends Handler
+class KnockKnockYandex extends Operator
 {
     private const LOGGER = 'logger';
 
