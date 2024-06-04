@@ -279,7 +279,7 @@ class Operator implements HandlerInterface
      *
      * @tag #knockHandler #setup #event #callback #behavior
      */
-    public function setupEvents(array $callbacks): array
+    public function setupEventHandlers(array $callbacks): array
     {
         $events = [];
 

@@ -249,7 +249,7 @@ class OperatorTest extends UnitTestCore
             },
         ];
 
-        $operator->setupEvents($events);
+        $operator->setupEventHandlers($events);
 
         $requestRealParams = [
             RequestInterface::SETUP_METHOD => Method::POST,
@@ -365,14 +365,14 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testSetupEventHandlers
      *
      * @tag #test #Handler #setup #eventHandlers
-     *@see Operator::setupEvents()
+     *@see Operator::setupEventHandlers()
      *
      */
     public function testSetupEventHandlers()
     {
         $operator = $this->getHandler();
 
-        $operator->setupEvents([]);
+        $operator->setupEventHandlers([]);
 
         $this->assertIsArray( $operator->eventHandlers );
         $this->assertCount(0, $operator->eventHandlers);
@@ -389,7 +389,7 @@ class OperatorTest extends UnitTestCore
             },
         ];
 
-        $callBackList = $operator->setupEvents($eventList);
+        $callBackList = $operator->setupEventHandlers($eventList);
 
         $this->assertSameSize( $callBackList, $eventList );
 
