@@ -19,7 +19,7 @@ use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointExceptio
 use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
 /**
- * Class Handler
+ * Class Operator
  *
  * @package andy87\knock_knock
  *
