@@ -12,13 +12,17 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\core;
 
-use andy87\knock_knock\core\{ Handler, Request };
+use andy87\knock_knock\core\{ Operator, Request };
 use andy87\knock_knock\tests\helpers\UnitTestCore;
 use andy87\knock_knock\interfaces\RequestInterface;
 use andy87\knock_knock\lib\{ ContentType, Method };
 use andy87\knock_knock\interfaces\ResponseInterface;
 use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\InvalidProtocolException, request\StatusNotFoundException };
+use andy87\knock_knock\exception\{ operator\InvalidMethodException,
+    request\InvalidHeaderException,
+    request\InvalidProtocolException,
+    request\StatusNotFoundException
+};
 
 /**
  * Class RequestTest
@@ -172,7 +176,7 @@ class RequestTest extends UnitTestCore
      */
     public function testConstructUrlOnPost(): void
     {
-        $request = (new Handler(self::HOST))
+        $request = (new Operator(self::HOST))
             ->constructRequest(
                 Method::POST,
                 self::ENDPOINT
@@ -820,29 +824,29 @@ class RequestTest extends UnitTestCore
         $protocol = 'http';
         $host = 'first.host';
 
-        $handler = new Handler("$protocol://$host");
-        $this->assertInstanceOf(Handler::class, $handler );
+        $operator = new Operator("$protocol://$host");
+        $this->assertInstanceOf(Operator::class, $operator );
 
-        $this->assertEquals( $protocol, $handler->commonRequest->protocol );
-        $this->assertEquals( $host, $handler->commonRequest->host );
+        $this->assertEquals( $protocol, $operator->commonRequest->protocol );
+        $this->assertEquals( $host, $operator->commonRequest->host );
 
         $protocol = 'wss';
         $host = 'second.host';
-        $handler->commonRequest->setHost("$protocol://$host");
+        $operator->commonRequest->setHost("$protocol://$host");
 
-        $this->assertEquals( $protocol, $handler->commonRequest->protocol );
-        $this->assertEquals( $host, $handler->commonRequest->host );
+        $this->assertEquals( $protocol, $operator->commonRequest->protocol );
+        $this->assertEquals( $host, $operator->commonRequest->host );
 
         $protocol = 'https';
         $host = 'next.host';
         $endpoint = 'endpoint';
-        $handler->commonRequest->setProtocol($protocol);
-        $handler->commonRequest->setHost($host);
-        $handler->commonRequest->setEndpoint($endpoint);
-        $handler->commonRequest->constructUrl();
+        $operator->commonRequest->setProtocol($protocol);
+        $operator->commonRequest->setHost($host);
+        $operator->commonRequest->setEndpoint($endpoint);
+        $operator->commonRequest->constructUrl();
 
-        $this->assertEquals( $protocol, $handler->commonRequest->protocol );
-        $this->assertEquals( $host, $handler->commonRequest->host );
+        $this->assertEquals( $protocol, $operator->commonRequest->protocol );
+        $this->assertEquals( $host, $operator->commonRequest->host );
     }
 
     /**

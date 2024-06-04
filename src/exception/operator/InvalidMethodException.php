@@ -1,6 +1,6 @@
 <?php
 
-namespace andy87\knock_knock\exception\handler;
+namespace andy87\knock_knock\exception\operator;
 
 use Exception;
 

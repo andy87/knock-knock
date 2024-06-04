@@ -13,14 +13,14 @@ declare(strict_types=1);
 namespace andy87\knock_knock\tests\helpers;
 
 use Exception;
-use andy87\knock_knock\core\Handler;
+use andy87\knock_knock\core\Operator;
 
 /**
  *  Class HandlerExample
  *
  * @package tests\examples
  */
-class HandlerExample extends Handler
+class OperatorExample extends Operator
 {
     public const INIT_INIT = 'init_Stay';
     public const INIT_DONE = 'init_Done';

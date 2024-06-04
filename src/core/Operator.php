@@ -13,10 +13,10 @@ declare(strict_types=1);
 namespace andy87\knock_knock\core;
 
 use andy87\knock_knock\lib\{ Method, ContentType };
-use andy87\knock_knock\exception\handler\{ EventUpdateException, InvalidMethodException };
+use andy87\knock_knock\exception\operator\{ EventUpdateException, InvalidMethodException };
 use andy87\knock_knock\interfaces\{ HandlerInterface, RequestInterface, ResponseInterface };
 use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamUpdateException, ParamNotFoundException };
-use andy87\knock_knock\exception\request\{InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
+use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
 /**
  * Class Handler
@@ -31,10 +31,10 @@ use andy87\knock_knock\exception\request\{InvalidHeaderException, InvalidRequest
  *
  * Покрытие тестами: 100%. @see KnockKnockTest
  */
-class Handler implements HandlerInterface
+class Operator implements HandlerInterface
 {
-    /** @var ?Handler $_instance Объект для реализации Singleton */
-    protected static ?Handler $_instance = null;
+    /** @var ?Operator $_instance Объект для реализации Singleton */
+    protected static ?Operator $_instance = null;
 
     /** @var string $host Хост, на который будут отправляться запросы */
     protected string $host;
@@ -279,7 +279,7 @@ class Handler implements HandlerInterface
      *
      * @tag #knockHandler #setup #event #callback #behavior
      */
-    public function setupEventHandlers(array $callbacks): array
+    public function setupEvents(array $callbacks): array
     {
         $events = [];
 
@@ -618,7 +618,7 @@ class Handler implements HandlerInterface
     public static function getInstance(string $host = null, array $commonRequestParams = []): static
     {
         if (static::$_instance === null) {
-            static::$_instance = new Handler( $host, $commonRequestParams );
+            static::$_instance = new Operator( $host, $commonRequestParams );
         }
 
         return static::$_instance;

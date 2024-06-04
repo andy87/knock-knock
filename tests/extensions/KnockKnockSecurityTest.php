@@ -17,7 +17,7 @@ use andy87\knock_knock\lib\{ ContentType, Method };
 use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
 use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
 use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException, extensions\InvalidAuthException };
+use andy87\knock_knock\exception\{ operator\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException, extensions\InvalidAuthException };
 
 /**
  * Class KnockKnockSecurityTest

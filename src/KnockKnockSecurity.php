@@ -13,7 +13,7 @@ declare(strict_types=1);
 namespace andy87\knock_knock;
 
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\core\{ Handler, Request, Response };
+use andy87\knock_knock\core\{ Operator, Request, Response };
 use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException, extensions\InvalidAuthException };
 use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
 
@@ -54,7 +54,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #setup #authorization
      */
-    public function setupAuthorization(string $authType, string $token): Handler
+    public function setupAuthorization(string $authType, string $token): Operator
     {
         if (in_array($authType, [self::TOKEN_BEARER, self::TOKEN_BASIC])) {
             $this->getterCommonRequest()->setHeader(self::HEADERS_AUTH_KEY, "$authType $token");
@@ -78,7 +78,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #setup #headers
      */
-    public function setupHeaders(array $headers): Handler
+    public function setupHeaders(array $headers): Operator
     {
         $headers = array_merge($this->getterCommonRequest()->headers, $headers);
 
@@ -100,7 +100,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #setup #content-type
      */
-    public function setupContentType(string $ContentType): Handler
+    public function setupContentType(string $ContentType): Operator
     {
         $this->getterCommonRequest()->setContentType($ContentType);
 
@@ -122,7 +122,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #use #headers
      */
-    public function useHeaders(array $headers): Handler
+    public function useHeaders(array $headers): Operator
     {
         $this->use[interfaces\RequestInterface::SETUP_HEADERS] = $headers;
 
@@ -140,7 +140,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #use #content-type
      */
-    public function useContentType(string $ContentType): Handler
+    public function useContentType(string $ContentType): Operator
     {
         $this->use[interfaces\RequestInterface::SETUP_CONTENT_TYPE] = $ContentType;
 

@@ -18,7 +18,7 @@ use andy87\knock_knock\KnockKnockOctopus;
 use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
 use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
 use andy87\knock_knock\exception\{ InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\{ handler\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException };
+use andy87\knock_knock\exception\{ operator\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException };
 
 /**
  * Class KnockKnockOctopusTest
