@@ -50,7 +50,7 @@
    - Переформатирован код:
      - Code Style ближе к PSR-4
      - сгруппированы методы и свойства
-   - Handler:
+   - Operator:
      - send() - теперь принимает `$request` вместо `$fakeResponse`
  - Добавлено:
    - add `github/workflows` for CI/CD

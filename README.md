@@ -223,13 +223,13 @@ $operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 
 ```php
 $operator->setupEventHandlers([
-    Handler::EVENT_AFTER_CONSTRUCT => function( Handler $operator ) {
+    Operator::EVENT_AFTER_CONSTRUCT => function( Operator $operator ) {
         // ...
     },
-    Handler::EVENT_CREATE_REQUEST => function( Handler $operator, Request $request ) {
+    Operator::EVENT_CREATE_REQUEST => function( Operator $operator, Request $request ) {
         // ...
     },
-    Handler::EVENT_BEFORE_SEND => function( Handler $operator, Request $request ) {
+    Operator::EVENT_BEFORE_SEND => function( Handler $operator, Request $request ) {
         // ...
     },
     Handler::EVENT_CURL_HANDLER => function( Handler $operator, resource $ch ) {
