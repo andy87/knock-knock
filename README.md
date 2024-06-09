@@ -610,14 +610,12 @@ $operator->useCookie( $cookie, $jar );
 
 <h3>Логирование</h3> <span id="knockknock-src-logs"></span>
 
-Добавление сообщений в свойство `->logs` 
+Добавление сообщений во внутренний массив `logs` 
 
 ```php
 $operator = new Operator( $_ENV['API_HOST'] );
 
-$$message = 'Какое то сообщение';
-
-$operator->addLog( $message );
+$operator->addLog( 'Какое то сообщение' );
 ```
 `$operator->addLog( string $message )`  
 
@@ -657,11 +655,11 @@ _P.S. host задаётся в конструкторе_
 <h4>Простой пример использования</h4> <span id="knockknock-Octopus-methods-example"></span>
 
 ```php
-//GET запрос
-$knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] );
+$knockKnockOctopus = new KnockKnockOctopus($_ENV['API_URL']);
 
-//POST запрос
-$knockKnockOctopus->post( '/new', [ 
+$knockKnockOctopus->get( '/profile', [ 'id' => 806034 ] ); //GET запрос
+
+$knockKnockOctopus->post( '/new', [  //POST запрос
     'name' => 'Новая новость',
     'content' => 'Текст новости' 
 ]);
