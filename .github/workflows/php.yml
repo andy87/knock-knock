@@ -21,9 +21,11 @@ jobs:
         run: |
           OUTPUT=$(composer validate --strict 2>&1)
           echo "$OUTPUT"
-          if echo "$OUTPUT" | grep -q 'warnings'; then
+          if echo "$OUTPUT" | grep -q 'errors'; then
+            echo "Errors found in composer.json"
+            exit 1
+          elif echo "$OUTPUT" | grep -q 'warnings'; then
             echo "Warnings found in composer.json"
-            exit 0
           fi
 
       - name: Cache Composer packages
