@@ -438,28 +438,25 @@ $response = $operator->constructResponse([
 
 <h2>Отправка запроса</h2> <span id="knockknock-src-Handler-send"></span>
 
-`send( ?Request $request = null ): Response`  
-Метод требует наличие объекта запроса установленного методом `setupRequest( Request $request )`.  
-
-Вызов метода `send()`, возвращает объект/экземпляр класса `Response`.  
-Срабатывает callback функция, привязанная к ключу:
+`send( ?Request $request = null ): Response`
+Вызов возвращает объект/экземпляр класса `Response`.  
+Срабатывают callback функции, привязанные к ключам:
  - `EVENT_AFTER_SEND`
  - `EVENT_CREATE_RESPONSE`
  - `EVENT_BEFORE_SEND`
  - `EVENT_CURL_HANDLER`
 
 ```php
-// "Долгий путь"
 $operator = new Operator( $_ENV['API_HOST'] );
 $request = $operator->constructRequest(Method::GET, 'info/me');
 $response = $operator->send($request);
 
-// "Короткий путь"
+// Аналог
 $operator = new Operator( $_ENV['API_HOST'] );
 $response = $operator->send( $operator->constructRequest(Method::GET, 'info/me') );
 ```
-Нельзя повторно отправить запрос, выбрасывается `RequestCompleteException`.
-Для повторной отправки запроса, необходимо создать новый:
+Нельзя повторно отправить запрос, выбрасывается исключение `RequestCompleteException`.
+Для повторной отправки запроса, необходимо создать новый объект запроса и использовать его:
 ```php
 $operator = new Operator( $_ENV['API_HOST'] );
 $request = $operator->constructRequest(Method::GET, 'info/me');
@@ -471,7 +468,7 @@ $response = $operator->send($request->clone());
 
 <h2>Отправка запроса с фэйковым ответом</h2> <span id="knockknock-src-Handler-fakeResponse"></span>
 
-Получение подготовленного(фэйкового) ответа
+
 ```php
 // параметры возвращаемого ответа
 $fakeResponse = [
