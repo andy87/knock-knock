@@ -59,3 +59,7 @@
    - Request
      - добавлен метод `setFakeResponse`
      - добавлено ReadOnly свойство `$fakeResponse`
+
+### 1.2.1
+ - Мелкие правки
+ - Добавлены тесты

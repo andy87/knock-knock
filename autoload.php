@@ -5,7 +5,7 @@
  * @homepage: https://github.com/andy87/KnockKnock
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-27
- * @version 1.2.0
+ * @version 1.2.1
  */
 
 require __DIR__.'/src/Autoloader.php';
