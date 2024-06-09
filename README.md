@@ -15,7 +15,13 @@ _Разумеется, это не конкурент, а просто попы�
 ### Содержание:
 
  - [Установка](#knockknock-setup)
- - - Требования
+ - [Объект - Базовый класс](#knockknock-src-Operator)
+ - [Объект - Запрос](#knockknock-src-Request)
+ - [Объект - Ответ](#knockknock-src-Response)
+ - [Дополнительные возможности](#knockknock-src-feature)
+ - [Расширение на основе базового класса](#knockknock-extends)
+ - [Пример Custom реализации](#knockknock-Custom)
+ - [Тесты](#knockknock-tests)
 
 ___
 
@@ -257,7 +263,7 @@ ___
 
 
 
-<h1 align="center">Запрос</h1>
+<h1 align="center">Запрос</h1><span id="knockknock-src-Request"></span>
 
 _use [andy87\knock_knock\core\Request](src/core/Request.php);_  
 
@@ -381,7 +387,7 @@ ___
 
 
 
-<h1 align="center">Ответ</h1>
+<h1 align="center">Ответ</h1><span id="knockknock-src-Response"></span>
 
 _use [andy87\knock_knock\core\Response](src/core/Response.php);_  
 
@@ -538,9 +544,7 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h1 align="center" >
-    Функциональная часть
-</h1> <span id="knockknock-src-feature"></span>
+<h1 align="center" >Дополнительные возможности</h1> <span id="knockknock-src-feature"></span>
 
 <h3>SSL</h3> <span id="knockknock-src-ssl"></span>
 
@@ -606,7 +610,7 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h1 align="center" id="knockknock-extends">Расширения на основе базового класса</h1>
+<h1 align="center">Расширения на основе базового класса</h1><span  id="knockknock-extends"></span>
 
 <h3 align="center">
     <a href="docs/KnockKnock/KnockKnockOctopus.md" target="_blank">
@@ -705,9 +709,7 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h1>
-    Custom реализация
-</h1> <span id="knockknock-Custom"></span>
+<h1>Custom реализация</h1> <span id="knockknock-Custom"></span>
 
 Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
@@ -802,9 +804,7 @@ ___
 <p align="center">- - - - -</p>
 
 
-<h2>
-    Тесты
-</h2> <span id="knockknock-tests"></span>
+<h2>Тесты</h2> <span id="knockknock-tests"></span>
 
  - tests: 100+
  - assertions: 350+
@@ -826,18 +826,14 @@ vendor/bin/phpunit --testdox
 vendor/bin/phpunit --log-junit "tests/logs/phpunit.xml"
 ```
 
-<h2>
-    Лицензия
-</h2> <span id="knockknock-license"></span>
+<h2>Лицензия</h2> <span id="knockknock-license"></span>
 
 https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0  
 Для получения дополнительной информации смотрите http://creativecommons.org/licenses/by-sa/4.0/  
 Свободно для не коммерческого использования  
 С указанием авторства для коммерческого использования  
 
-<h2>
-    Изменения
-</h2> <span id="knockknock-changelog"></span>
+<h2>Изменения</h2> <span id="knockknock-changelog"></span>
 
 Для получения полной информации смотрите [CHANGELOG](docs/CHANGELOG.md)
 
