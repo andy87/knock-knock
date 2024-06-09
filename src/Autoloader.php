@@ -20,11 +20,10 @@ class Autoloader
     private int $prefixLength;
 
 
-
     /**
      * @param string $baseDirectory
      */
-    public function __construct( string $baseDirectory = __DIR__ )
+    public function __construct(string $baseDirectory = __DIR__)
     {
         $this->directory = $baseDirectory;
 
@@ -36,7 +35,7 @@ class Autoloader
     /**
      * @param bool $prepend
      */
-    public static function register( bool $prepend = false ): void
+    public static function register(bool $prepend = false): void
     {
         spl_autoload_register([new self(), 'autoload'], true, $prepend);
     }
@@ -44,15 +43,14 @@ class Autoloader
     /**
      * @param string $className
      */
-    public function autoload( string $className ): void
+    public function autoload(string $className): void
     {
-        if ( str_starts_with( $className, $this->prefix ) )
-        {
-            $parts = explode( '\\', substr($className, $this->prefixLength) );
+        if (str_starts_with($className, $this->prefix)) {
+            $parts = explode('\\', substr($className, $this->prefixLength));
 
-            $filepath = $this->directory . DIRECTORY_SEPARATOR . implode( DIRECTORY_SEPARATOR, $parts ) . '.php';
+            $filepath = $this->directory . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $parts) . '.php';
 
-            if ( is_file($filepath) ) require $filepath;
+            if (is_file($filepath)) require $filepath;
         }
     }
 }

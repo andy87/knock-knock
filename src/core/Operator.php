@@ -12,11 +12,17 @@ declare(strict_types=1);
 
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\lib\{ Method, ContentType };
-use andy87\knock_knock\exception\operator\{ EventUpdateException, InvalidMethodException };
-use andy87\knock_knock\interfaces\{ HandlerInterface, RequestInterface, ResponseInterface };
-use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamUpdateException, ParamNotFoundException };
-use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
+use andy87\knock_knock\lib\{Method, ContentType};
+use andy87\knock_knock\exception\operator\{EventUpdateException, InvalidMethodException};
+use andy87\knock_knock\interfaces\{HandlerInterface, RequestInterface, ResponseInterface};
+use andy87\knock_knock\exception\{InvalidHostException,
+    InvalidEndpointException,
+    ParamUpdateException,
+    ParamNotFoundException};
+use andy87\knock_knock\exception\request\{InvalidHeaderException,
+    InvalidRequestException,
+    RequestCompleteException,
+    StatusNotFoundException};
 
 /**
  * Class Operator
@@ -171,8 +177,7 @@ class Operator implements HandlerInterface
      */
     public function constructRequest(string $method, string $endpoint, array $requestConfig = []): Request
     {
-        if ($this->validateMethod($method))
-        {
+        if ($this->validateMethod($method)) {
             if (empty($endpoint)) throw new InvalidEndpointException();
 
             $requestConfig = array_merge([
@@ -223,24 +228,24 @@ class Operator implements HandlerInterface
 
 
     /**
-     * 
+     *
      * @param string $host
      *
      * @return $this
      *
      * @throws InvalidHostException
      */
-    public function setupHost( string $host ): static
+    public function setupHost(string $host): static
     {
         $this->_host = $host;
 
-        if ( empty($this->_host) )
-        {
+        if (empty($this->_host)) {
             throw new InvalidHostException();
         }
 
         return $this;
     }
+
     /**
      * @param Request $request
      * @param array $options
@@ -306,13 +311,15 @@ class Operator implements HandlerInterface
      *
      * @tag #knockHandler #send #response
      */
-    public function send( ?RequestInterface $request = null ): Response
+    public function send(?RequestInterface $request = null): Response
     {
-        if ( $request ) $this->setupRequest($request);
+        if ($request) $this->setupRequest($request);
 
-        if ( !$this->_realRequest ) throw new InvalidRequestException();
-        
-        return $this->sendRequest( $this->_realRequest );
+        if ($this->_realRequest) {
+            return $this->sendRequest($this->_realRequest);
+        }
+
+        throw new InvalidRequestException();
     }
 
     /**
@@ -359,7 +366,7 @@ class Operator implements HandlerInterface
 
         $response = $this->constructResponse($response, $request);
 
-        if (  $error = curl_error($ch) ) {
+        if ($error = curl_error($ch)) {
             $response->addError($error);
         }
 
@@ -616,7 +623,7 @@ class Operator implements HandlerInterface
     public static function getInstance(string $host = null, array $commonRequestParams = []): static
     {
         if (static::$_instance === null) {
-            static::$_instance = new Operator( $host, $commonRequestParams );
+            static::$_instance = new Operator($host, $commonRequestParams);
         }
 
         return static::$_instance;
@@ -667,6 +674,7 @@ class Operator implements HandlerInterface
     {
         return $this->_realRequest ?? null;
     }
+
     /**
      * Получение обработчиков событий
      *
@@ -706,8 +714,7 @@ class Operator implements HandlerInterface
      */
     protected function sendRequest(Request $request): Response
     {
-        if ( $request->statusIsComplete() )
-        {
+        if ($request->statusIsComplete()) {
             throw new RequestCompleteException();
 
         } else {

@@ -13,10 +13,16 @@ declare(strict_types=1);
 namespace andy87\knock_knock;
 
 use andy87\knock_knock\lib\Method;
-use andy87\knock_knock\core\{ Operator, Response };
+use andy87\knock_knock\core\{Operator, Response};
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\exception\{ ParamUpdateException, ParamNotFoundException, InvalidEndpointException, operator\InvalidMethodException };
-use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
+use andy87\knock_knock\exception\{ParamUpdateException,
+    ParamNotFoundException,
+    InvalidEndpointException,
+    operator\InvalidMethodException};
+use andy87\knock_knock\exception\request\{InvalidHeaderException,
+    InvalidRequestException,
+    RequestCompleteException,
+    StatusNotFoundException};
 
 /**
  * Class KnockOctopus
@@ -224,7 +230,7 @@ class KnockKnockOctopus extends Operator
      */
     public function fakeResponse(array $fakeResponse, array $requestParams = []): Response
     {
-        $request =  $this->constructRequest(
+        $request = $this->constructRequest(
             Method::GET,
             '/',
             $requestParams

@@ -13,10 +13,13 @@ declare(strict_types=1);
 namespace andy87\knock_knock\tests\helpers;
 
 use andy87\knock_knock\lib\Method;
-use andy87\knock_knock\core\{ Operator, Request };
+use andy87\knock_knock\core\{Operator, Request};
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\exception\{ operator\InvalidMethodException, request\StatusNotFoundException };
-use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException, InvalidEndpointException, InvalidHostException };
+use andy87\knock_knock\exception\{operator\InvalidMethodException, request\StatusNotFoundException};
+use andy87\knock_knock\exception\{ParamNotFoundException,
+    ParamUpdateException,
+    InvalidEndpointException,
+    InvalidHostException};
 
 /**
  * Class PostmanEcho
@@ -67,7 +70,7 @@ abstract class PostmanEcho
      */
     public const ENDPOINT_BASIC_AUTH = '/basic-auth';
 
-    /** @var array  */
+    /** @var array */
     public const DATA = [
         23 => 'ab',
         'a' => 2,
@@ -88,7 +91,6 @@ abstract class PostmanEcho
     public static Operator $operator;
 
 
-
     /**
      * Возвращает объект `Handler` для работы с запросами к `postman-echo.com`
      *
@@ -99,10 +101,9 @@ abstract class PostmanEcho
      */
     public static function getOperatorInstance(): Operator
     {
-        if ( !isset(self::$operator) )
-        {
-            self::$operator = new Operator( self::HOST, [
-                RequestInterface::SETUP_PROTOCOL  => self::PROTOCOL,
+        if (!isset(self::$operator)) {
+            self::$operator = new Operator(self::HOST, [
+                RequestInterface::SETUP_PROTOCOL => self::PROTOCOL,
                 RequestInterface::SETUP_CURL_OPTIONS => [
                     CURLOPT_HEADER => false,
                     CURLOPT_RETURNTRANSFER => true
@@ -127,10 +128,10 @@ abstract class PostmanEcho
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException
      */
-    public static function constructRequest( string $method, string $endpoint, array $params = [] ): Request
+    public static function constructRequest(string $method, string $endpoint, array $params = []): Request
     {
         return self::getOperatorInstance()
-            ->constructRequest( $method, $endpoint, $params );
+            ->constructRequest($method, $endpoint, $params);
     }
 
     /**
@@ -142,9 +143,9 @@ abstract class PostmanEcho
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException
      */
-    public static function constructRequestMethodGet( array $params = [] ): Request
+    public static function constructRequestMethodGet(array $params = []): Request
     {
-        return self::constructRequest( Method::GET, self::ENDPOINT_GET, $params );
+        return self::constructRequest(Method::GET, self::ENDPOINT_GET, $params);
     }
 
     /**
@@ -156,9 +157,9 @@ abstract class PostmanEcho
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException
      */
-    public static function constructRequestMethodPost( array $params = [] ): Request
+    public static function constructRequestMethodPost(array $params = []): Request
     {
-        return self::constructRequest( Method::POST, self::ENDPOINT_POST, $params );
+        return self::constructRequest(Method::POST, self::ENDPOINT_POST, $params);
     }
 
     /**
@@ -170,9 +171,9 @@ abstract class PostmanEcho
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException
      */
-    public static function constructRequestMethodPut( array $params = [] ): Request
+    public static function constructRequestMethodPut(array $params = []): Request
     {
-        return self::constructRequest( Method::PUT, self::ENDPOINT_PUT, $params );
+        return self::constructRequest(Method::PUT, self::ENDPOINT_PUT, $params);
     }
 
     /**
@@ -184,9 +185,9 @@ abstract class PostmanEcho
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException
      */
-    public static function constructRequestMethodPatch( array $params = [] ): Request
+    public static function constructRequestMethodPatch(array $params = []): Request
     {
-        return self::constructRequest( Method::PATCH, self::ENDPOINT_PATCH, $params );
+        return self::constructRequest(Method::PATCH, self::ENDPOINT_PATCH, $params);
     }
 
     /**
@@ -198,8 +199,8 @@ abstract class PostmanEcho
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException
      */
-    public static function constructRequestMethodDelete( array $params = [] ): Request
+    public static function constructRequestMethodDelete(array $params = []): Request
     {
-        return self::constructRequest( Method::DELETE, self::ENDPOINT_DELETE, $params );
+        return self::constructRequest(Method::DELETE, self::ENDPOINT_DELETE, $params);
     }
 }

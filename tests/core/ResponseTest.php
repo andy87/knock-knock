@@ -13,11 +13,15 @@ declare(strict_types=1);
 namespace andy87\knock_knock\tests\core;
 
 use andy87\knock_knock\lib\Method;
-use andy87\knock_knock\core\{ Operator, Request, Response };
-use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
-use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
-use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\{ operator\InvalidMethodException,
+use andy87\knock_knock\core\{Operator, Request, Response};
+use andy87\knock_knock\tests\helpers\{PostmanEcho, UnitTestCore};
+use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
+use andy87\knock_knock\exception\{InvalidHostException,
+    InvalidEndpointException,
+    ParamNotFoundException,
+    ParamUpdateException
+};
+use andy87\knock_knock\exception\{operator\InvalidMethodException,
     request\InvalidHeaderException,
     request\InvalidRequestException,
     request\RequestCompleteException,
@@ -49,7 +53,6 @@ class ResponseTest extends UnitTestCore
     private Response $response;
 
 
-
     /**
      * Установки
      *
@@ -71,36 +74,36 @@ class ResponseTest extends UnitTestCore
      * Проверка создания объекта класса `Response`
      *      Тест ожидает, что объект будет создан
      *
-     * @see Response::__construct()
-     *
-     * 
-     *
      * @return void
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testConstructor
      *
      * @tag #test #response #constructor
+     * @see Response::__construct()
+     *
+     *
+     *
      */
     public function testConstructor(): void
     {
-        $this->assertInstanceOf(Operator::class, $this->operator );
-        $this->assertInstanceOf(Request::class, $this->request );
-        $this->assertInstanceOf(Response::class, $this->response );
+        $this->assertInstanceOf(Operator::class, $this->operator);
+        $this->assertInstanceOf(Request::class, $this->request);
+        $this->assertInstanceOf(Response::class, $this->response);
     }
 
     /**
      * Проверка геттеров объекта класса `Response`
      *      Тест ожидает, что геттеры вернут ожидаемые значения
      *
-     * Source: @see Response::__get()
-     *
-     * @return void
+     * Source: @return void
      *
      * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testMagicGet
      *
      * @tag #test #response #getter
+     * @see Response::__get()
+     *
      */
     public function testMagicGet()
     {
@@ -110,17 +113,17 @@ class ResponseTest extends UnitTestCore
             RequestInterface::SETUP_CURL_OPTIONS => self::CURL_OPTIONS,
         ]);
 
-        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request );
+        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request);
 
-        $this->assertEquals(self::HTTP_CODE_OK, $response->httpCode );
-        $this->assertEquals(self::CONTENT, $response->content );
+        $this->assertEquals(self::HTTP_CODE_OK, $response->httpCode);
+        $this->assertEquals(self::CONTENT, $response->content);
 
         $jsonOriginal = json_encode($request->params);
         $jsonResponse = json_encode($response->request->params);
-        $this->assertEquals( $jsonOriginal, $jsonResponse );
+        $this->assertEquals($jsonOriginal, $jsonResponse);
 
-        $this->assertEquals(self::CURL_INFO, $response->request->curlInfo );
-        $this->assertEquals(self::CURL_OPTIONS, $response->request->curlOptions );
+        $this->assertEquals(self::CURL_INFO, $response->request->curlInfo);
+        $this->assertEquals(self::CURL_OPTIONS, $response->request->curlOptions);
     }
 
     /**
@@ -130,12 +133,12 @@ class ResponseTest extends UnitTestCore
      *
      * @throws StatusNotFoundException|ParamUpdateException|InvalidEndpointException|ParamNotFoundException|InvalidMethodException|
      * @throws InvalidHeaderException|InvalidHostException|RequestCompleteException|InvalidRequestException
-     * 
+     *
      * @tag #test #response #setup #objects
      */
     private function setupObjects(): void
     {
-        $this->operator = new Operator(PostmanEcho::HOST,[
+        $this->operator = new Operator(PostmanEcho::HOST, [
             RequestInterface::SETUP_CURL_OPTIONS => [
                 CURLOPT_HEADER => false,
                 CURLOPT_RETURNTRANSFER => true,
@@ -146,7 +149,7 @@ class ResponseTest extends UnitTestCore
         $this->request = $this->operator
             ->constructRequest(Method::GET, PostmanEcho::ENDPOINT_GET, [
                 RequestInterface::SETUP_DATA => PostmanEcho::DATA,
-        ]);
+            ]);
 
         $this->response = $this->operator->send($this->request);
     }
@@ -155,25 +158,25 @@ class ResponseTest extends UnitTestCore
      * Проверка замены данных объекта класса `Response`
      *      Тест ожидает, что данные объекта будут заменены на новые
      *
-     * Source: @see Response::getHttpCode()
-     *
-     * @return void
+     * Source: @return void
      *
      * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testReplace
      *
      * @tag #test #response #getHttpCode
+     * @see Response::getHttpCode()
+     *
      */
     public function testReplace()
     {
         $request = new Request(PostmanEcho::ENDPOINT_GET, []);
         $this->assertInstanceOf(Request::class, $request);
 
-        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request );
+        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request);
         $this->assertInstanceOf(Response::class, $response);
 
-        $this->assertEquals(self::HTTP_CODE_OK, $response->httpCode );
+        $this->assertEquals(self::HTTP_CODE_OK, $response->httpCode);
         $this->assertEquals(self::CONTENT, $response->content);
 
         $newContent = 'new content';
@@ -182,37 +185,37 @@ class ResponseTest extends UnitTestCore
         $response->replace(ResponseInterface::CONTENT, $newContent);
         $response->replace(ResponseInterface::HTTP_CODE, $newHttpCode);
 
-        $this->assertEquals( $newHttpCode, $response->httpCode );
-        $this->assertEquals( $newContent, $response->content );
+        $this->assertEquals($newHttpCode, $response->httpCode);
+        $this->assertEquals($newContent, $response->content);
     }
 
     /**
      * Проверка метода asArray объекта класса `Response`
      *      Тест ожидает на выходе массив сформированный из данных JSON ответа
      *
-     * Source: @see Response::asArray()
-     *
-     * @return void
+     * Source: @return void
      *
      * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testAsArray
      *
      * @tag #test #response #asArray
+     * @see Response::asArray()
+     *
      */
     public function testAsArray()
     {
         $request = new Request(PostmanEcho::ENDPOINT_GET, []);
         $this->assertInstanceOf(Request::class, $request);
 
-        $response = new Response( self::CONTENT, self::HTTP_CODE_OK, $request );
+        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request);
         $this->assertInstanceOf(Response::class, $response);
 
-        $this->assertEquals(self::CONTENT, $response->content );
+        $this->assertEquals(self::CONTENT, $response->content);
 
         $response->asArray();
 
-        $this->assertEquals( json_decode(self::CONTENT, true), $response->content, "Ожидается, что контент будет преобразован в массив");
+        $this->assertEquals(json_decode(self::CONTENT, true), $response->content, "Ожидается, что контент будет преобразован в массив");
 
         $this->assertIsArray($response->content, "Ожидается, что контент будет преобразован в массив");
     }
@@ -222,23 +225,23 @@ class ResponseTest extends UnitTestCore
      *      Тест ожидает, что в начале у объекта нет ошибок, далее добавляет ошибку и проверяет,
      *      что readOnly свойство `errors` содержит одну ошибку
      *
-     * Source: @see Response::getErrors()
-     * Source: @see Response::addError()
-     *
-     * @return void
+     * Source: @return void
      *
      * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testGetErrors
      *
      * @tag #test #response #getErrors
+     * @see Response::getErrors()
+     * Source: @see Response::addError()
+     *
      */
     public function testGetErrors()
     {
         $request = new Request(PostmanEcho::ENDPOINT_GET, []);
         $this->assertInstanceOf(Request::class, $request);
 
-        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request );
+        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request);
         $this->assertInstanceOf(Response::class, $response);
 
         $this->assertEmpty($response->errors);
@@ -260,22 +263,22 @@ class ResponseTest extends UnitTestCore
      *      После добавления ошибки валидация вернет false
      *
      *
-     * Source: @see Response::validate()
-     *
-     * @return void
+     * Source: @return void
      *
      * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testValidate
      *
      * @tag #test #response #validate
+     * @see Response::validate()
+     *
      */
     public function testValidate()
     {
         $request = new Request(PostmanEcho::ENDPOINT_GET, []);
         $this->assertInstanceOf(Request::class, $request);
 
-        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request );
+        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request);
         $this->assertInstanceOf(Response::class, $response);
 
         $this->assertTrue($response->validate(), "Ожидается, что валидация пройдет успешно");
@@ -289,9 +292,7 @@ class ResponseTest extends UnitTestCore
      * Проверка метода setupData объекта класса `Response`
      *      Тест ожидает, что данные объекта будут заменены на новые
      *
-     * Source: @see Response::getData()
-     * Source: @see Response::setupData()
-     * Source: @see Response::convertDataToArray()
+     * Source: @return void
      *
      * @return void
      *
@@ -300,34 +301,36 @@ class ResponseTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testSetupData
      *
      * @tag #test #response #setupData
-     */
-    public function testSetupData()
-    {
-        $request = new Request(PostmanEcho::ENDPOINT_GET, []);
-        $this->assertInstanceOf(Request::class, $request);
-
-        $content = 'testSetupData Content';
-
-        $response = new Response($content, self::HTTP_CODE_OK, $request );
-        $this->assertInstanceOf(Response::class, $response);
-
-        $this->assertEquals($content, $response->content, "Ожидается, что контент будет равен '$content'");
-    }
-
-    /**
-     * Проверка метода setupHttpCode объекта класса `Response`
-     *      Тест ожидает, что код ответа будет заменен на новый
-     *
-     * Source: @see Response::getHttpCode()
-     * Source: @see Response::setupHttpCode()
-     *
-     * @return void
-     *
      * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testSetupHttpCode
      *
      * @tag #test #response #setupHttpCode
+     * @see Response::setupData()
+     * Source:/
+     * public function testSetupData()
+     * {
+     * $request = new Request(PostmanEcho::ENDPOINT_GET, []);
+     * $this->assertInstanceOf(Request::class, $request);
+     *
+     * $content = 'testSetupData Content';
+     *
+     * $response = new Response($content, self::HTTP_CODE_OK, $request );
+     * $this->assertInstanceOf(Response::class, $response);
+     *
+     * $this->assertEquals($content, $response->content, "Ожидается, что контент будет равен '$content'");
+     * }
+     *
+     * /**
+     * Проверка метода setupHttpCode объекта класса `Response`
+     *      Тест ожидает, что код ответа будет заменен на новый
+     *
+     * Source: @see Response::convertDataToArray()
+     *
+     * @see Response::getData()
+     * Source: @see Response::getHttpCode()
+     * Source: @see Response::setupHttpCode()
+     *
      */
     public function testSetupHttpCode()
     {
@@ -336,20 +339,17 @@ class ResponseTest extends UnitTestCore
 
         $newHttpCode = 777;
 
-        $response = new Response(self::CONTENT, $newHttpCode, $request );
+        $response = new Response(self::CONTENT, $newHttpCode, $request);
         $this->assertInstanceOf(Response::class, $response);
 
-        $this->assertEquals( $newHttpCode, $response->httpCode, "Ожидается, что код ответа будет равен $newHttpCode");
+        $this->assertEquals($newHttpCode, $response->httpCode, "Ожидается, что код ответа будет равен $newHttpCode");
     }
 
     /**
      * Проверка метода setupRequest объекта класса `Response`
      *      Тест ожидает, что объект запроса будет заменен на новый
      *
-     * Source: @see Response::getRequest()
-     * Source: @see Response::setupRequest()
-     *
-     * @return void
+     * Source: @return void
      *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testSetupRequest
      *
@@ -360,12 +360,12 @@ class ResponseTest extends UnitTestCore
         $request = new Request(PostmanEcho::ENDPOINT_GET, self::PARAMS);
         $this->assertInstanceOf(Request::class, $request);
 
-        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request );
+        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request);
         $this->assertInstanceOf(Response::class, $response);
 
         $originalRequestParams = json_encode($request->params);
         $responseRequestParams = json_encode($response->request->params);
 
-        $this->assertEquals( $originalRequestParams, $responseRequestParams, "Ожидается, что параметры запроса будут равны");
+        $this->assertEquals($originalRequestParams, $responseRequestParams, "Ожидается, что параметры запроса будут равны");
     }
 }

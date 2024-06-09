@@ -14,18 +14,22 @@ namespace andy87\knock_knock\tests\core;
 
 use Exception;
 use ReflectionClass;
-use andy87\knock_knock\lib\{ ContentType, Method };
+use andy87\knock_knock\lib\{ContentType, Method};
 use andy87\knock_knock\tests\helpers\OperatorExample;
-use andy87\knock_knock\core\{ Operator, Request, Response };
-use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
-use andy87\knock_knock\interfaces\{ HandlerInterface, RequestInterface, ResponseInterface };
-use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
+use andy87\knock_knock\core\{Operator, Request, Response};
+use andy87\knock_knock\tests\helpers\{PostmanEcho, UnitTestCore};
+use andy87\knock_knock\interfaces\{HandlerInterface, RequestInterface, ResponseInterface};
+use andy87\knock_knock\exception\{InvalidHostException,
+    InvalidEndpointException,
+    ParamNotFoundException,
+    ParamUpdateException};
 use andy87\knock_knock\exception\{operator\EventUpdateException,
     operator\InvalidMethodException,
     request\InvalidHeaderException,
     request\InvalidRequestException,
     request\RequestCompleteException,
-    request\StatusNotFoundException};
+    request\StatusNotFoundException
+};
 
 /**
  * Class HandlerTest
@@ -65,12 +69,12 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testConstructor
      *
      * @tag #test #Handler #constructor
-     *@see Operator::__construct()
+     * @see Operator::__construct()
      *
      */
     public function testConstructor(): void
     {
-        $this->assertInstanceOf(Operator::class, $this->operator );
+        $this->assertInstanceOf(Operator::class, $this->operator);
     }
 
     /**
@@ -84,14 +88,14 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testGetInstance
      *
      * @tag #test #Handler #get #instance
-     *@see Operator::getInstance()
+     * @see Operator::getInstance()
      *
      */
     public function testGetInstance(): void
     {
-        $operator = Operator::getInstance(self::HOST );
+        $operator = Operator::getInstance(self::HOST);
 
-        $this->assertInstanceOf(Operator::class, $operator );
+        $this->assertInstanceOf(Operator::class, $operator);
 
         $operator->disableSSL();
 
@@ -99,12 +103,12 @@ class OperatorTest extends UnitTestCore
         // -> статический метод должен вернуть тот же объект
         $operator = Operator::getInstance();
 
-        $this->assertInstanceOf(Operator::class, $operator );
+        $this->assertInstanceOf(Operator::class, $operator);
 
         $request = $operator->commonRequest;
 
-        $this->assertArrayHasKey(CURLOPT_SSL_VERIFYPEER, $request->curlOptions );
-        $this->assertArrayHasKey(CURLOPT_SSL_VERIFYHOST, $request->curlOptions );
+        $this->assertArrayHasKey(CURLOPT_SSL_VERIFYPEER, $request->curlOptions);
+        $this->assertArrayHasKey(CURLOPT_SSL_VERIFYHOST, $request->curlOptions);
     }
 
     /**
@@ -121,16 +125,16 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testValidateHostName
      *
      * @tag #test #Handler #validate #hostName
-     *@see Operator::validateHostName()
+     * @see          Operator::validateHostName()
      *
      * @dataProvider hostNameProvider
      *
      */
-    public function testValidateHostName( string $host, bool $expected ): void
+    public function testValidateHostName(string $host, bool $expected): void
     {
         $result = Operator::validateHostName($host);
 
-        $this->assertEquals( $expected, $result );
+        $this->assertEquals($expected, $result);
     }
 
     /**
@@ -139,7 +143,7 @@ class OperatorTest extends UnitTestCore
      * Data: @return array[]
      *
      * @tag #test #Handler #provider #validate #hostName
-     *@see OperatorTest::testValidateHostName()
+     * @see OperatorTest::testValidateHostName()
      *
      */
     public static function hostNameProvider(): array
@@ -175,14 +179,14 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testEventInit
      *
      * @tag #test #Handler #event #init
-     *@see Operator::init()
+     * @see Operator::init()
      *
      */
     public function testEventInit()
     {
         $this->getOperatorExample();
 
-        $this->assertEquals(OperatorExample::INIT_DONE, OperatorExample::$initResult );
+        $this->assertEquals(OperatorExample::INIT_DONE, OperatorExample::$initResult);
     }
 
     /**
@@ -196,7 +200,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testGetter
      *
      * @tag #test #Handler #get
-     *@see Operator::__get()
+     * @see Operator::__get()
      *
      */
     public function testGetter()
@@ -206,15 +210,15 @@ class OperatorTest extends UnitTestCore
         $this->assertInstanceOf(Request::class, $operator->commonRequest);
 
         $request = $this->getRequest();
-        $this->assertInstanceOf(Request::class, $request );
+        $this->assertInstanceOf(Request::class, $request);
 
-        $operator->setupRequest( $request );
-        $this->assertInstanceOf(Request::class, $operator->realRequest );
+        $operator->setupRequest($request);
+        $this->assertInstanceOf(Request::class, $operator->realRequest);
         $this->assertCount(6, $operator->eventHandlers);
 
         $operator->addLog('test');
-        $this->assertIsArray( $operator->logs );
-        $this->assertCount(1, $operator->logs );
+        $this->assertIsArray($operator->logs);
+        $this->assertCount(1, $operator->logs);
     }
 
     /**
@@ -228,7 +232,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testGetParams
      *
      * @tag #test #Handler #get #params
-     *@see Operator::getParams()
+     * @see Operator::getParams()
      *
      */
     public function testGetParams()
@@ -241,10 +245,10 @@ class OperatorTest extends UnitTestCore
             RequestInterface::SETUP_METHOD => Method::PUT,
         ];
 
-        $operator = $this->getHandler( $apiUrl, $requestCommon );
+        $operator = $this->getHandler($apiUrl, $requestCommon);
 
         $events = [
-            HandlerInterface::EVENT_AFTER_INIT => function() {
+            HandlerInterface::EVENT_AFTER_INIT => function () {
                 return HandlerInterface::EVENT_AFTER_INIT;
             },
         ];
@@ -253,26 +257,26 @@ class OperatorTest extends UnitTestCore
 
         $requestRealParams = [
             RequestInterface::SETUP_METHOD => Method::POST,
-            RequestInterface::SETUP_CURL_INFO => [ 'info' => 'real' ]
+            RequestInterface::SETUP_CURL_INFO => ['info' => 'real']
         ];
 
-        $requestReal = $operator->constructRequest(Method::POST, '/endpointReal', $requestRealParams );
+        $requestReal = $operator->constructRequest(Method::POST, '/endpointReal', $requestRealParams);
 
-        $operator->setupRequest( $requestReal );
+        $operator->setupRequest($requestReal);
 
         $params = $operator->getParams();
 
-        $this->assertArrayHasKey(HandlerInterface::PARAM_HOST, $params );
-        $this->assertEquals( $host, $params[HandlerInterface::PARAM_HOST] );
-        $this->assertEquals( $protocol, $requestReal->protocol );
+        $this->assertArrayHasKey(HandlerInterface::PARAM_HOST, $params);
+        $this->assertEquals($host, $params[HandlerInterface::PARAM_HOST]);
+        $this->assertEquals($protocol, $requestReal->protocol);
 
-        $this->assertArrayHasKey(HandlerInterface::PARAM_COMMON_REQUEST, $params );
-        $this->assertInstanceOf(Request::class, $params[HandlerInterface::PARAM_COMMON_REQUEST] );
+        $this->assertArrayHasKey(HandlerInterface::PARAM_COMMON_REQUEST, $params);
+        $this->assertInstanceOf(Request::class, $params[HandlerInterface::PARAM_COMMON_REQUEST]);
 
-        $this->assertArrayHasKey(HandlerInterface::PARAM_REAL_REQUEST, $params );
-        $this->assertInstanceOf(Request::class, $params[HandlerInterface::PARAM_REAL_REQUEST] );
+        $this->assertArrayHasKey(HandlerInterface::PARAM_REAL_REQUEST, $params);
+        $this->assertInstanceOf(Request::class, $params[HandlerInterface::PARAM_REAL_REQUEST]);
 
-        $this->assertArrayHasKey(HandlerInterface::PARAM_EVENT_HANDLERS, $params );
+        $this->assertArrayHasKey(HandlerInterface::PARAM_EVENT_HANDLERS, $params);
         $this->assertSameSize($events, $params[HandlerInterface::PARAM_EVENT_HANDLERS]);
     }
 
@@ -288,33 +292,33 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testConstruct
      *
      * @tag #test #Handler #construct
-     *@see Operator::constructRequest()
+     * @see Operator::constructRequest()
      * Source: @see Operator::constructResponse()
      *
      */
-    public function testConstruct():void
+    public function testConstruct(): void
     {
         $operator = $this->operator;
 
         $this->assertEquals(self::HOST, $operator->host);
 
-        $operator->on(HandlerInterface::EVENT_CONSTRUCT_REQUEST, function(Operator $operator) {
+        $operator->on(HandlerInterface::EVENT_CONSTRUCT_REQUEST, function (Operator $operator) {
             $operator->addLog(HandlerInterface::EVENT_CONSTRUCT_REQUEST);
         });
-        $operator->on(HandlerInterface::EVENT_CONSTRUCT_RESPONSE, function(Operator $operator) {
+        $operator->on(HandlerInterface::EVENT_CONSTRUCT_RESPONSE, function (Operator $operator) {
             $operator->addLog(HandlerInterface::EVENT_CONSTRUCT_RESPONSE);
         });
 
-        $request = $operator->constructRequest( Method::GET, self::ENDPOINT );
-        $this->assertInstanceOf(Request::class, $request );
+        $request = $operator->constructRequest(Method::GET, self::ENDPOINT);
+        $this->assertInstanceOf(Request::class, $request);
         $this->assertTrue(in_array(HandlerInterface::EVENT_CONSTRUCT_REQUEST, $operator->logs));
 
         $response = $operator->constructResponse([
             ResponseInterface::CONTENT => 'content',
             ResponseInterface::HTTP_CODE => 200,
-        ], $request );
+        ], $request);
 
-        $this->assertInstanceOf(Response::class, $response );
+        $this->assertInstanceOf(Response::class, $response);
 
         $this->assertTrue(in_array(HandlerInterface::EVENT_CONSTRUCT_RESPONSE, $operator->logs));
     }
@@ -330,7 +334,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testSetupRequest
      *
      * @tag #test #Handler #setup #request
-     *@see Operator::setupRequest()
+     * @see Operator::setupRequest()
      *
      */
     public function testSetupRequest()
@@ -341,18 +345,18 @@ class OperatorTest extends UnitTestCore
             RequestInterface::SETUP_DATA => self::DATA_A
         ]);
 
-        $operator->setupRequest( $request );
-        $this->assertInstanceOf( Request::class, $operator->realRequest );
-        $this->assertEquals( json_encode(self::DATA_A), json_encode($operator->realRequest->data) );
+        $operator->setupRequest($request);
+        $this->assertInstanceOf(Request::class, $operator->realRequest);
+        $this->assertEquals(json_encode(self::DATA_A), json_encode($operator->realRequest->data));
 
         // Проверка с перезаписью и добавлением свойств
-        $operator->setupRequest( $request, [
+        $operator->setupRequest($request, [
             RequestInterface::SETUP_DATA => self::DATA_B,
             RequestInterface::SETUP_CONTENT_TYPE => ContentType::RAR
         ]);
 
-        $this->assertEquals( json_encode(self::DATA_B), json_encode($operator->realRequest->data) );
-        $this->assertEquals( ContentType::RAR, $operator->realRequest->contentType );
+        $this->assertEquals(json_encode(self::DATA_B), json_encode($operator->realRequest->data));
+        $this->assertEquals(ContentType::RAR, $operator->realRequest->contentType);
     }
 
     /**
@@ -365,7 +369,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testSetupEventHandlers
      *
      * @tag #test #Handler #setup #eventHandlers
-     *@see Operator::setupEventHandlers()
+     * @see Operator::setupEventHandlers()
      *
      */
     public function testSetupEventHandlers()
@@ -374,27 +378,27 @@ class OperatorTest extends UnitTestCore
 
         $operator->setupEventHandlers([]);
 
-        $this->assertIsArray( $operator->eventHandlers );
+        $this->assertIsArray($operator->eventHandlers);
         $this->assertCount(0, $operator->eventHandlers);
 
         $eventList = [
-            HandlerInterface::EVENT_AFTER_INIT => function() {
+            HandlerInterface::EVENT_AFTER_INIT => function () {
                 return HandlerInterface::EVENT_AFTER_INIT;
             },
-            HandlerInterface::EVENT_CONSTRUCT_REQUEST => function() {
+            HandlerInterface::EVENT_CONSTRUCT_REQUEST => function () {
                 return HandlerInterface::EVENT_CONSTRUCT_REQUEST;
             },
-            HandlerInterface::EVENT_CONSTRUCT_RESPONSE => function() {
+            HandlerInterface::EVENT_CONSTRUCT_RESPONSE => function () {
                 return HandlerInterface::EVENT_CONSTRUCT_RESPONSE;
             },
         ];
 
         $callBackList = $operator->setupEventHandlers($eventList);
 
-        $this->assertSameSize( $callBackList, $eventList );
+        $this->assertSameSize($callBackList, $eventList);
 
-        $this->assertIsArray( $operator->eventHandlers );
-        $this->assertSameSize( $eventList, $operator->eventHandlers );
+        $this->assertIsArray($operator->eventHandlers);
+        $this->assertSameSize($eventList, $operator->eventHandlers);
     }
 
     /**
@@ -407,16 +411,17 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testEventsOn
      *
      * @tag #test #Handler #event #on
-     *@see Operator::on()
+     * @see Operator::on()
      *
      */
     public function testEventsOn()
     {
         $operatorExample = $this->getOperatorExample();
 
-        $operatorExample->on(OperatorExample::MY_EVENT, function() {});
+        $operatorExample->on(OperatorExample::MY_EVENT, function () {
+        });
 
-        $this->assertArrayHasKey(OperatorExample::MY_EVENT, $operatorExample->eventHandlers );
+        $this->assertArrayHasKey(OperatorExample::MY_EVENT, $operatorExample->eventHandlers);
     }
 
     /**
@@ -429,7 +434,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testEventCall
      *
      * @tag #test #Handler #event #call
-     *@see Operator::event()
+     * @see Operator::event()
      *
      */
     public function testEventCall()
@@ -441,15 +446,15 @@ class OperatorTest extends UnitTestCore
 
         $operatorExample = $this->getOperatorExample();
 
-        $operatorExample->on(OperatorExample::MY_EVENT, function(Operator $operator) {
+        $operatorExample->on(OperatorExample::MY_EVENT, function (Operator $operator) {
             $operator->addLog(OperatorExample::MY_EVENT);
         });
 
         /** Проверка на вызов `event()` через `callEventHandler` */
         $operatorExample->callEventHandler(OperatorExample::MY_EVENT);
 
-        $this->assertCount(1, $operatorExample->logs, "Ожидается что после вызова `callEventHandler` в лог запишутся данные " );
-        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[0], "Ожидается что значение в `logs[0]` будет равно значению `HandlerExample::MY_EVENT` " );
+        $this->assertCount(1, $operatorExample->logs, "Ожидается что после вызова `callEventHandler` в лог запишутся данные ");
+        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[0], "Ожидается что значение в `logs[0]` будет равно значению `HandlerExample::MY_EVENT` ");
     }
 
     /**
@@ -462,7 +467,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testEventOff
      *
      * @tag #test #Handler #event #off
-     *@see Operator::off()
+     * @see Operator::off()
      *
      */
     public function testEventOff()
@@ -470,21 +475,21 @@ class OperatorTest extends UnitTestCore
         $operatorExample = $this->getOperatorExample();
 
         $operatorExample->on(OperatorExample::MY_EVENT,
-            function( Operator $operator) {
+            function (Operator $operator) {
                 $operator->addLog(OperatorExample::MY_EVENT);
             }
         );
 
         $operatorExample->callEventHandler(OperatorExample::MY_EVENT);
 
-        $this->assertCount(1, $operatorExample->logs );
-        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[0] );
+        $this->assertCount(1, $operatorExample->logs);
+        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[0]);
 
         $operatorExample->off(OperatorExample::MY_EVENT);
 
         $operatorExample->callEventHandler(OperatorExample::MY_EVENT);
 
-        $this->assertCount(1, $operatorExample->logs );
+        $this->assertCount(1, $operatorExample->logs);
     }
 
     /**
@@ -497,7 +502,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testEventChange
      *
      * @tag #test #Handler #event #change
-     *@see Operator::changeEvent()
+     * @see Operator::changeEvent()
      *
      */
     public function testEventChange()
@@ -505,42 +510,42 @@ class OperatorTest extends UnitTestCore
         $operatorExample = $this->getOperatorExample();
 
         $operatorExample->on(OperatorExample::MY_EVENT,
-            function( Operator $operator) {
+            function (Operator $operator) {
                 $operator->addLog(OperatorExample::MY_EVENT);
             }
         );
 
         $operatorExample->callEventHandler(OperatorExample::MY_EVENT);
 
-        $this->assertCount(1, $operatorExample->logs );
-        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[0] );
+        $this->assertCount(1, $operatorExample->logs);
+        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[0]);
 
 
         $this->expectException(Exception::class);
 
         $operatorExample->on(OperatorExample::MY_EVENT,
-            function( Operator $operator) {
-            $operator->addLog(OperatorExample::MY_EVENT);
-            $operator->addLog(OperatorExample::MY_EVENT);
-            $operator->addLog(OperatorExample::MY_EVENT);
-        });
-
-        $operatorExample->callEventHandler(OperatorExample::MY_EVENT);
-
-        $this->assertCount(2, $operatorExample->logs );
-        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[1] );
-
-        $operatorExample->changeEvent(OperatorExample::MY_EVENT,
-            function( Operator $operator) {
-                $operator->addLog(OperatorExample::MY_EVENT . '3' );
-                $operator->addLog(OperatorExample::MY_EVENT . '4' );
+            function (Operator $operator) {
+                $operator->addLog(OperatorExample::MY_EVENT);
+                $operator->addLog(OperatorExample::MY_EVENT);
+                $operator->addLog(OperatorExample::MY_EVENT);
             });
 
         $operatorExample->callEventHandler(OperatorExample::MY_EVENT);
 
-        $this->assertCount(4, $operatorExample->logs );
-        $this->assertEquals(OperatorExample::MY_EVENT . '3', $operatorExample->logs[3] );
-        $this->assertEquals(OperatorExample::MY_EVENT . '4', $operatorExample->logs[4] );
+        $this->assertCount(2, $operatorExample->logs);
+        $this->assertEquals(OperatorExample::MY_EVENT, $operatorExample->logs[1]);
+
+        $operatorExample->changeEvent(OperatorExample::MY_EVENT,
+            function (Operator $operator) {
+                $operator->addLog(OperatorExample::MY_EVENT . '3');
+                $operator->addLog(OperatorExample::MY_EVENT . '4');
+            });
+
+        $operatorExample->callEventHandler(OperatorExample::MY_EVENT);
+
+        $this->assertCount(4, $operatorExample->logs);
+        $this->assertEquals(OperatorExample::MY_EVENT . '3', $operatorExample->logs[3]);
+        $this->assertEquals(OperatorExample::MY_EVENT . '4', $operatorExample->logs[4]);
 
     }
 
@@ -553,7 +558,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testDisableSsl
      *
      * @tag #test #Handler #ssl #disable
-     *@see Operator::disableSSL()
+     * @see Operator::disableSSL()
      *
      */
     public function testDisableSsl()
@@ -567,8 +572,8 @@ class OperatorTest extends UnitTestCore
             self::ENDPOINT
         );
 
-        $this->assertTrue( $request->curlOptions[CURLOPT_SSL_VERIFYPEER] === false );
-        $this->assertTrue( $request->curlOptions[CURLOPT_SSL_VERIFYHOST] === 0 );
+        $this->assertTrue($request->curlOptions[CURLOPT_SSL_VERIFYPEER] === false);
+        $this->assertTrue($request->curlOptions[CURLOPT_SSL_VERIFYHOST] === 0);
     }
 
     /**
@@ -580,7 +585,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testEnableSsl
      *
      * @tag #test #Handler #ssl #enable
-     *@see Operator::enableSSL()
+     * @see Operator::enableSSL()
      *
      */
     public function testEnableSsl()
@@ -595,8 +600,8 @@ class OperatorTest extends UnitTestCore
             self::ENDPOINT
         );
 
-        $this->assertTrue( $request->curlOptions[CURLOPT_SSL_VERIFYPEER] === true );
-        $this->assertTrue( $request->curlOptions[CURLOPT_SSL_VERIFYHOST] === 2 );
+        $this->assertTrue($request->curlOptions[CURLOPT_SSL_VERIFYPEER] === true);
+        $this->assertTrue($request->curlOptions[CURLOPT_SSL_VERIFYHOST] === 2);
     }
 
     /**
@@ -607,7 +612,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testEnableRedirect
      *
      * @tag #test #Handler #redirect #enable
-     *@see Operator::enableRedirect()
+     * @see Operator::enableRedirect()
      *
      */
     public function testEnableRedirect()
@@ -621,7 +626,7 @@ class OperatorTest extends UnitTestCore
             self::ENDPOINT
         );
 
-        $this->assertTrue( $request->curlOptions[CURLOPT_FOLLOWLOCATION] === true );
+        $this->assertTrue($request->curlOptions[CURLOPT_FOLLOWLOCATION] === true);
     }
 
     /**
@@ -632,7 +637,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testUseCookie
      *
      * @tag #test #Handler #cookie
-     *@see Operator::UseCookie()
+     * @see Operator::UseCookie()
      *
      */
     public function testUseCookie()
@@ -643,27 +648,27 @@ class OperatorTest extends UnitTestCore
         $jar = 'jar.txt';
         $file = 'file.txt';
 
-        $operator->useCookie( $cookie, $jar );
+        $operator->useCookie($cookie, $jar);
 
         $request = $operator->constructRequest(
             Method::GET,
             self::ENDPOINT
         );
 
-        $this->assertTrue( $request->curlOptions[CURLOPT_COOKIE] === $cookie );
-        $this->assertTrue( $request->curlOptions[CURLOPT_COOKIEJAR] === $jar );
-        $this->assertTrue( $request->curlOptions[CURLOPT_COOKIEFILE] === $jar );
+        $this->assertTrue($request->curlOptions[CURLOPT_COOKIE] === $cookie);
+        $this->assertTrue($request->curlOptions[CURLOPT_COOKIEJAR] === $jar);
+        $this->assertTrue($request->curlOptions[CURLOPT_COOKIEFILE] === $jar);
 
-        $operator->useCookie( $cookie, $jar, $file );
+        $operator->useCookie($cookie, $jar, $file);
 
         $request = $operator->constructRequest(
             Method::GET,
             self::ENDPOINT
         );
 
-        $this->assertTrue( $request->curlOptions[CURLOPT_COOKIE] === $cookie );
-        $this->assertTrue( $request->curlOptions[CURLOPT_COOKIEJAR] === $jar );
-        $this->assertTrue( $request->curlOptions[CURLOPT_COOKIEFILE] === $file );
+        $this->assertTrue($request->curlOptions[CURLOPT_COOKIE] === $cookie);
+        $this->assertTrue($request->curlOptions[CURLOPT_COOKIEJAR] === $jar);
+        $this->assertTrue($request->curlOptions[CURLOPT_COOKIEFILE] === $file);
     }
 
     /**
@@ -682,10 +687,10 @@ class OperatorTest extends UnitTestCore
     public function testSendRequestWithFakeResponse(): void
     {
         $operator = PostmanEcho::getOperatorInstance();
-        $this->assertInstanceOf(Operator::class, $operator );
+        $this->assertInstanceOf(Operator::class, $operator);
 
         $request = PostmanEcho::constructRequestMethodGet();
-        $this->assertInstanceOf(Request::class, $request );
+        $this->assertInstanceOf(Request::class, $request);
 
         $fakeResponse = [
             ResponseInterface::CONTENT => json_encode(PostmanEcho::DATA),
@@ -693,11 +698,11 @@ class OperatorTest extends UnitTestCore
         ];
         $request->setFakeResponse($fakeResponse);
 
-        $response = $operator->send( $request );
-        $this->assertInstanceOf(Response::class, $response );
+        $response = $operator->send($request);
+        $this->assertInstanceOf(Response::class, $response);
 
-        $this->assertEquals($fakeResponse[ ResponseInterface::CONTENT ], $response->content );
-        $this->assertEquals($fakeResponse[ ResponseInterface::HTTP_CODE ], $response->httpCode );
+        $this->assertEquals($fakeResponse[ResponseInterface::CONTENT], $response->content);
+        $this->assertEquals($fakeResponse[ResponseInterface::HTTP_CODE], $response->httpCode);
     }
 
     /**
@@ -715,21 +720,21 @@ class OperatorTest extends UnitTestCore
     public function testSendRequestOnMethodPost(): void
     {
         $operator = PostmanEcho::getOperatorInstance();
-        $this->assertInstanceOf(Operator::class, $operator );
+        $this->assertInstanceOf(Operator::class, $operator);
 
-    $data = PostmanEcho::DATA;
+        $data = PostmanEcho::DATA;
 
         $request = PostmanEcho::constructRequestMethodPost([
             RequestInterface::SETUP_DATA => $data,
             RequestInterface::SETUP_CONTENT_TYPE => ContentType::JSON
         ]);
-        $this->assertInstanceOf(Request::class, $request );
+        $this->assertInstanceOf(Request::class, $request);
 
         $response = $operator->send($request);
 
-        $this->assertInstanceOf(Response::class, $response );
+        $this->assertInstanceOf(Response::class, $response);
 
-        $content = json_decode( $response->content, true );
+        $content = json_decode($response->content, true);
 
         /** @see PostmanEcho::ENDPOINT_POST */
         $this->assertArrayHasKey(PostmanEcho::GET_KEY_ARGS, $content);
@@ -740,28 +745,27 @@ class OperatorTest extends UnitTestCore
         $this->assertArrayHasKey(PostmanEcho::GET_KEY_JSON, $content);
         $this->assertArrayHasKey(PostmanEcho::GET_KEY_URL, $content);
 
-        $this->assertEquals( $response->request->url, $content[PostmanEcho::GET_KEY_URL] );
-        $this->assertEquals( Method::POST, $response->request->method );
+        $this->assertEquals($response->request->url, $content[PostmanEcho::GET_KEY_URL]);
+        $this->assertEquals(Method::POST, $response->request->method);
     }
-
 
 
     /**
      * Ожидается что метод `updateRequestParams` обновит параметры запроса.
      * Вызов метода `updateRequestParams` с новыми параметрами произойдет внутри метода `setupRequest`
      *
-     * Source: @see Operator::updateRequestParams()
-     *
-     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException|InvalidHeaderException
+     * Source: @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException|InvalidHeaderException
      *
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testUpdateRequestParams
      *
      * @tag #test #Handler #update #requestParams
+     * @see Operator::updateRequestParams()
+     *
      */
     public function testUpdateRequestParams()
     {
-        $operator = $this->getHandler(self::HOST );
-        $this->assertInstanceOf(Operator::class, $operator );
+        $operator = $this->getHandler(self::HOST);
+        $this->assertInstanceOf(Operator::class, $operator);
 
         $oldData = [
             RequestInterface::SETUP_PROTOCOL => Request::PROTOCOL_HTTP,
@@ -781,8 +785,8 @@ class OperatorTest extends UnitTestCore
         ];
 
 
-        $request = $operator->constructRequest( Method::GET, '/tyda', $oldData );
-        $this->assertInstanceOf(Request::class, $request );
+        $request = $operator->constructRequest(Method::GET, '/tyda', $oldData);
+        $this->assertInstanceOf(Request::class, $request);
 
         $newData = [
             RequestInterface::SETUP_PROTOCOL => Request::PROTOCOL_HTTPS,
@@ -801,41 +805,41 @@ class OperatorTest extends UnitTestCore
             RequestInterface::SETUP_CONTENT_TYPE => ContentType::XML,
         ];
 
-        $request = $operator->setupRequest( $request, $newData )->realRequest;
+        $request = $operator->setupRequest($request, $newData)->realRequest;
 
-        $this->assertEquals( $newData[RequestInterface::SETUP_PROTOCOL], $request->protocol );
-        $this->assertEquals( $newData[RequestInterface::SETUP_HOST], $request->host );
-        $this->assertEquals( $newData[RequestInterface::SETUP_METHOD], $request->method );
-        $this->assertEquals( $newData[RequestInterface::SETUP_HEADERS]['Content-Type'], $request->headers['Content-Type'] );
-        $this->assertEquals( $newData[RequestInterface::SETUP_DATA]['state'], $request->data['state'] );
-        $this->assertEquals( $newData[RequestInterface::SETUP_CURL_OPTIONS][CURLOPT_HEADER], $request->curlOptions[CURLOPT_HEADER] );
-        $this->assertEquals( $newData[RequestInterface::SETUP_CURL_INFO]['info'], $request->curlInfo['info'] );
-        $this->assertEquals( $newData[RequestInterface::SETUP_CONTENT_TYPE], $request->contentType );
+        $this->assertEquals($newData[RequestInterface::SETUP_PROTOCOL], $request->protocol);
+        $this->assertEquals($newData[RequestInterface::SETUP_HOST], $request->host);
+        $this->assertEquals($newData[RequestInterface::SETUP_METHOD], $request->method);
+        $this->assertEquals($newData[RequestInterface::SETUP_HEADERS]['Content-Type'], $request->headers['Content-Type']);
+        $this->assertEquals($newData[RequestInterface::SETUP_DATA]['state'], $request->data['state']);
+        $this->assertEquals($newData[RequestInterface::SETUP_CURL_OPTIONS][CURLOPT_HEADER], $request->curlOptions[CURLOPT_HEADER]);
+        $this->assertEquals($newData[RequestInterface::SETUP_CURL_INFO]['info'], $request->curlInfo['info']);
+        $this->assertEquals($newData[RequestInterface::SETUP_CONTENT_TYPE], $request->contentType);
     }
 
     /**
      * Ожидается что метод `updatePostFields` задаст `CURLOPT_POSTFIELDS` свойство запроса
      *
-     * Source: @see Operator::updatePostFields()
-     *
-     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException
+     * Source: @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException
      * @throws InvalidMethodException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testUpdatePostFields
      *
      * @tag #test #Handler #update #postFields
+     * @see Operator::updatePostFields()
+     *
      */
     public function testUpdatePostFields()
     {
         $operator = $this->getHandler(self::HOST, []);
-        $this->assertInstanceOf(Operator::class, $operator );
+        $this->assertInstanceOf(Operator::class, $operator);
 
         $postFields = [
             'a' => 1,
             'b' => 2,
         ];
 
-        $request = $operator->constructRequest(Method::POST,self::ENDPOINT, [
+        $request = $operator->constructRequest(Method::POST, self::ENDPOINT, [
             RequestInterface::SETUP_DATA => $postFields,
             RequestInterface::SETUP_CONTENT_TYPE => ContentType::JSON
         ]);
@@ -849,9 +853,9 @@ class OperatorTest extends UnitTestCore
 
         $responsePostFields = $response->request->curlOptions[CURLOPT_POSTFIELDS];
 
-        $this->assertEquals( json_encode($postFields), $responsePostFields );
+        $this->assertEquals(json_encode($postFields), $responsePostFields);
 
-        $request = $operator->constructRequest(Method::PUT,self::ENDPOINT, [
+        $request = $operator->constructRequest(Method::PUT, self::ENDPOINT, [
             RequestInterface::SETUP_DATA => $postFields,
             RequestInterface::SETUP_CONTENT_TYPE => ContentType::FORM
         ]);
@@ -865,7 +869,7 @@ class OperatorTest extends UnitTestCore
 
         $responsePostFields = $response->request->curlOptions[CURLOPT_POSTFIELDS];
 
-        $this->assertEquals( http_build_query($postFields), $responsePostFields );
+        $this->assertEquals(http_build_query($postFields), $responsePostFields);
     }
 
     /**
@@ -873,16 +877,16 @@ class OperatorTest extends UnitTestCore
      *
      * @dataProvider methodListProvider
      *
-     * Source: @see Operator::updateMethod()
-     *
-     * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException
+     * Source: @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException
      * @throws InvalidMethodException|InvalidHeaderException|RequestCompleteException|InvalidRequestException
      *
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testUpdateMethod
      *
      * @tag #test #Handler #update #method
+     * @see          Operator::updateMethod()
+     *
      */
-    public function testUpdateMethod( string $method )
+    public function testUpdateMethod(string $method)
     {
         $operator = $this->getHandler(self::HOST, []);
 
@@ -891,13 +895,13 @@ class OperatorTest extends UnitTestCore
             ResponseInterface::HTTP_CODE => self::HTTP_CODE_OK,
         ];
 
-        $request = $operator->constructRequest( $method,self::ENDPOINT );
+        $request = $operator->constructRequest($method, self::ENDPOINT);
 
         $request->setFakeResponse($fakeResponse);
 
-        $response = $operator->send( $request );
+        $response = $operator->send($request);
 
-        $this->assertEquals( $method, $response->request->method );
+        $this->assertEquals($method, $response->request->method);
     }
 
     /**
@@ -908,27 +912,27 @@ class OperatorTest extends UnitTestCore
      *
      * @dataProvider methodListProvider
      *
-     * Source: @see Operator::validateMethod()
-     *
-     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException|InvalidHeaderException
+     * Source: @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException|InvalidEndpointException|InvalidMethodException|InvalidHeaderException
      *
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testValidateMethod
      *
      * @tag #test #Handler #validate #method
+     * @see          Operator::validateMethod()
+     *
      */
-    public function testValidateMethod( string $method )
+    public function testValidateMethod(string $method)
     {
         $operator = new Operator(self::HOST);
 
-        $request = $operator->constructRequest( $method,self::ENDPOINT );
+        $request = $operator->constructRequest($method, self::ENDPOINT);
 
-        $operator->setupRequest( $request );
+        $operator->setupRequest($request);
 
-        $this->assertEquals( $method, $operator->realRequest->method );
+        $this->assertEquals($method, $operator->realRequest->method);
 
         $this->expectException(Exception::class);
 
-        $operator->constructRequest( 'INVALID_METHOD',self::ENDPOINT );
+        $operator->constructRequest('INVALID_METHOD', self::ENDPOINT);
     }
 
     /**
@@ -940,14 +944,14 @@ class OperatorTest extends UnitTestCore
     public static function methodListProvider(): array
     {
         return [
-            [ Method::GET ],
-            [ Method::POST ],
-            [ Method::PUT ],
-            [ Method::DELETE ],
-            [ Method::PATCH ],
-            [ Method::OPTIONS ],
-            [ Method::HEAD ],
-            [ Method::TRACE ]
+            [Method::GET],
+            [Method::POST],
+            [Method::PUT],
+            [Method::DELETE],
+            [Method::PATCH],
+            [Method::OPTIONS],
+            [Method::HEAD],
+            [Method::TRACE]
         ];
     }
 
@@ -966,6 +970,6 @@ class OperatorTest extends UnitTestCore
      */
     private function getOperatorExample(): OperatorExample
     {
-        return new OperatorExample(self::HOST );
+        return new OperatorExample(self::HOST);
     }
 }

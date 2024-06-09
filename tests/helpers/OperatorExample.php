@@ -28,9 +28,7 @@ class OperatorExample extends Operator
     public static string $initResult = self::INIT_INIT;
 
 
-
     public const MY_EVENT = 'my_event';
-
 
 
     /**
