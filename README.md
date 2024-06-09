@@ -844,6 +844,7 @@ https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0
 24/05/2024 - 99b  
 26/05/2024 - v1.0.0  
 25/05/2024 - v1.0.1  
-{today}/05/2024 - v1.0.2  
+04/05/2024 - v1.0.2  
+09/06/2024 - v1.2.1  
 
 [Packagist](https://packagist.org/packages/andy87/knockknock)
