@@ -888,19 +888,20 @@ class Operator implements HandlerInterface
             );
         }
 
-        if (!self::validateHostName($this->_host)) {
-            throw new InvalidHostException("Хост `$this->_host` не валиден");
+        if (self::validateHostName($this->_host)) {
+            $commonRequestParams = array_merge(
+                [
+                    RequestInterface::SETUP_PROTOCOL => Request::PROTOCOL_HTTP,
+                    RequestInterface::SETUP_HOST => $this->_host,
+                ],
+                $commonRequestParams
+            );
+
+            return new Request(null, $commonRequestParams);
         }
 
-        $commonRequestParams = array_merge(
-            [
-                RequestInterface::SETUP_PROTOCOL => Request::PROTOCOL_HTTP,
-                RequestInterface::SETUP_HOST => $this->_host,
-            ],
-            $commonRequestParams
-        );
+        throw new InvalidHostException("Хост `$this->_host` не валиден");
 
-        return new Request(null, $commonRequestParams);
     }
 
     /**
