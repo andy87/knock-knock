@@ -283,6 +283,8 @@ _use [andy87\knock_knock\core\Request](src/core/Request.php);_
 - **params** - _параметры запроса_
 - **url** - _полный URL_
 - **params** - _все свойства в виде массива_
+- **fakeResponse** - _установленные фэйковые данные ответа_
+- **errors** - _лог ошибок_
 
 <h3 align="center">Создание объекта запроса</h3> <span id="knockknock-src-Request-construct"></span>
 
@@ -335,17 +337,18 @@ $response = $operator->setupRequest( $cloneRequest )->send();
 
 Таблица set/get методов для взаимодействия с отдельными свойствами запроса
 
-| Параметр        | Сеттер                                | Геттер                   | Информация                                                                                                                                                                    |
-|-----------------|---------------------------------------|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Протокол        | setProtocol( string $protocol )       | getProtocol(): string    | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a>                                                                                                    |
-| Хост            | setHost( string $host )               | getHost(): string        | ---                                                                                                                                                                           |
-| Endpoint        | setEndpoint( string $url )            | getEndpoint(): string    | ---                                                                                                                                                                           |
-| Метод           | setMethod( string $method )           | getMethod(): string      | <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>                                                                                |
-| Заголовки       | setHeaders( array $headers )          | getHeaders(): array      | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">заголовки</a>  |
-| Тип контента    | setContentType( string $contentType ) | getContentType(): string | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a>                             |
-| Данные          | setData( mixed $data )                | getData(): mixed         | ---                                                                                                                                                                           |
-| Опции cURL      | setCurlOptions( array $curlOptions )  | getCurlOptions(): array  | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a>                                                                               |
-| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array     | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                         |
+| Параметр        | Сеттер                                | Геттер                     | Информация                                                                                                                                                                   |
+|-----------------|---------------------------------------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Протокол        | setProtocol( string $protocol )       | getProtocol(): string      | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a>                                                                                                   |
+| Хост            | setHost( string $host )               | getHost(): string          | ---                                                                                                                                                                          |
+| Endpoint        | setEndpoint( string $url )            | getEndpoint(): string      | ---                                                                                                                                                                          |
+| Метод           | setMethod( string $method )           | getMethod(): string        | <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>                                                                               |
+| Заголовки       | setHeaders( array $headers )          | getHeaders(): array        | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">заголовки</a> |
+| Тип контента    | setContentType( string $contentType ) | getContentType(): string   | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a>                            |
+| Данные          | setData( mixed $data )                | getData(): mixed           | ---                                                                                                                                                                          |
+| Опции cURL      | setCurlOptions( array $curlOptions )  | getCurlOptions(): array    | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a>                                                                              |
+| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array       | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                        |
+| Фэйковый ответ  | setFakeResponse( array $response )    | getFakeResponse(): array   |                                                                                                                                                                              |
 
 ```php
 $request = $operator->constructRequest(Method::GET, 'info/me');
@@ -379,6 +382,16 @@ $operator->setupRequest( $request, [
 ]);
 ```
 `setupRequest( Request $request, array $options = [] ): self`
+
+
+##### addError( string $error )
+Добавление ошибки в лог ошибок
+```php
+$request = $operator->constructRequest(Method::GET, 'info/me');
+
+$request->addError('Ошибка!');
+
+```
 
 
 <p align="center">- - - - -</p>
@@ -425,7 +438,7 @@ $response = $operator->constructResponse([
 
 <h2>Отправка запроса</h2> <span id="knockknock-src-Handler-send"></span>
 
-`send( array $kafeResponse = [] ): Response`  
+`send( ?Request $request = null ): Response`  
 Метод требует наличие объекта запроса установленного методом `setupRequest( Request $request )`.  
 
 Вызов метода `send()`, возвращает объект/экземпляр класса `Response`.  
@@ -535,7 +548,16 @@ $curlInfo =  $response->curlInfo;
 $response = $operator->send($request)->asArray(); // $response
 $array = $response->content; // Array$response
 ```
+##### addError( string $error )
+Добавление ошибки в лог ошибок
+```php
+$request = $operator->constructRequest(Method::GET, 'info/me');
 
+$response = $operator->send($request);
+
+$response->addError('Ошибка!');
+
+```
 
 <p align="center">- - - - -</p>
 

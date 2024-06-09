@@ -36,8 +36,6 @@ class Operator implements HandlerInterface
     /** @var ?Operator $_instance Объект для реализации Singleton */
     protected static ?Operator $_instance = null;
 
-    /** @var string $host Хост, на который будут отправляться запросы */
-    protected string $host;
 
     /** @var ?Request $_commonRequest Объект содержащий параметры, назначаемые всем исходящим запросам */
     protected ?Request $_commonRequest = null;

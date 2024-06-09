@@ -296,7 +296,7 @@ class OperatorTest extends UnitTestCore
     {
         $operator = $this->operator;
 
-            $this->assertEquals(self::HOST, $operator->host);
+        $this->assertEquals(self::HOST, $operator->host);
 
         $operator->on(HandlerInterface::EVENT_CONSTRUCT_REQUEST, function(Operator $operator) {
             $operator->addLog(HandlerInterface::EVENT_CONSTRUCT_REQUEST);
