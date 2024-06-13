@@ -66,3 +66,8 @@
 
 ### 1.3.0
  - fix packagist
+ - 
+### 1.3.1
+ - codeStyle
+ - fix test
+
