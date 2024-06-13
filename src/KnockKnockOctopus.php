@@ -1,4 +1,6 @@
-<?php /**
+<?php declare(strict_types=1);
+
+/**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Расширяет класс KnockKnock и предоставляет доступ к "простым" методам отправки запросов через ext cURL
@@ -7,8 +9,6 @@
  * @date 2024-05-27
  * @version 1.3.0
  */
-
-declare(strict_types=1);
 
 namespace andy87\knock_knock;
 

@@ -1,5 +1,7 @@
-<?php /**
- * @name: Handler
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Тесты для методов класса Handler
  * @homepage: https://github.com/andy87/Handler
@@ -7,8 +9,6 @@
  * @date 2024-05-27
  * @version 1.3.0
  */
-
-declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\core;
 
@@ -306,25 +306,24 @@ class ResponseTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testSetupHttpCode
      *
      * @tag #test #response #setupHttpCode
-     * @see Response::setupData()
-     * Source:/
-     * public function testSetupData()
-     * {
-     * $request = new Request(PostmanEcho::ENDPOINT_GET, []);
-     * $this->assertInstanceOf(Request::class, $request);
      *
-     * $content = 'testSetupData Content';
-     *
-     * $response = new Response($content, self::HTTP_CODE_OK, $request );
-     * $this->assertInstanceOf(Response::class, $response);
-     *
-     * $this->assertEquals($content, $response->content, "Ожидается, что контент будет равен '$content'");
-     * }
-     *
-     * /**
+     * Source: @see Response::setupData()
+     **/
+     public function testSetupData()
+     {
+     $request = new Request(PostmanEcho::ENDPOINT_GET, []);
+     $this->assertInstanceOf(Request::class, $request);
+          $content = 'testSetupData Content';
+          $response = new Response($content, self::HTTP_CODE_OK, $request );
+     $this->assertInstanceOf(Response::class, $response);
+          $this->assertEquals($content, $response->content, "Ожидается, что контент будет равен '$content'");
+     }
+
+    /**
      * Проверка метода setupHttpCode объекта класса `Response`
      *      Тест ожидает, что код ответа будет заменен на новый
      *
+     * @throws ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      * Source: @see Response::convertDataToArray()
      *
      * @see Response::getData()
@@ -351,6 +350,8 @@ class ResponseTest extends UnitTestCore
      *
      * Source: @return void
      *
+     * @throws ParamUpdateException|ParamNotFoundException
+     *
      * @cli vendor/bin/phpunit tests/core/ResponseTest.php --testdox --filter testSetupRequest
      *
      * @tag #test #response #setupRequest
@@ -360,8 +361,10 @@ class ResponseTest extends UnitTestCore
         $request = new Request(PostmanEcho::ENDPOINT_GET, self::PARAMS);
         $this->assertInstanceOf(Request::class, $request);
 
-        $response = new Response(self::CONTENT, self::HTTP_CODE_OK, $request);
+        $response = new Response(self::CONTENT, self::HTTP_CODE_OK);
         $this->assertInstanceOf(Response::class, $response);
+
+        $response->setupRequest($request);
 
         $originalRequestParams = json_encode($request->params);
         $responseRequestParams = json_encode($response->request->params);

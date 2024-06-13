@@ -1,5 +1,7 @@
-<?php /**
- * @name: Handler
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Базовый клас для Тестов
  * @homepage: https://github.com/andy87/Handler
@@ -8,14 +10,11 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock\tests\helpers;
 
-
 use PHPUnit\Framework\TestCase;
-use andy87\knock_knock\interfaces\RequestInterface;
 use andy87\knock_knock\lib\{Method, ContentType};
+use andy87\knock_knock\interfaces\RequestInterface;
 use andy87\knock_knock\core\{Operator, Request, Response};
 use andy87\knock_knock\exception\{InvalidHostException,
     ParamNotFoundException,

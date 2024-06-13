@@ -1,5 +1,7 @@
-<?php /**
- * @name: Handler
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Тесты для методов класса KnockKnockOctopus
  * @homepage: https://github.com/andy87/Handler
@@ -8,10 +10,7 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock\tests\extensions;
-
 
 use andy87\knock_knock\lib\ContentType;
 use andy87\knock_knock\KnockKnockOctopus;

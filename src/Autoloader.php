@@ -1,4 +1,6 @@
-<?php /**
+<?php namespace andy87\knock_knock;
+
+/**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Авто загрузчик
@@ -7,8 +9,6 @@
  * @date 2024-05-27
  * @version 1.3.0
  */
-
-namespace andy87\knock_knock;
 
 /**
  * Implements a lightweight PSR-0 compliant autoloader for KnockKnock.

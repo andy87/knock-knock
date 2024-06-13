@@ -1,4 +1,14 @@
-<?php
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
+ * @author Andrey and_y87 Kidin
+ * @description Класс для тестов
+ * @homepage: https://github.com/andy87/Handler
+ * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
+ * @date 2024-05-27
+ * @version 1.3.0
+ */
 
 namespace andy87\knock_knock\tests\helpers;
 

@@ -1,5 +1,7 @@
-<?php /**
- * @name: Handler
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Класс для тестов
  * @homepage: https://github.com/andy87/Handler
@@ -7,8 +9,6 @@
  * @date 2024-05-27
  * @version 1.3.0
  */
-
-declare(strict_types=1);
 
 namespace andy87\knock_knock\tests\helpers;
 
