@@ -1,4 +1,6 @@
-<?php /**
+<?php declare(strict_types=1);
+
+/**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Компонент содержащий параметры ответа
@@ -8,12 +10,10 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock\core;
 
-use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
-use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException };
+use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
+use andy87\knock_knock\exception\{ParamNotFoundException, ParamUpdateException};
 
 /**
  * Class Response
@@ -159,7 +159,7 @@ class Response implements ResponseInterface
      */
     public function replace(string $key, mixed $value): Response
     {
-        match($key) {
+        match ($key) {
             self::HTTP_CODE => $this->_httpCode = $value,
             self::CONTENT => $this->_data = $value,
             default => throw new ParamNotFoundException('Bad key'),
@@ -303,6 +303,7 @@ class Response implements ResponseInterface
     {
         return $this->_httpCode;
     }
+
     /**
      * Возвращает данные ответа
      *

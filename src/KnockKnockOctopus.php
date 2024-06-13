@@ -1,4 +1,6 @@
-<?php /**
+<?php declare(strict_types=1);
+
+/**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Расширяет класс KnockKnock и предоставляет доступ к "простым" методам отправки запросов через ext cURL
@@ -8,15 +10,19 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock;
 
 use andy87\knock_knock\lib\Method;
-use andy87\knock_knock\core\{ Operator, Response };
+use andy87\knock_knock\core\{Operator, Response};
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\exception\{ ParamUpdateException, ParamNotFoundException, InvalidEndpointException, operator\InvalidMethodException };
-use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
+use andy87\knock_knock\exception\{ParamUpdateException,
+    ParamNotFoundException,
+    InvalidEndpointException,
+    operator\InvalidMethodException};
+use andy87\knock_knock\exception\request\{InvalidHeaderException,
+    InvalidRequestException,
+    RequestCompleteException,
+    StatusNotFoundException};
 
 /**
  * Class KnockOctopus
@@ -224,7 +230,7 @@ class KnockKnockOctopus extends Operator
      */
     public function fakeResponse(array $fakeResponse, array $requestParams = []): Response
     {
-        $request =  $this->constructRequest(
+        $request = $this->constructRequest(
             Method::GET,
             '/',
             $requestParams

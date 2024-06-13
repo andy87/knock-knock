@@ -1,5 +1,7 @@
-<?php /**
- * @name: Handler
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Базовый клас для Тестов
  * @homepage: https://github.com/andy87/Handler
@@ -8,16 +10,16 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock\tests\helpers;
 
-
 use PHPUnit\Framework\TestCase;
+use andy87\knock_knock\lib\{Method, ContentType};
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\lib\{ Method, ContentType };
-use andy87\knock_knock\core\{ Operator, Request, Response };
-use andy87\knock_knock\exception\{ InvalidHostException, ParamNotFoundException, ParamUpdateException, request\StatusNotFoundException };
+use andy87\knock_knock\core\{Operator, Request, Response};
+use andy87\knock_knock\exception\{InvalidHostException,
+    ParamNotFoundException,
+    ParamUpdateException,
+    request\StatusNotFoundException};
 
 /**
  * Class UnitTestCore
@@ -39,10 +41,10 @@ abstract class UnitTestCore extends TestCase
     protected const POST_FIELD = ['postFieldKey' => 'postFieldValue'];
     protected const HEADERS = ['headerKey' => 'headerValue'];
     protected const CURL_OPTIONS = [CURLOPT_TIMEOUT => 30];
-    protected const CURL_INFO = [ CURLINFO_HEADER_OUT => true ];
+    protected const CURL_INFO = [CURLINFO_HEADER_OUT => true];
 
     protected const PARAMS = [
-        RequestInterface::SETUP_PROTOCOL  => self::PROTOCOL,
+        RequestInterface::SETUP_PROTOCOL => self::PROTOCOL,
         RequestInterface::SETUP_HOST => self::HOST,
         RequestInterface::SETUP_ENDPOINT => self::ENDPOINT,
 
@@ -56,8 +58,8 @@ abstract class UnitTestCore extends TestCase
         RequestInterface::SETUP_CURL_INFO => self::CURL_INFO,
     ];
 
-    public const DATA_A = [ 'dataA' => 'dataA' ];
-    public const DATA_B = [ 'dataB' => 'dataB' ];
+    public const DATA_A = ['dataA' => 'dataA'];
+    public const DATA_B = ['dataB' => 'dataB'];
 
 
     /**
@@ -70,9 +72,9 @@ abstract class UnitTestCore extends TestCase
      *
      * @tag #handler #get
      */
-    public function getHandler( ?string $host = null, ?array $params = null ): Operator
+    public function getHandler(?string $host = null, ?array $params = null): Operator
     {
-        return new Operator($host ?? self::HOST, $params ?? self::PARAMS );
+        return new Operator($host ?? self::HOST, $params ?? self::PARAMS);
     }
 
     /**
@@ -85,9 +87,9 @@ abstract class UnitTestCore extends TestCase
      *
      * @tag #request #get
      */
-    public function getRequest( ?string $endpoint = null, ?array $params = null ): Request
+    public function getRequest(?string $endpoint = null, ?array $params = null): Request
     {
-        return new Request($endpoint ?? self::ENDPOINT, $params ?? self::PARAMS );
+        return new Request($endpoint ?? self::ENDPOINT, $params ?? self::PARAMS);
     }
 
     /**
@@ -101,10 +103,10 @@ abstract class UnitTestCore extends TestCase
      *
      * @tag #response #get
      */
-    public function getResponse( string $content = self::CONTENT, int $httpCode = self::HTTP_CODE_OK, ?Operator $operator = null ): Response
+    public function getResponse(string $content = self::CONTENT, int $httpCode = self::HTTP_CODE_OK, ?Operator $operator = null): Response
     {
         $operator = $operator ?? $this->getHandler();
 
-        return new Response( $content, $httpCode, $operator->commonRequest );
+        return new Response($content, $httpCode, $operator->commonRequest);
     }
 }

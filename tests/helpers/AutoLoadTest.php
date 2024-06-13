@@ -1,4 +1,14 @@
-<?php
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
+ * @author Andrey and_y87 Kidin
+ * @description Класс для тестов
+ * @homepage: https://github.com/andy87/Handler
+ * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
+ * @date 2024-05-27
+ * @version 1.3.0
+ */
 
 namespace andy87\knock_knock\tests\helpers;
 
@@ -25,7 +35,7 @@ use andy87\knock_knock\lib\Method;
  *
  * @tag #test #autoload
  */
-class AutoLoadTest  extends UnitTestCore
+class AutoLoadTest extends UnitTestCore
 {
     /**
      * Тест работы библиотеки с подключением через файл `autoload.php`
@@ -56,12 +66,12 @@ class AutoLoadTest  extends UnitTestCore
 
         $response = $operator->send($request);
 
-        $content = json_decode( $response->content, true );
+        $content = json_decode($response->content, true);
 
         $this->assertArrayHasKey('args', $content);
         $this->assertArrayHasKey('headers', $content);
         $this->assertArrayHasKey('url', $content);
 
-        $this->assertEquals( $response->request->url, $content['url'] );
+        $this->assertEquals($response->request->url, $content['url']);
     }
 }

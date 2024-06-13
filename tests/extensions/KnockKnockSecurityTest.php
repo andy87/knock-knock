@@ -1,5 +1,7 @@
-<?php /**
- * @name: Handler
+<?php declare(strict_types=1);
+
+/**
+ * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Тесты для методов класса KnockKnockSecurity
  * @homepage: https://github.com/andy87/Handler
@@ -8,16 +10,20 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock\tests\extensions;
 
 use andy87\knock_knock\KnockKnockSecurity;
-use andy87\knock_knock\lib\{ ContentType, Method };
-use andy87\knock_knock\tests\helpers\{ PostmanEcho, UnitTestCore };
-use andy87\knock_knock\interfaces\{ RequestInterface, ResponseInterface };
-use andy87\knock_knock\exception\{ InvalidHostException, InvalidEndpointException, ParamNotFoundException, ParamUpdateException };
-use andy87\knock_knock\exception\{ operator\InvalidMethodException, request\InvalidHeaderException, request\StatusNotFoundException, extensions\InvalidAuthException };
+use andy87\knock_knock\lib\{ContentType, Method};
+use andy87\knock_knock\tests\helpers\{PostmanEcho, UnitTestCore};
+use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
+use andy87\knock_knock\exception\{InvalidHostException,
+    InvalidEndpointException,
+    ParamNotFoundException,
+    ParamUpdateException};
+use andy87\knock_knock\exception\{operator\InvalidMethodException,
+    request\InvalidHeaderException,
+    request\StatusNotFoundException,
+    extensions\InvalidAuthException};
 
 /**
  * Class KnockKnockSecurityTest
@@ -53,7 +59,6 @@ class KnockKnockSecurityTest extends UnitTestCore
     ];
 
 
-
     /** @var KnockKnockSecurity $KnockKnockSecurity */
     public static KnockKnockSecurity $KnockKnockSecurity;
 
@@ -69,7 +74,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @tag #security #setup #authorization
      */
-    private function getKnockKnockOctopus( array $commonRequestParams = [] ): KnockKnockSecurity
+    private function getKnockKnockOctopus(array $commonRequestParams = []): KnockKnockSecurity
     {
         return new KnockKnockSecurity(
             PostmanEcho::HOST,
@@ -98,13 +103,13 @@ class KnockKnockSecurityTest extends UnitTestCore
      *
      * @tag #security #setup #authorization
      */
-    public function testSetupAuthorization( string $tokenType, string $token ): void
+    public function testSetupAuthorization(string $tokenType, string $token): void
     {
         $KnockKnockSecurity = $this->getKnockKnockOctopus();
 
         $response = $KnockKnockSecurity
-            ->setupAuthorization( $tokenType, $token )
-            ->get(PostmanEcho::ENDPOINT_GET );
+            ->setupAuthorization($tokenType, $token)
+            ->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertArrayHasKey(
             'Authorization',
@@ -113,14 +118,14 @@ class KnockKnockSecurityTest extends UnitTestCore
         );
         $this->assertEquals(
             $tokenType . ' ' . $token,
-            $response->request->headers[ 'Authorization' ],
+            $response->request->headers['Authorization'],
             "Ожидается, что значение будет равно '" . $tokenType . ' ' . $token . "'"
         );
 
         // перезапись токена
         $response = $KnockKnockSecurity
-            ->setupAuthorization( $tokenType, ( $token . 'New' ) )
-            ->get(PostmanEcho::ENDPOINT_GET );
+            ->setupAuthorization($tokenType, ($token . 'New'))
+            ->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertArrayHasKey(
             'Authorization',
@@ -129,7 +134,7 @@ class KnockKnockSecurityTest extends UnitTestCore
         );
         $this->assertEquals(
             $tokenType . ' ' . $token . 'New',
-            $response->request->headers[ 'Authorization' ],
+            $response->request->headers['Authorization'],
             "Ожидается, что значение будет равно '" . $tokenType . ' ' . $token . 'New' . "'"
         );
     }
@@ -137,21 +142,19 @@ class KnockKnockSecurityTest extends UnitTestCore
     /**
      * Данные для теста `testSetupAuthorization`
      *
-     * Data: @see KnockKnockSecurityTest::testSetupAuthorization()
-     *
-     * @return array[]
+     * Data: @return array[]
      *
      * @tag #test #Handler #provider #validate #hostName
+     * @see KnockKnockSecurityTest::testSetupAuthorization()
+     *
      */
     public static function SetupAuthProvider(): array
     {
         return [
-            [ KnockKnockSecurity::TOKEN_BASIC, self::TOKEN_BASIC ],
-            [ KnockKnockSecurity::TOKEN_BEARER, self::TOKEN_BEARER ],
+            [KnockKnockSecurity::TOKEN_BASIC, self::TOKEN_BASIC],
+            [KnockKnockSecurity::TOKEN_BEARER, self::TOKEN_BEARER],
         ];
     }
-
-
 
 
     /**
@@ -174,9 +177,9 @@ class KnockKnockSecurityTest extends UnitTestCore
     {
         $KnockKnockSecurity = $this->getKnockKnockOctopus();
 
-        $KnockKnockSecurity->setupHeaders(self::HEADERS[ self::OLD ]);
+        $KnockKnockSecurity->setupHeaders(self::HEADERS[self::OLD]);
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertArrayHasKey(
             'X-Test-Header-old',
@@ -184,15 +187,15 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках будет ключ 'X-Test-Header-old'"
         );
         $this->assertEquals(
-            self::HEADERS[ self::OLD ][ 'X-Test-Header-old' ],
-            $response->request->headers[ 'X-Test-Header-old' ],
+            self::HEADERS[self::OLD]['X-Test-Header-old'],
+            $response->request->headers['X-Test-Header-old'],
             "Ожидается, что значение будет равно 'testHeaderValue'"
         );
 
         // перезапись заголовков
-        $KnockKnockSecurity->setupHeaders(self::HEADERS[ self::NEW ]);
+        $KnockKnockSecurity->setupHeaders(self::HEADERS[self::NEW]);
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertArrayHasKey(
             'X-Test-Header-new',
@@ -200,8 +203,8 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках будет ключ 'X-Test-Header-new'"
         );
         $this->assertEquals(
-            self::HEADERS[ self::NEW ][ 'X-Test-Header-new' ],
-            $response->request->headers[ 'X-Test-Header-new' ],
+            self::HEADERS[self::NEW]['X-Test-Header-new'],
+            $response->request->headers['X-Test-Header-new'],
             "Ожидается, что значение будет равно 'testHeaderValueNew'"
         );
     }
@@ -228,7 +231,7 @@ class KnockKnockSecurityTest extends UnitTestCore
 
         $response = $KnockKnockSecurity
             ->setupContentType(ContentType::JSON)
-            ->get(PostmanEcho::ENDPOINT_GET );
+            ->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertEquals(
             ContentType::JSON,
@@ -239,7 +242,7 @@ class KnockKnockSecurityTest extends UnitTestCore
         // перезапись типа контента
         $response = $KnockKnockSecurity
             ->setupContentType(ContentType::XML)
-            ->get(PostmanEcho::ENDPOINT_GET );
+            ->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertEquals(
             ContentType::XML,
@@ -268,9 +271,9 @@ class KnockKnockSecurityTest extends UnitTestCore
     {
         $KnockKnockSecurity = $this->getKnockKnockOctopus();
 
-        $KnockKnockSecurity->setupHeaders(self::HEADERS[ self::OLD ]);
+        $KnockKnockSecurity->setupHeaders(self::HEADERS[self::OLD]);
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertArrayHasKey(
             'X-Test-Header-old',
@@ -278,15 +281,15 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках будет ключ 'X-Test-Header-old'"
         );
         $this->assertEquals(
-            self::HEADERS[ self::OLD ][ 'X-Test-Header-old' ],
-            $response->request->headers[ 'X-Test-Header-old' ],
+            self::HEADERS[self::OLD]['X-Test-Header-old'],
+            $response->request->headers['X-Test-Header-old'],
             "Ожидается, что значение будет равно 'testHeaderValueOld'"
         );
 
         // перезапись заголовков
-        $KnockKnockSecurity->useHeaders(self::HEADERS[ self::NEW ]);
+        $KnockKnockSecurity->useHeaders(self::HEADERS[self::NEW]);
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertArrayHasKey(
             'X-Test-Header-new',
@@ -294,12 +297,12 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках будет ключ 'X-Test-Header-new'"
         );
         $this->assertEquals(
-            self::HEADERS[ self::NEW ][ 'X-Test-Header-new' ],
-            $response->request->headers[ 'X-Test-Header-new' ],
+            self::HEADERS[self::NEW]['X-Test-Header-new'],
+            $response->request->headers['X-Test-Header-new'],
             "Ожидается, что значение будет равно 'testHeaderValueNew'"
         );
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertArrayHasKey(
             'X-Test-Header-old',
@@ -307,8 +310,8 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках будет ключ 'X-Test-Header-old'"
         );
         $this->assertEquals(
-            self::HEADERS[ self::OLD ][ 'X-Test-Header-old' ],
-            $response->request->headers[ 'X-Test-Header-old' ],
+            self::HEADERS[self::OLD]['X-Test-Header-old'],
+            $response->request->headers['X-Test-Header-old'],
             "Ожидается, что значение будет равно 'testHeaderValueOld'"
         );
     }
@@ -347,9 +350,9 @@ class KnockKnockSecurityTest extends UnitTestCore
 
         $content = json_decode($response->content, true);
 
-        $this->assertArrayHasKey( 'args', $content,"Ожидается, что в ответе будет ключ 'args'");
-        $this->assertArrayHasKey( 'headers', $content,"Ожидается, что в ответе будет ключ 'headers'");
-        $this->assertArrayHasKey( 'url', $content,"Ожидается, что в ответе будет значение 'url'");
+        $this->assertArrayHasKey('args', $content, "Ожидается, что в ответе будет ключ 'args'");
+        $this->assertArrayHasKey('headers', $content, "Ожидается, что в ответе будет ключ 'headers'");
+        $this->assertArrayHasKey('url', $content, "Ожидается, что в ответе будет значение 'url'");
 
         // Проверка отправки запроса с фейковым ответом
         $request = $KnockKnockSecurity
@@ -368,14 +371,14 @@ class KnockKnockSecurityTest extends UnitTestCore
         $response = $KnockKnockSecurity->send($request);
 
         $this->assertEquals(
-            self::FAKE_RESPONSE[ ResponseInterface::CONTENT ],
+            self::FAKE_RESPONSE[ResponseInterface::CONTENT],
             $response->content,
-            "Ожидается, что контент будет равен '" . self::FAKE_RESPONSE[ ResponseInterface::CONTENT ] . "'"
+            "Ожидается, что контент будет равен '" . self::FAKE_RESPONSE[ResponseInterface::CONTENT] . "'"
         );
         $this->assertEquals(
-            self::FAKE_RESPONSE[ ResponseInterface::HTTP_CODE ],
+            self::FAKE_RESPONSE[ResponseInterface::HTTP_CODE],
             $response->httpCode,
-            "Ожидается, что код ответа будет равен '" . self::FAKE_RESPONSE[ ResponseInterface::HTTP_CODE ] . "'"
+            "Ожидается, что код ответа будет равен '" . self::FAKE_RESPONSE[ResponseInterface::HTTP_CODE] . "'"
         );
     }
 
@@ -401,9 +404,9 @@ class KnockKnockSecurityTest extends UnitTestCore
         $KnockKnockSecurity = $this
             ->getKnockKnockOctopus([
                 RequestInterface::SETUP_CONTENT_TYPE => ContentType::JSON,
-                RequestInterface::SETUP_HEADERS => self::HEADERS[ self::OLD ],
+                RequestInterface::SETUP_HEADERS => self::HEADERS[self::OLD],
             ])
-            ->setupAuthorization(KnockKnockSecurity::TOKEN_BASIC, self::TOKEN_BASIC );
+            ->setupAuthorization(KnockKnockSecurity::TOKEN_BASIC, self::TOKEN_BASIC);
 
         $this->assertInstanceOf(KnockKnockSecurity::class,
             $KnockKnockSecurity,
@@ -421,8 +424,8 @@ class KnockKnockSecurityTest extends UnitTestCore
             $KnockKnockSecurity->commonRequest->headers,
             "Ожидается, что в заголовках НЕ будет ключ 'X-Test-Header-new'"
         );
-        $this->assertEquals(self::HEADERS[ self::OLD ][ 'X-Test-Header-old' ],
-            $KnockKnockSecurity->commonRequest->headers[ 'X-Test-Header-old' ],
+        $this->assertEquals(self::HEADERS[self::OLD]['X-Test-Header-old'],
+            $KnockKnockSecurity->commonRequest->headers['X-Test-Header-old'],
             "Ожидается, что значение будет равно 'testHeaderValueOld'"
         );
         $this->assertArrayHasKey(KnockKnockSecurity::HEADERS_AUTH_KEY,
@@ -430,11 +433,11 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertEquals(KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC,
-            $KnockKnockSecurity->commonRequest->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
+            $KnockKnockSecurity->commonRequest->headers[KnockKnockSecurity::HEADERS_AUTH_KEY],
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC . "'"
         );
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertEquals(ContentType::JSON,
             $response->request->contentType,
@@ -457,15 +460,15 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertEquals(KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC,
-            $response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
+            $response->request->headers[KnockKnockSecurity::HEADERS_AUTH_KEY],
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC . "'"
         );
 
-        $KnockKnockSecurity->useHeaders(self::HEADERS[ self::NEW ]);
+        $KnockKnockSecurity->useHeaders(self::HEADERS[self::NEW]);
         $KnockKnockSecurity->useContentType(ContentType::XML);
-        $KnockKnockSecurity->setupAuthorization(KnockKnockSecurity::TOKEN_BEARER, self::TOKEN_BEARER );
+        $KnockKnockSecurity->setupAuthorization(KnockKnockSecurity::TOKEN_BEARER, self::TOKEN_BEARER);
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertEquals(ContentType::XML,
             $response->request->contentType,
@@ -488,13 +491,13 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertEquals(KnockKnockSecurity::TOKEN_BEARER . ' ' . self::TOKEN_BEARER,
-            $response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
+            $response->request->headers[KnockKnockSecurity::HEADERS_AUTH_KEY],
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BEARER . ' ' . self::TOKEN_BEARER . "'"
         );
 
-        $KnockKnockSecurity->setupAuthorization(KnockKnockSecurity::TOKEN_BASIC, self::TOKEN_BASIC );
+        $KnockKnockSecurity->setupAuthorization(KnockKnockSecurity::TOKEN_BASIC, self::TOKEN_BASIC);
 
-        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET );
+        $response = $KnockKnockSecurity->get(PostmanEcho::ENDPOINT_GET);
 
         $this->assertEquals(ContentType::JSON,
             $response->request->contentType,
@@ -513,7 +516,7 @@ class KnockKnockSecurityTest extends UnitTestCore
             "Ожидается, что в заголовках БУДЕТ ключ 'Authorization'"
         );
         $this->assertEquals(KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC,
-            $response->request->headers[ KnockKnockSecurity::HEADERS_AUTH_KEY ],
+            $response->request->headers[KnockKnockSecurity::HEADERS_AUTH_KEY],
             "Ожидается, что значение БУДЕТ равно '" . KnockKnockSecurity::TOKEN_BASIC . ' ' . self::TOKEN_BASIC . "'"
         );
     }

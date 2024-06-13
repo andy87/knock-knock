@@ -1,4 +1,6 @@
-<?php /**
+<?php declare(strict_types=1);
+
+/**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Компонент содержащий параметры запроса
@@ -8,14 +10,16 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock\core;
 
 use andy87\knock_knock\lib\Method;
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidProtocolException, StatusNotFoundException };
-use andy87\knock_knock\exception\{ InvalidEndpointException, InvalidHostException, ParamUpdateException, ParamNotFoundException };
+use andy87\knock_knock\exception\request\{InvalidHeaderException, InvalidProtocolException, StatusNotFoundException};
+use andy87\knock_knock\exception\{InvalidEndpointException,
+    InvalidHostException,
+    ParamUpdateException,
+    ParamNotFoundException
+};
 
 /**
  * Class Request
@@ -49,7 +53,7 @@ class Request implements RequestInterface
 {
     /** @var string Протокол */
     public const PROTOCOL_HTTP = 'http';
-    /** @var string Безопасный протокол*/
+    /** @var string Безопасный протокол */
     public const PROTOCOL_HTTPS = 'https';
 
 
@@ -762,15 +766,33 @@ class Request implements RequestInterface
                 $this->_method = $value;
                 break;
 
-            case self::STATUS_ID: $this->_statusID = $value; break;
-            case self::SETUP_PROTOCOL: $this->_protocol = $value; break;
-            case self::SETUP_ENDPOINT: $this->_endpoint = $value; break;
-            case self::SETUP_CONTENT_TYPE: $this->_contentType = $value; break;
-            case self::SETUP_HEADERS: $this->_headers = $value; break;
-            case self::SETUP_DATA:$this->_data = $value; break;
-            case self::CURL_PARAMS: $this->_curlParams = $value; break;
-            case self::SETUP_CURL_OPTIONS: $this->_curlParams[self::SETUP_CURL_OPTIONS] = $value; break;
-            case self::SETUP_CURL_INFO: $this->_curlParams[self::SETUP_CURL_INFO] = $value; break;
+            case self::STATUS_ID:
+                $this->_statusID = $value;
+                break;
+            case self::SETUP_PROTOCOL:
+                $this->_protocol = $value;
+                break;
+            case self::SETUP_ENDPOINT:
+                $this->_endpoint = $value;
+                break;
+            case self::SETUP_CONTENT_TYPE:
+                $this->_contentType = $value;
+                break;
+            case self::SETUP_HEADERS:
+                $this->_headers = $value;
+                break;
+            case self::SETUP_DATA:
+                $this->_data = $value;
+                break;
+            case self::CURL_PARAMS:
+                $this->_curlParams = $value;
+                break;
+            case self::SETUP_CURL_OPTIONS:
+                $this->_curlParams[self::SETUP_CURL_OPTIONS] = $value;
+                break;
+            case self::SETUP_CURL_INFO:
+                $this->_curlParams[self::SETUP_CURL_INFO] = $value;
+                break;
 
             default:
                 throw new ParamNotFoundException("неизвестный параметр запроса `$param`");

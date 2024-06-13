@@ -1,4 +1,6 @@
-<?php /**
+<?php declare(strict_types=1);
+
+/**
  * @name: KnockKnock
  * @author Andrey and_y87 Kidin
  * @description Расширяет класс KnockKnockOctopus и предоставляет доступ к функционалу для простой и быстрой реализации авторизации и настройки запросов.
@@ -8,14 +10,15 @@
  * @version 1.3.0
  */
 
-declare(strict_types=1);
-
 namespace andy87\knock_knock;
 
 use andy87\knock_knock\interfaces\RequestInterface;
-use andy87\knock_knock\core\{ Operator, Request, Response };
-use andy87\knock_knock\exception\{ ParamNotFoundException, ParamUpdateException, extensions\InvalidAuthException };
-use andy87\knock_knock\exception\request\{ InvalidHeaderException, InvalidRequestException, RequestCompleteException, StatusNotFoundException };
+use andy87\knock_knock\core\{Operator, Request, Response};
+use andy87\knock_knock\exception\{ParamNotFoundException, ParamUpdateException, extensions\InvalidAuthException};
+use andy87\knock_knock\exception\request\{InvalidHeaderException,
+    InvalidRequestException,
+    RequestCompleteException,
+    StatusNotFoundException};
 
 /**
  * Class KnockAuthorization
@@ -164,7 +167,7 @@ class KnockKnockSecurity extends KnockKnockOctopus
      *
      * @tag #security #use #send
      */
-    public function send( ?RequestInterface $request = null ): Response
+    public function send(?RequestInterface $request = null): Response
     {
         if (count($this->use)) {
             $this->modifyRequestByUse($this->getterRealRequest());
