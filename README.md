@@ -47,11 +47,11 @@ ___
 
 - при composer, установленном локально:
 ```bash
-composer require andy87/knock-knock
+composer require andy87/knockknock
 ````  
 - при использовании composer.phar:
 ```bash
-php composer.phar require andy87/knock-knock
+php composer.phar require andy87/knockknock
 ```
 **Далее:** обновление зависимостей `composer update`
 
@@ -60,7 +60,7 @@ php composer.phar require andy87/knock-knock
 
 Открыть файл `composer.json`  
 В раздел, ключ `require` добавить строку  
-`"andy87/knock-knock": "*"`  
+`"andy87/knockknock": "*"`  
 **Далее:** обновление зависимостей `composer update`
 
 
