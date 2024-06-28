@@ -71,3 +71,8 @@
  - codeStyle
  - fix test
 
+### 1.3.2
+- codeStyle
+  - add comments Exception
+- update README
+- setup: "minimum-stability": "dev",
