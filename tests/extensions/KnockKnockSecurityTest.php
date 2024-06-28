@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
 /**
- * @name: KnockKnock
+ * @name: knock-knock
  * @author Andrey and_y87 Kidin
  * @description Тесты для методов класса KnockKnockSecurity
  * @homepage: https://github.com/andy87/Handler
  * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
  * @date 2024-05-27
- * @version 1.3.0
+ * @version 1.3.2
  */
 
 namespace andy87\knock_knock\tests\extensions;

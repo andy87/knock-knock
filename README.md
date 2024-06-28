@@ -47,11 +47,11 @@ ___
 
 - при composer, установленном локально:
 ```bash
-composer require andy87/KnockKnock
+composer require andy87/knock-knock
 ````  
 - при использовании composer.phar:
 ```bash
-php composer.phar require andy87/KnockKnock
+php composer.phar require andy87/knock-knock
 ```
 **Далее:** обновление зависимостей `composer update`
 
@@ -60,11 +60,8 @@ php composer.phar require andy87/KnockKnock
 
 Открыть файл `composer.json`  
 В раздел, ключ `require` добавить строку  
-`"andy87/knockknock": ">=1.0.0"`  
+`"andy87/knock-knock": "*"`  
 **Далее:** обновление зависимостей `composer update`
-
-
-<p align="center">- - - - -</p>
 
 
 <h2>Используя: подключение авто загрузчика</h2><span id="knockknock-setup-composer-autoload"></span>
@@ -848,21 +845,6 @@ vendor/bin/phpunit --log-junit "tests/logs/phpunit.xml"
 https://github.com/andy87/KnockKnock под лицензией CC BY-SA 4.0  
 Для получения дополнительной информации смотрите http://creativecommons.org/licenses/by-sa/4.0/  
 Свободно для не коммерческого использования  
-С указанием авторства для коммерческого использования  
-
-<h2>Изменения</h2> <span id="knockknock-changelog"></span>
-
-Для получения полной информации смотрите [CHANGELOG](docs/CHANGELOG.md)
-
-<h3>
-    Последние изменения
-</h3> <span id="knockknock-changes"></span>
-
-24/05/2024 - 99b  
-26/05/2024 - v1.0.0  
-25/05/2024 - v1.0.1  
-04/06/2024 - v1.0.2  
-09/06/2024 - v1.2.1  
-09/06/2024 - v1.3.0  
+С указанием авторства для коммерческого использования
 
 [Packagist](https://packagist.org/packages/andy87/knockknock)
