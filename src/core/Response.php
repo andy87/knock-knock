@@ -16,7 +16,7 @@ use andy87\knock_knock\interfaces\{RequestInterface, ResponseInterface};
 use andy87\knock_knock\exception\{ParamNotFoundException, ParamUpdateException};
 
 /**
- * Class Response
+ * Предоставляет данные ответа, преобразование JSON и диагностику ошибок.
  *
  * @package andy87\knock_knock\query
  *
@@ -27,7 +27,7 @@ use andy87\knock_knock\exception\{ParamNotFoundException, ParamUpdateException};
  *
  * @property-read array $errors
  *
- * Покрытие тестами: 100%. @see ResponseTest
+ * @see \andy87\knock_knock\tests\core\ResponseTest
  */
 class Response implements ResponseInterface
 {
@@ -188,9 +188,9 @@ class Response implements ResponseInterface
     // --- Errors ---
 
     /**
-     * Добавление ошибки в массив ошибок
+     * Добавляет ошибку до завершения запроса; для ответа без запроса также доступно.
      *
-     * @param string $errorMessage
+     * @param string $errorMessage Диагностическое сообщение без изменения формата errors.
      *
      * @return $this
      *
@@ -200,7 +200,7 @@ class Response implements ResponseInterface
      */
     public function addError(string $errorMessage): self
     {
-        if ($this->request->statusIsPrepare()) {
+        if ($this->_request === null || !$this->_request->statusIsComplete()) {
             $this->_errors[] = $errorMessage;
         }
 
@@ -321,7 +321,7 @@ class Response implements ResponseInterface
             if ($content === null) {
                 $content = $this->_data;
 
-                $this->addError('Unknown data type: ' . gettype($content));
+                $this->_errors[] = 'Unknown data type: ' . gettype($content);
             }
 
         } else {
@@ -333,9 +333,9 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Преобразование данных в массив
+     * Преобразует объект или JSON-массив; неподдерживаемый результат оставляет для fallback.
      *
-     * @param mixed $data
+     * @param mixed $data Исходное содержимое ответа.
      *
      * @return ?array
      *
@@ -357,10 +357,10 @@ class Response implements ResponseInterface
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $resp = null;
 
-                $this->addError('JSON decode error: ' . json_last_error_msg());
+                $this->_errors[] = 'JSON decode error: ' . json_last_error_msg();
             }
         }
 
-        return $resp;
+        return is_array($resp) ? $resp : null;
     }
 }

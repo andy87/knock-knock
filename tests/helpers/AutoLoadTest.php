@@ -48,6 +48,7 @@ class AutoLoadTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/helpers/AutoLoadTest.php --testdox
      *
      * @tag #test #autoload
+     * @group external
      */
     public function testAutoLoad(): void
     {
@@ -55,11 +56,11 @@ class AutoLoadTest extends UnitTestCore
 
         $this->assertTrue(class_exists('andy87\knock_knock\core\Operator'));
 
-        $operator = new Operator(PostmanEcho::HOST);
+        $operator = new Operator(PostmanEcho::PROTOCOL . '://' . PostmanEcho::HOST);
         $operator->disableSSL();
 
         $request = $operator->constructRequest(Method::GET, PostmanEcho::ENDPOINT_GET);
-        $request->setCurlOptions([
+        $request->addCurlOptions([
             CURLOPT_HEADER => false,
             CURLOPT_RETURNTRANSFER => true
         ]);

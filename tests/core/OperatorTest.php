@@ -44,6 +44,9 @@ use andy87\knock_knock\exception\{operator\EventUpdateException,
  */
 class OperatorTest extends UnitTestCore
 {
+    /** @var Operator Клиент, создаваемый заново для каждого теста. */
+    private Operator $operator;
+
     /**
      * Установки
      *
@@ -716,6 +719,7 @@ class OperatorTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/core/HandlerTest.php --testdox --filter testSendRequestOnMethodPost
      *
      * @tag #test #Handler #send #post
+     * @group external
      */
     public function testSendRequestOnMethodPost(): void
     {

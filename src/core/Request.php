@@ -22,7 +22,7 @@ use andy87\knock_knock\exception\{InvalidEndpointException,
 };
 
 /**
- * Class Request
+ * Хранит параметры и состояние одного запроса, формирует его URL.
  *
  * @package andy87\knock_knock\query
  *
@@ -47,7 +47,7 @@ use andy87\knock_knock\exception\{InvalidEndpointException,
  * @property-read array $fakeResponse
  * @property-read array $errors
  *
- * Покрытие тестами: 100%. @see RequestTest
+ * @see \andy87\knock_knock\tests\core\RequestTest
  */
 class Request implements RequestInterface
 {
@@ -196,8 +196,7 @@ class Request implements RequestInterface
             $this->prepareHost();
             $this->prepareEndpoint();
 
-            $address = trim($this->_host . '/' . $this->_endpoint);
-            $address = str_replace(['//', '///'], '/', $address);
+            $address = trim(rtrim($this->_host, '/') . '/' . ltrim($this->_endpoint, '/'));
 
             $query = '';
 
@@ -237,7 +236,7 @@ class Request implements RequestInterface
     }
 
     /**
-     * Подготовка endpoint
+     * Однократно добавляет массив или готовую строку query к endpoint GET-запроса.
      *
      * @return void
      *
@@ -247,20 +246,18 @@ class Request implements RequestInterface
      */
     public function prepareEndpoint(): void
     {
-        if (isset($this->_data) && count($this->_data)) {
-            if ($this->_method === Method::GET) {
-                $endpoint = $this->_endpoint;
+        if (($this->_method ?? null) !== Method::GET || !isset($this->_data)) {
+            return;
+        }
 
-                $query = http_build_query($this->_data);
+        $query = is_array($this->_data) ? http_build_query($this->_data) : $this->_data;
+        if (is_string($query) && $query !== '') {
+            $query = trim($query, '?&');
+            $endpoint = trim($this->_endpoint, '?&');
+            $symbol = (str_contains($endpoint, '?')) ? '&' : '?';
 
-                $endpoint = trim($endpoint, '?');
-                $endpoint = trim($endpoint, '&');
-
-                $symbol = (str_contains($endpoint, '?')) ? '&' : '?';
-
-                $this->_endpoint = $endpoint . $symbol . $query;
-                $this->_data = null;
-            }
+            $this->_endpoint = $endpoint . $symbol . $query;
+            $this->_data = null;
         }
     }
 

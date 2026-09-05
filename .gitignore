@@ -7,3 +7,12 @@ composer.phar
 composer.lock
 
 .phpunit.result.cache
+
+# Local agent instructions and scratch files
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.claude/
+.qwen/
+.codex/
+work/

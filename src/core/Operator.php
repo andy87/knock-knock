@@ -25,7 +25,7 @@ use andy87\knock_knock\exception\request\{InvalidHeaderException,
     StatusNotFoundException};
 
 /**
- * Class Operator
+ * Формирует запросы и выполняет их через cURL с общими настройками и событиями.
  *
  * @package andy87\knock_knock
  *
@@ -35,12 +35,15 @@ use andy87\knock_knock\exception\request\{InvalidHeaderException,
  * @property-read callable[] $eventHandlers
  * @property-read array $logs
  *
- * Покрытие тестами: 100%. @see KnockKnockTest
+ * @see \andy87\knock_knock\tests\core\OperatorTest
  */
 class Operator implements HandlerInterface
 {
     /** @var ?Operator $_instance Объект для реализации Singleton */
     protected static ?Operator $_instance = null;
+
+    /** @var array<class-string, Operator> Независимые Singleton-экземпляры наследников. */
+    private static array $_instances = [];
 
 
     /** @var ?Request $_commonRequest Объект содержащий параметры, назначаемые всем исходящим запросам */
@@ -165,7 +168,7 @@ class Operator implements HandlerInterface
      *
      * @param string $method
      * @param string $endpoint
-     * @param array $requestConfig
+     * @param array $requestConfig Настройки запроса; совпадающие ключи заменяются общими настройками.
      *
      * @return Request
      *
@@ -337,11 +340,11 @@ class Operator implements HandlerInterface
      */
     public function getResponseOnSendCurlRequest(Request $request): Response
     {
+        $options = $this->prepareCurlOptions($request);
+
         $ch = curl_init($request->url);
 
         $curlParams = $request->curlParams;
-
-        $options = $curlParams[RequestInterface::SETUP_CURL_OPTIONS];
 
         curl_setopt_array($ch, $options);
 
@@ -372,7 +375,8 @@ class Operator implements HandlerInterface
 
         $this->event(self::EVENT_CURL_HANDLER, [$this, $ch]);
 
-        curl_close($ch);
+        // Начиная с PHP 8 освобождение CurlHandle выполняется автоматически.
+        unset($ch);
 
         $this->event(self::EVENT_AFTER_SEND, [$this, $response]);
 
@@ -609,10 +613,10 @@ class Operator implements HandlerInterface
     /**
      * Получение экземпляра класса, используя паттерн Singleton
      *
-     * @param ?string $host
-     * @param array $commonRequestParams
+     * @param ?string $host Хост при первом создании экземпляра данного класса.
+     * @param array $commonRequestParams Общие настройки при первом создании.
      *
-     * @return self
+     * @return static Повторно используемый экземпляр вызываемого класса.
      *
      * @throws InvalidHostException|ParamNotFoundException|StatusNotFoundException|ParamUpdateException
      *
@@ -620,13 +624,17 @@ class Operator implements HandlerInterface
      *
      * @tag #knockHandler #get #instance
      */
-    public static function getInstance(string $host = null, array $commonRequestParams = []): static
+    public static function getInstance(?string $host = null, array $commonRequestParams = []): static
     {
-        if (static::$_instance === null) {
-            static::$_instance = new Operator($host, $commonRequestParams);
+        if (static::class === self::class) {
+            if (static::$_instance === null) {
+                static::$_instance = new static($host, $commonRequestParams);
+            }
+
+            return static::$_instance;
         }
 
-        return static::$_instance;
+        return self::$_instances[static::class] ??= new static($host, $commonRequestParams);
     }
 
 
@@ -764,6 +772,50 @@ class Operator implements HandlerInterface
     // === P R I V A T E ===
 
     /**
+     * Собирает заголовки фасада и режим HEAD для фактической отправки.
+     * Явные CURLOPT_HTTPHEADER имеют приоритет; повторы и подавление сохраняются.
+     *
+     * @param Request $request Запрос после выполнения EVENT_BEFORE_SEND.
+     * @return array Опции cURL с сохранёнными числовыми ключами.
+     * @throws InvalidHeaderException Если заголовок фасада содержит CR/LF или некорректное имя.
+     * @throws ParamNotFoundException При ошибке чтения параметров запроса.
+     */
+    private function prepareCurlOptions(Request $request): array
+    {
+        $options = $request->curlOptions;
+        $headers = [];
+        foreach ($request->headers as $name => $value) {
+            if (!preg_match('/^[!#$%&\'*+.^_`|~0-9A-Za-z-]+$/D', (string)$name)
+                || strpbrk((string)$value, "\r\n") !== false) {
+                throw new InvalidHeaderException('Некорректный HTTP-заголовок');
+            }
+            $headers[strtolower($name)] = $name . ': ' . $value;
+        }
+
+        $contentType = $request->contentType;
+        if ($contentType !== null && $contentType !== '' && !isset($headers['content-type'])) {
+            if (strpbrk($contentType, "\r\n") !== false) {
+                throw new InvalidHeaderException('Некорректный Content-Type');
+            }
+            $headers['content-type'] = 'Content-Type: ' . $contentType;
+        }
+
+        $explicitHeaders = $options[CURLOPT_HTTPHEADER] ?? [];
+        foreach ($explicitHeaders as $header) {
+            $name = strtolower(trim(substr($header, 0, strcspn($header, ':;'))));
+            unset($headers[$name]);
+        }
+        if ($headers) {
+            $options[CURLOPT_HTTPHEADER] = array_merge(array_values($headers), $explicitHeaders);
+        }
+        if ($request->method === Method::HEAD) {
+            $options[CURLOPT_NOBODY] = true;
+        }
+
+        return $options;
+    }
+
+    /**
      * Обновление параметров запроса на основе переданных параметров в
      *
      * @param Request $request
@@ -796,9 +848,9 @@ class Operator implements HandlerInterface
     }
 
     /**
-     * Установка POST-полей
+     * Готовит GET query, кодирует массивы и передаёт строковые тела без повторного кодирования.
      *
-     * @param Request $request
+     * @param Request $request Отправляемый запрос с исходными данными.
      *
      * @return $this
      *
@@ -812,21 +864,19 @@ class Operator implements HandlerInterface
     {
         $data = $request->data;
 
-        if ($data && count($data)) {
-            if ($request->method === Method::GET) {
-                $request->prepareEndpoint();
+        if ($request->method === Method::GET) {
+            $request->prepareEndpoint();
+        } elseif (is_string($data)) {
+            $request->setCurlOption(CURLOPT_POSTFIELDS, $data);
+        } elseif (is_array($data) && count($data)) {
+            $data = match ($request->contentType) {
+                ContentType::JSON => json_encode($data),
+                ContentType::FORM => http_build_query($data),
+                default => null,
+            };
 
-            } else {
-
-                $data = match ($request->contentType) {
-                    ContentType::JSON => json_encode($data),
-                    ContentType::FORM => http_build_query($data),
-                    default => null,
-                };
-
-                if ($data) {
-                    $request->setCurlOption(CURLOPT_POSTFIELDS, $data);
-                }
+            if ($data) {
+                $request->setCurlOption(CURLOPT_POSTFIELDS, $data);
             }
         }
 

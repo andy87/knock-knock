@@ -21,11 +21,11 @@ use andy87\knock_knock\exception\request\{InvalidHeaderException,
     StatusNotFoundException};
 
 /**
- * Class KnockAuthorization
+ * Добавляет авторизацию и разовые настройки к HTTP-методам фасада.
  *
  * @package andy87\knock_knock
  *
- * Покрытие тестами: 100%. @see RequestTest
+ * @see \andy87\knock_knock\tests\extensions\KnockKnockSecurityTest
  */
 class KnockKnockSecurity extends KnockKnockOctopus
 {
@@ -169,11 +169,19 @@ class KnockKnockSecurity extends KnockKnockOctopus
      */
     public function send(?RequestInterface $request = null): Response
     {
-        if (count($this->use)) {
-            $this->modifyRequestByUse($this->getterRealRequest());
+        if ($request !== null) {
+            $this->setupRequest($request);
         }
 
-        return parent::send($request);
+        if (count($this->use)) {
+            $realRequest = $this->getterRealRequest();
+            if ($realRequest === null) {
+                throw new InvalidRequestException();
+            }
+            $this->modifyRequestByUse($realRequest);
+        }
+
+        return parent::send();
     }
 
     /**

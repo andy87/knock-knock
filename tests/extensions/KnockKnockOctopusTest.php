@@ -49,7 +49,7 @@ class KnockKnockOctopusTest extends UnitTestCore
      */
     private function getKnockKnockOctopus(): KnockKnockOctopus
     {
-        $KnockKnockOctopus = new KnockKnockOctopus(PostmanEcho::HOST);
+        $KnockKnockOctopus = new KnockKnockOctopus(PostmanEcho::PROTOCOL . '://' . PostmanEcho::HOST);
 
         $KnockKnockOctopus->disableSSL();
 
@@ -111,6 +111,7 @@ class KnockKnockOctopusTest extends UnitTestCore
      * @tag #test #Handler #octopus #get
      * @see KnockKnockOctopus::get()
      *
+     * @group external
      */
     public function testGet(): void
     {
@@ -145,6 +146,7 @@ class KnockKnockOctopusTest extends UnitTestCore
      * @tag #test #Handler #octopus #post
      * @see KnockKnockOctopus::post()
      *
+     * @group external
      */
     public function testPost(): void
     {
@@ -169,7 +171,7 @@ class KnockKnockOctopusTest extends UnitTestCore
 
         $this->assertEquals($response->request->url, $content['url']);
 
-        $this->assertEquals(PostmanEcho::DATA, $content['json']);
+        $this->assertEquals(PostmanEcho::DATA, $content['form']);
     }
 
 

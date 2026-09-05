@@ -39,7 +39,7 @@ use andy87\knock_knock\exception\request\{InvalidHeaderException,
  * - @see KnockKnockOctopus::head();
  * - @see KnockKnockOctopus::trace();
  *
- * Покрытие тестами: 30%. @see RequestTest
+ * @see \andy87\knock_knock\tests\extensions\KnockKnockOctopusTest
  */
 class KnockKnockOctopus extends Operator
 {

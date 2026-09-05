@@ -94,9 +94,12 @@ use andy87\knock_knock\lib\Method;
 use andy87\knock_knock\lib\ContentType;
 use andy87\knock_knock\core\Operator;
 use andy87\knock_knock\core\Response;
+use andy87\knock_knock\core\Request;
 
 // Получаем компонент реализующий отправку запросов
-$operator = new Operator( $_ENV['API_HOST'] )->disableSSL();  
+$operator = new Operator($_ENV['API_HOST'], [
+    Request::SETUP_CURL_OPTIONS => [CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10],
+]);
 
 /**
  * Краткая форма записи (с не очевидным объектом запроса) 
@@ -111,9 +114,10 @@ $request->setCurlInfo([ CURLINFO_CONTENT_TYPE ]); // Назначаем опци
 $response = $operator->send($request); // Отправляем запрос и получаем ответ
 
 $content = $response->content; // Получаем данные ответа
-$curlOptions = $response->request->curlOptions; // Получаем опции cURL
+$curlInfo = $response->request->curlInfo; // Получаем информацию о выполненном запросе
 
-$output = ( $curlOptions[CURLINFO_CONTENT_TYPE] === ContentType::JSON ) ? json_decode( $content ) : $content;
+$output = str_starts_with($curlInfo[CURLINFO_CONTENT_TYPE] ?? '', ContentType::JSON)
+    ? json_decode($content) : $content;
 
 print_r( $output );
 
@@ -153,9 +157,14 @@ PHP Фасад\Адаптер для отправки запросов чере�
  - Singleton
  - логирование
   
-#### ВАЖНЫЙ МОМЕНТ!  
+#### ВАЖНЫЙ МОМЕНТ!
 - В классах применяется инкапсуляция, поэтому для доступа к свойствам компонентов используются ReadOnly свойства.  
-- `CURL_OPTIONS` по умолчанию пустые! В большинстве случаев, для получения валидных ответов, требуется задать необходимые настройки.   
+- `CURL_OPTIONS` по умолчанию пустые! В большинстве случаев, для получения валидных ответов, требуется задать необходимые настройки.
+
+Совместимость существующих интеграций: `constructRequest()` сохраняет приоритет общих настроек
+над одноимёнными настройками запроса, включая замену целых массивов. Индивидуальное изменение
+выполняется сеттерами уже созданного `Request` либо через `setupRequest($request, $options)`.
+Подробности передачи заголовков, ошибок и поддерживаемых данных — в [контрактах совместимости](docs/compatibility.md).
 
 
 
@@ -174,7 +183,7 @@ $operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 - `array $operatorConfig` - массив с настройками для всех исходящих запросов.
 
 При создании объекта `Operator` будет вызван метод `init()`, который запускает пользовательские инструкции.  
-После выполнения `init()` запускается обработчик события привязанный к ключу `EVENT_AFTER_CONSTRUCT`
+После выполнения `init()` запускается обработчик события привязанный к ключу `EVENT_AFTER_INIT`
 
 <h2 align="center" id="knockknock-src-Operator-params">
   Общие настройки запросов
@@ -186,8 +195,8 @@ $operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 ```php
 // настройки для последующих исходящих запросов
 $commonRequestParams = [
-    Request::SETUP_PROTOCO => $_ENV['API_PROTOCOL'],
-    Request::SETUP_CONTENT_TYPE => Request::CONTENT_TYPE_JSON,
+    Request::SETUP_PROTOCOL => $_ENV['API_PROTOCOL'],
+    Request::SETUP_CONTENT_TYPE => ContentType::JSON,
     Request::SETUP_CURL_OPTIONS => [
         CURLOPT_HEADER => false,
         CURLOPT_RETURNTRANSFER => true
@@ -215,30 +224,30 @@ $operator = Operator::getInstance( $_ENV['API_HOST'], $commonRequestParams );
 
 <h3>Список событий</h3> <span id="knockknock-src-events-list"></span>
 
-- `EVENT_AFTER_CONSTRUCT` после создания объекта knockKnock
-- `EVENT_CREATE_REQUEST` после создания объекта запроса
+- `EVENT_AFTER_INIT` после создания объекта knockKnock
+- `EVENT_CONSTRUCT_REQUEST` после создания объекта запроса
 - `EVENT_BEFORE_SEND` перед отправкой запроса
-- `EVENT_CURL_Operator` перед отправкой curl запроса
-- `EVENT_CREATE_RESPONSE` после создания объекта ответа
+- `EVENT_CURL_HANDLER` после выполнения cURL, пока доступен CurlHandle
+- `EVENT_CONSTRUCT_RESPONSE` после создания объекта ответа
 - `EVENT_AFTER_SEND` после получения ответа
 
 <h5>Пример установки обработчиков событий</h5> <span id="knockknock-src-Handler-events-example"></span>
 
 ```php
 $operator->setupEventHandlers([
-    Operator::EVENT_AFTER_CONSTRUCT => function( Operator $operator ) {
+    Operator::EVENT_AFTER_INIT => function( Operator $operator ) {
         // ...
     },
-    Operator::EVENT_CREATE_REQUEST => function( Operator $operator, Request $request ) {
+    Operator::EVENT_CONSTRUCT_REQUEST => function( Operator $operator, Request $request ) {
         // ...
     },
     Operator::EVENT_BEFORE_SEND => function( Operator $operator, Request $request ) {
         // ...
     },
-    Operator::EVENT_CURL_HANDLER => function( Operator $operator, resource $ch ) {
+    Operator::EVENT_CURL_HANDLER => function( Operator $operator, CurlHandle $ch ) {
         // ...
     },
-    Operator::EVENT_CREATE_RESPONSE => function( Operator $operator, Response $response ) {
+    Operator::EVENT_CONSTRUCT_RESPONSE => function( Operator $operator, Response $response ) {
         // ...
     },
     Operator::EVENT_AFTER_SEND => function( Operator $operator, Response $response ) {
@@ -248,10 +257,13 @@ $operator->setupEventHandlers([
 ```
 Первый аргумент - ключ события, второй - callback функция.
 
-Все callback функции принимают первым аргументом объект/экземпляр класса `Operaotr`.  
+Все callback функции принимают первым аргументом объект/экземпляр класса `Operaotr`.
 Вторым аргументом передаётся объект/экземпляр класса в зависимости от события:
-- `Request` - для событий `EVENT_CREATE_REQUEST`, `EVENT_BEFORE_SEND`
-- `Response` - для событий `EVENT_CREATE_RESPONSE`, `EVENT_AFTER_SEND`
+- `Request` - для событий `EVENT_CONSTRUCT_REQUEST`, `EVENT_BEFORE_SEND`
+- `Response` - для событий `EVENT_CONSTRUCT_RESPONSE`, `EVENT_AFTER_SEND`
+
+Обработчик `EVENT_AFTER_INIT` нужно регистрировать внутри переопределённого `init()`:
+при настройке событий после конструктора это событие уже произошло.
 
 
 <p align="center">- - - - -</p>
@@ -288,31 +300,32 @@ _use [andy87\knock_knock\core\Request](src/core/Request.php);_
 Передавая параметры напрямую в конструктор:
 ```php
 $request = new Request( 'info/me', [
-    Request::METHOD => Method::POST,
-    Request::DATA => [ 'client_id' => 34 ],
-    Request::HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
-    Request::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
-    Request::CURL_INFO => [
+    Request::SETUP_HOST => $_ENV['API_HOST'], // URL с протоколом, например https://api.example.com
+    Request::SETUP_METHOD => Method::POST,
+    Request::SETUP_DATA => [ 'client_id' => 34 ],
+    Request::SETUP_HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
+    Request::SETUP_CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
+    Request::SETUP_CURL_INFO => [
         CURLINFO_CONTENT_TYPE,
         CURLINFO_HEADER_SIZE,
         CURLINFO_TOTAL_TIME
     ],
-    Request::CONTENT_TYPE => ContentType::FORM_DATA,
+    Request::SETUP_CONTENT_TYPE => ContentType::FORM,
 ]);
 ```
-Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_REQUEST`
+Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CONSTRUCT_REQUEST`
 ```php
 $request = $operator->constructRequest(Method::GET, 'info/me', [
-    Request::METHOD => Method::POST,
-    Request::DATA => [ 'client_id' => 45 ],
-    Request::HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
-    Request::CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
-    Request::CURL_INFO => [
+    Request::SETUP_METHOD => Method::POST,
+    Request::SETUP_DATA => [ 'client_id' => 45 ],
+    Request::SETUP_HEADERS => [ 'api-secret-key' => $_ENV['API_SECRET_KEY'] ],
+    Request::SETUP_CURL_OPTIONS => [ CURLOPT_TIMEOUT => 10 ],
+    Request::SETUP_CURL_INFO => [
         CURLINFO_CONTENT_TYPE,
         CURLINFO_HEADER_SIZE,
         CURLINFO_TOTAL_TIME
     ],
-    Request::CONTENT_TYPE => ContentType::FORM_DATA,
+    Request::SETUP_CONTENT_TYPE => ContentType::FORM,
 ]);
 ```
 Клонируя существующий объект запроса:
@@ -336,23 +349,23 @@ $response = $operator->setupRequest( $cloneRequest )->send();
 
 | Параметр        | Сеттер                                | Геттер                     | Информация                                                                                                                                                                   |
 |-----------------|---------------------------------------|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Протокол        | setProtocol( string $protocol )       | getProtocol(): string      | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a>                                                                                                   |
-| Хост            | setHost( string $host )               | getHost(): string          | ---                                                                                                                                                                          |
-| Endpoint        | setEndpoint( string $url )            | getEndpoint(): string      | ---                                                                                                                                                                          |
-| Метод           | setMethod( string $method )           | getMethod(): string        | <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>                                                                               |
-| Заголовки       | setHeaders( array $headers )          | getHeaders(): array        | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">заголовки</a> |
-| Тип контента    | setContentType( string $contentType ) | getContentType(): string   | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a>                            |
-| Данные          | setData( mixed $data )                | getData(): mixed           | ---                                                                                                                                                                          |
-| Опции cURL      | setCurlOptions( array $curlOptions )  | getCurlOptions(): array    | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a>                                                                              |
-| Информация cURL | setCurlInfo( array $curlInfo )        | getCurlInfo(): array       | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                        |
-| Фэйковый ответ  | setFakeResponse( array $response )    | getFakeResponse(): array   |                                                                                                                                                                              |
+| Протокол        | setProtocol( string $protocol )       | $request->protocol      | <a href="https://curl.se/docs/protdocs.html" target="_blank">протоколы</a>                                                                                                   |
+| Хост            | setHost( string $host )               | $request->host          | ---                                                                                                                                                                          |
+| Endpoint        | setEndpoint( string $url )            | $request->endpoint      | ---                                                                                                                                                                          |
+| Метод           | setMethod( string $method )           | $request->method        | <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" target="_blank">методы</a>                                                                               |
+| Заголовки       | addHeaders( array $headers )          | $request->headers        | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%B7%D0%B0%D0%B3%D0%BE%D0%BB%D0%BE%D0%B2%D0%BA%D0%BE%D0%B2_HTTP" target="_blank">заголовки</a> |
+| Тип контента    | setContentType( string $contentType ) | $request->contentType   | <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_MIME-%D1%82%D0%B8%D0%BF%D0%BE%D0%B2" target="_blank">Тип контента</a>                            |
+| Данные          | setData( mixed $data )                | $request->data           | ---                                                                                                                                                                          |
+| Опции cURL      | setCurlOptions( array $curlOptions )  | $request->curlOptions    | <a href="https://www.php.net/manual/ru/function.curl-setopt.php" target="_blank">Опции cURL</a>                                                                              |
+| Информация cURL | setCurlInfo( array $curlInfo )        | $request->curlInfo       | <a href="https://www.php.net/manual/ru/function.curl-getinfo.php" target="_blank">Информация cURL</a>                                                                        |
+| Фэйковый ответ  | setFakeResponse( array $response )    | $request->fakeResponse   |                                                                                                                                                                              |
 
 ```php
 $request = $operator->constructRequest(Method::GET, 'info/me');
 
 $request->setMethod( Method::GET );
 $request->setData(['client_id' => 67]);
-$request->setHeaders(['api-secret-key' => 'secretKey67']);
+$request->addHeaders(['api-secret-key' => 'secretKey67']);
 $request->setCurlOptions([
     CURLOPT_TIMEOUT => 10,
     CURLOPT_RETURNTRANSFER => true
@@ -364,9 +377,9 @@ $request->setCurlInfo([
 ]);
 $request->setContentType( ContentType::JSON );
 
-$protocol = $request->getPrococol(); // String
-$host = $request->getHost(); // String
-// ... аналогичным образом доступны и другие подобные методы для получения свойств запроса
+$protocol = $request->protocol; // String
+$host = $request->host; // String
+// Остальные значения также доступны через read-only свойства Request.
 ```
 <h3>Назначение запроса с переназначением свойств</h3> <span id="knockknock-src-Request-setupRequest"></span>
 
@@ -419,9 +432,9 @@ _use [andy87\knock_knock\core\Response](src/core/Response.php);_
 
 Передавая параметры напрямую в конструктор:
 ```php
-$response = new Response('{"id" => 806034, "name" => "and_y87"}', 200 );
+$response = new Response('{"id":806034,"name":"and_y87"}', 200);
 ```
-Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CREATE_RESPONSE`
+Методом, который вызывает _callback_ функцию, привязанную к ключу `EVENT_CONSTRUCT_RESPONSE`
 ```php
 $response = $operator->constructResponse([
     Response::CONTENT => [
@@ -439,7 +452,7 @@ $response = $operator->constructResponse([
 Вызов возвращает объект/экземпляр класса `Response`.  
 Срабатывают callback функции, привязанные к ключам:
  - `EVENT_AFTER_SEND`
- - `EVENT_CREATE_RESPONSE`
+ - `EVENT_CONSTRUCT_RESPONSE`
  - `EVENT_BEFORE_SEND`
  - `EVENT_CURL_HANDLER`
 
@@ -685,7 +698,7 @@ $knockKnockSecurity
     ->setupAuthorization( KnockKnockSecurity::TOKEN_BEARER, 'token' )
     ->setupHeaders([ 'X-Api-Key' => $_ENV['X_API_KEY'] ])
     ->setupContentType( ContentType::JSON )
-    ->on( Operator::EVENT_AFTER_SEND, function( Operator $operator, Response $response ) => 
+    ->on( Operator::EVENT_AFTER_SEND, function( Operator $operator, Response $response ): void
     {
         $logFilePath = $_SERVER['DOCUMENT_ROOT'] . '/api_log.txt';
 
@@ -697,7 +710,7 @@ $responsePatch = $knockKnockSecurity->patch( 'product', [
     'price' => 1000
 ]);
 
-$product = $responsePatch->asArray();
+$product = $responsePatch->asArray()->content;
 
 $price = $product['price'];
 
@@ -727,67 +740,34 @@ ___
 
 Custom реализация Базового класса, к примеру с добавлением логирования работающим "под капотом"
 ```php
+/** HTTP-клиент с JSON-телами и журналом HTTP-кодов без записи токенов и содержимого. */
 class KnockKnockYandex extends Operator
 {
-    private const LOGGER = 'logger';
-
-
-    private string $host = 'https://api.yandex.ru/'
-
-    private string $contentType = ContentType::JSON
-
-    private YandexLogger $logger;
-
-
-
     /**
+     * Настраивает JSON-запросы, получение тела и журналирование ответа.
      * @return void
+     * @throws \Exception При ошибке установки параметров или обработчика.
      */
     public function init(): void
     {
-        $this->setupYandexLoggerEventHandlers();
-    }
-    
-    /**
-     * @param array $callbacks
-     * 
-     * @return self
-     */
-    private function setupYandexLoggerEventHandlers( array $callbacks ): self
-    {
-        $this->on( self::AFTER_CREATE_REQUEST, function( Request $request ) => 
-        {
-            $logData = $this->getLogDataByRequest( $request );
-
-            $this->addYandexLog( $logData );
-        };
-
-        $this->on(self::EVENT_AFTER_SEND, function( Response $response ) => 
-        {
-            $logData = $this->getLogDataByRequest( $response->request );
-
-            $this->addYandexLog( $logData );
-        };
+        $this->commonRequest->setContentType(ContentType::JSON);
+        $this->commonRequest->addCurlOptions([
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10,
+        ]);
+        $this->on(self::EVENT_AFTER_SEND, [$this, 'logResponse']);
     }
 
     /**
-      * @param Request $request
-      * 
-      * @return array
-      */
-    private function getLogDataByRequest( Request $request ): array
-    {
-        return $request->getParams();
-    }
-
-    /**
-     * @param array $logData
-     * 
+     * Сохраняет HTTP-код выполненной попытки в журнал клиента.
+     * @param Operator $operator Клиент, вызвавший событие.
+     * @param Response $response Полученный ответ.
      * @return void
+     * @throws \Exception При ошибке чтения ответа.
      */
-    private function addYandexLog( array $logData ): bool
+    public function logResponse(Operator $operator, Response $response): void
     {
-        return $logger->log( $logData );
+        $operator->addLog('HTTP ' . $response->httpCode);
     }
 }
 
@@ -798,16 +778,13 @@ class KnockKnockYandex extends Operator
 
 ```php
 
-$knockKnockYandex = KnockKnockYandex::getInstanсe( $_ENV['API_HOST'], [
-    KnockKnockYandex::LOGGER => new YandexLogger(),
+$knockKnockYandex = KnockKnockYandex::getInstance($_ENV['API_HOST']);
+
+$request = $knockKnockYandex->constructRequest(Method::PATCH, 'profile', [
+    Request::SETUP_DATA => [ 'city' => 'Moscow' ],
 ]);
 
-$response = $knockKnockYandex->setupRequest( 'profile', [ 
-    Request::METHOD => Method::PATCH,
-    Request::DATA => [ 'city' => 'Moscow' ],
-]); // Логирование `afterCreateRequest`
-
-$response = $knockKnockYandex->send(); // Логирование `afterSend`
+$response = $knockKnockYandex->send($request); // Логирование afterSend
 ```
 
 
@@ -820,8 +797,22 @@ ___
 
 <h2>Тесты</h2> <span id="knockknock-tests"></span>
 
- - tests: 100+
- - assertions: 350+
+Для PHPUnit 10 требуется PHP 8.1 или новее; минимальная версия PHP самой библиотеки — 8.0.
+Локальные HTTP-проверки запускают дочерний PHP-процесс через `proc_open` на loopback.
+Тесты, использующие внешний Postman Echo, отмечены группой `external`.
+
+Проверки без внешних сервисов:
+
+```bash
+php vendor/phpunit/phpunit/phpunit --exclude-group external
+```
+
+Только внешний Postman Echo (старые fixtures отключают проверку сертификатов;
+этот набор не доказывает корректность TLS-валидации):
+
+```bash
+php vendor/phpunit/phpunit/phpunit --group external
+```
 
 <h3>
     Запуск тестов:

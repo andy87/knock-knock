@@ -76,10 +76,12 @@ class KnockKnockSecurityTest extends UnitTestCore
      */
     private function getKnockKnockOctopus(array $commonRequestParams = []): KnockKnockSecurity
     {
-        return new KnockKnockSecurity(
-            PostmanEcho::HOST,
+        $client = new KnockKnockSecurity(
+            PostmanEcho::PROTOCOL . '://' . PostmanEcho::HOST,
             $commonRequestParams
         );
+
+        return $client->disableSSL();
     }
 
     /**
@@ -102,6 +104,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSetupAuthorization
      *
      * @tag #security #setup #authorization
+     * @group external
      */
     public function testSetupAuthorization(string $tokenType, string $token): void
     {
@@ -172,6 +175,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSetupHeaders
      *
      * @tag #security #setup #headers
+     * @group external
      */
     public function testSetupHeaders(): void
     {
@@ -224,6 +228,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSetupContentType
      *
      * @tag #security #setup #content-type
+     * @group external
      */
     public function testSetupContentType(): void
     {
@@ -266,6 +271,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testUseHeaders
      *
      * @tag #security #use #headers
+     * @group external
      */
     public function testUseHeaders(): void
     {
@@ -330,6 +336,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testSend
      *
      * @tag #security #send
+     * @group external
      */
     public function testSend(): void
     {
@@ -398,6 +405,7 @@ class KnockKnockSecurityTest extends UnitTestCore
      * @cli vendor/bin/phpunit tests/extensions/KnockKnockSecurityTest.php --testdox --filter testModifyRequestByUse
      *
      * @tag #security #use #request #modify
+     * @group external
      */
     public function testModifyRequestByUse(): void
     {
