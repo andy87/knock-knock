@@ -328,11 +328,12 @@ class Operator implements HandlerInterface
     /**
      * Получение ответа на отправку запроса через cURL
      *
-     * @param Request $request
+     * @param Request $request Подготовленный запрос для выполнения HTTP-вызова.
      *
-     * @return Response
+     * @return Response Ответ сервера с транспортной диагностикой.
      *
      * @throws StatusNotFoundException|ParamUpdateException
+     * @throws \Throwable Исходное исключение cURL или обработчика события; начатая попытка завершается.
      *
      * Test: @see KnockKnockTest::testSendRequest()
      *
@@ -348,39 +349,49 @@ class Operator implements HandlerInterface
 
         curl_setopt_array($ch, $options);
 
-        $response = curl_exec($ch);
+        try {
+            $response = curl_exec($ch);
 
-        $curlInfoList = $curlParams[RequestInterface::SETUP_CURL_INFO];
+            $curlInfoList = $curlParams[RequestInterface::SETUP_CURL_INFO];
 
-        if (count($curlInfoList)) {
-            $curlInfo = [];
+            if (count($curlInfoList)) {
+                $curlInfo = [];
 
-            foreach ($curlInfoList as $info) {
-                $curlInfo[$info] = curl_getinfo($ch, $info);
+                foreach ($curlInfoList as $info) {
+                    $curlInfo[$info] = curl_getinfo($ch, $info);
+                }
+
+                $request->setCurlInfo($curlInfo);
             }
 
-            $request->setCurlInfo($curlInfo);
+            $response = [
+                ResponseInterface::CONTENT => $response,
+                ResponseInterface::HTTP_CODE => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+            ];
+
+            $response = $this->constructResponse($response, $request);
+
+            if ($error = curl_error($ch)) {
+                $response->addError($error);
+            }
+
+            $this->event(self::EVENT_CURL_HANDLER, [$this, $ch]);
+
+            // Начиная с PHP 8 освобождение CurlHandle выполняется автоматически.
+            unset($ch);
+
+            $this->event(self::EVENT_AFTER_SEND, [$this, $response]);
+
+            return $response;
+        } catch (\Throwable $error) {
+            // HTTP-вызов уже начат: сбой callback не делает повтор той же попытки безопасным.
+            if (!$request->statusIsComplete()) {
+                $request->setupStatusComplete();
+            }
+            throw $error;
+        } finally {
+            unset($ch);
         }
-
-        $response = [
-            ResponseInterface::CONTENT => $response,
-            ResponseInterface::HTTP_CODE => curl_getinfo($ch, CURLINFO_HTTP_CODE),
-        ];
-
-        $response = $this->constructResponse($response, $request);
-
-        if ($error = curl_error($ch)) {
-            $response->addError($error);
-        }
-
-        $this->event(self::EVENT_CURL_HANDLER, [$this, $ch]);
-
-        // Начиная с PHP 8 освобождение CurlHandle выполняется автоматически.
-        unset($ch);
-
-        $this->event(self::EVENT_AFTER_SEND, [$this, $response]);
-
-        return $response;
     }
 
 
@@ -626,6 +637,10 @@ class Operator implements HandlerInterface
      */
     public static function getInstance(?string $host = null, array $commonRequestParams = []): static
     {
+        if (static::$_instance !== null && get_class(static::$_instance) === static::class) {
+            return static::$_instance;
+        }
+
         if (static::class === self::class) {
             if (static::$_instance === null) {
                 static::$_instance = new static($host, $commonRequestParams);
@@ -862,12 +877,13 @@ class Operator implements HandlerInterface
      */
     private function updatePostFields(Request $request): static
     {
+        $request->setPreparedPostFields(null);
         $data = $request->data;
 
         if ($request->method === Method::GET) {
             $request->prepareEndpoint();
         } elseif (is_string($data)) {
-            $request->setCurlOption(CURLOPT_POSTFIELDS, $data);
+            $request->setPreparedPostFields($data);
         } elseif (is_array($data) && count($data)) {
             $data = match ($request->contentType) {
                 ContentType::JSON => json_encode($data),
@@ -876,7 +892,7 @@ class Operator implements HandlerInterface
             };
 
             if ($data) {
-                $request->setCurlOption(CURLOPT_POSTFIELDS, $data);
+                $request->setPreparedPostFields($data);
             }
         }
 

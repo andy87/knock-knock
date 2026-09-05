@@ -107,6 +107,9 @@ class Request implements RequestInterface
         self::SETUP_CURL_OPTIONS => []
     ];
 
+    /** @var bool Признак тела, подготовленного фасадом из data, а не заданного напрямую в cURL. */
+    private bool $_hasPreparedPostFields = false;
+
 
     /**
      * Request конструктор.
@@ -439,6 +442,7 @@ class Request implements RequestInterface
         $this->limiterIsComplete();
 
         $this->_curlParams[self::SETUP_CURL_OPTIONS] = $curlOptions;
+        $this->_hasPreparedPostFields = false;
 
         return $this;
     }
@@ -460,6 +464,32 @@ class Request implements RequestInterface
         $this->limiterIsComplete();
 
         $this->_curlParams[self::SETUP_CURL_OPTIONS][$key] = $value;
+        if ($key === CURLOPT_POSTFIELDS) {
+            $this->_hasPreparedPostFields = false;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Устанавливает подготовленное транспортом тело или удаляет только ранее подготовленное.
+     * Явно заданный CURLOPT_POSTFIELDS при очистке сохраняется.
+     *
+     * @internal Используется Operator при подготовке отправки.
+     * @param ?string $body Подготовленное тело; null очищает автоматически сформированное тело.
+     * @return self Текущий запрос.
+     * @throws StatusNotFoundException|ParamUpdateException Если запрос уже завершён.
+     */
+    public function setPreparedPostFields(?string $body): self
+    {
+        $this->limiterIsComplete();
+        if ($body !== null) {
+            $this->setCurlOption(CURLOPT_POSTFIELDS, $body);
+            $this->_hasPreparedPostFields = true;
+        } elseif ($this->_hasPreparedPostFields) {
+            unset($this->_curlParams[self::SETUP_CURL_OPTIONS][CURLOPT_POSTFIELDS]);
+            $this->_hasPreparedPostFields = false;
+        }
 
         return $this;
     }
@@ -680,7 +710,10 @@ class Request implements RequestInterface
      */
     public function clone(): Request
     {
-        return new Request($this->_endpoint, $this->getterParams());
+        $clone = new Request($this->_endpoint, $this->getterParams());
+        $clone->_hasPreparedPostFields = $this->_hasPreparedPostFields;
+
+        return $clone;
     }
 
 
