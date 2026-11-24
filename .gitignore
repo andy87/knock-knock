@@ -1,18 +1,4 @@
-
-.idea/
-
-vendor/
-
-composer.phar
+/vendor/
 composer.lock
-
+.idea/
 .phpunit.result.cache
-
-# Local agent instructions and scratch files
-AGENTS.md
-CLAUDE.md
-GEMINI.md
-.claude/
-.qwen/
-.codex/
-work/

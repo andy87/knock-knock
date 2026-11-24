@@ -1,44 +1,21 @@
 {
-  "name": "andy87/knockknock",
-  "description": "PHP Facade Curl library - developed by and_y87",
-  "keywords": ["and_y87", "php", "cURL","facade", "knock-knock", "knockknock"],
-  "homepage": "https://andy87.ru",
+  "name": "andy87/knock-knock",
+  "description": "Small, immutable, dependency-free PHP cURL HTTP client facade.",
+  "keywords": ["php", "curl", "http", "client", "facade", "knock-knock"],
   "license": "CC-BY-SA-4.0",
-
-  "version": "1.3.2",
-  "minimum-stability": "dev",
-
-  "authors": [
-    {
-      "name": "Kidin Andrey",
-      "email": "kidin_a@list.ru"
-    }
-  ],
-
   "require": {
-    "php": ">=8.0.0",
+    "php": ">=8.2",
     "ext-curl": "*",
     "ext-json": "*"
   },
-
-  "require-dev": {
-    "phpunit/phpunit": "^10.5"
-  },
-
   "autoload": {
-    "psr-4": {
-      "andy87\\knock_knock\\": "src/"
-    }
+    "psr-4": { "KnockKnock\\": "src/" }
   },
-
   "autoload-dev": {
-    "psr-4": {
-      "andy87\\knock_knock\\": "src/",
-      "andy87\\knock_knock\\tests\\": "tests/"
-    }
+    "psr-4": { "KnockKnock\\Tests\\": "tests/" }
   },
-
   "scripts": {
-    "test": "vendor/bin/phpunit"
-  }
+    "test": "php tests/run.php"
+  },
+  "config": { "sort-packages": true }
 }

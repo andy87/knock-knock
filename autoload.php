@@ -1,13 +1,17 @@
-<?php /**
- * @name: knock-knock
- * @author Andrey and_y87 Kidin
- * @description Авто загрузчик
- * @homepage: https://github.com/andy87/KnockKnock
- * @license CC BY-SA 4.0 http://creativecommons.org/licenses/by-sa/4.0/
- * @date 2024-05-27
- * @version 1.3.2
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Fallback autoloader for projects that do not use Composer.
  */
-
-require __DIR__.'/src/Autoloader.php';
-
-andy87\knock_knock\Autoloader::register();
+spl_autoload_register(static function (string $class): void {
+    $prefix = 'KnockKnock\\';
+    if (!str_starts_with($class, $prefix)) {
+        return;
+    }
+    $file = __DIR__ . '/src/' . str_replace('\\', '/', substr($class, strlen($prefix))) . '.php';
+    if (is_file($file)) {
+        require $file;
+    }
+});

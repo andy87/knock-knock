@@ -1,33 +1,24 @@
-name: PHP Composer
+name: Tests
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [master, main]
   pull_request:
-    branches: [ "master" ]
 
 permissions:
   contents: read
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        php: ['8.2', '8.3', '8.4']
     steps:
       - uses: actions/checkout@v4
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v3
+      - uses: shivammathur/setup-php@v2
         with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
-
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-progress
-
-      - name: Run test suite
-        run: composer run-script test
+          php-version: ${{ matrix.php }}
+          extensions: curl, json
+      - run: composer validate --strict
+      - run: composer test
