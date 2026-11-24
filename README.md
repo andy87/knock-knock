@@ -145,7 +145,7 @@ The underlying transport (and its cURL handle) is shared between copies, keeping
 |---|---|
 | `status` | HTTP status code (`int`) |
 | `body` | Raw body (`string`; empty for `HEAD`) |
-| `headers` | All headers, lower-cased names; repeated headers joined with `, ` |
+| `headers` | All headers, lower-cased names; repeated headers joined with `, ` except Set-Cookie (first value). Use `headerValues($name)` for every individual value |
 | `header($name)` | One header, case-insensitive, or `null` |
 | `json()` | Decoded body as array; throws `InvalidRequestException` if it isn't a JSON object/array |
 | `successful()` | `2xx` |

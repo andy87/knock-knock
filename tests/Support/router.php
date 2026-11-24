@@ -5,6 +5,11 @@ declare(strict_types=1);
 header('X-Test: yes');
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+if ($path === '/cookies') {
+    header('Set-Cookie: a=1; Expires=Wed, 09 Jun 2027 10:18:14 GMT', false);
+    header('Set-Cookie: b=2', false);
+    return;
+}
 if ($path === '/redirect') {
     header('Location: /echo', true, 302);
     return;

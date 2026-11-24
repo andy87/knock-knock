@@ -28,6 +28,12 @@ $server = static function (): string {
 };
 
 return [
+    'cookies remain separate with commas in Expires' => function () use ($server) {
+        $r = (new Client($server()))->get('/cookies');
+        $first = 'a=1; Expires=Wed, 09 Jun 2027 10:18:14 GMT';
+        same([$first, 'b=2'], $r->headerValues('Set-Cookie'));
+        same($first, $r->header('set-cookie'));
+    },
     'GET round trip with query, headers and parsed response headers' => function () use ($server) {
         $r = (new Client($server()))->withBearer('t')->get('/echo', ['a' => 1]);
         $j = $r->json();

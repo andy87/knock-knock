@@ -10,6 +10,26 @@ use KnockKnock\Transport\FakeTransport;
 $make = static fn (FakeTransport $t, string $base = 'https://api.test/v1/'): Client => new Client($base, $t);
 
 return [
+    'latest authorization wins across casing changes' => function () use ($make) {
+        $t = (new FakeTransport())->queue();
+        $make($t)->withBearer('one')->withHeaders(['authorization' => 'Bearer two'])->withBearer('three')->get('/');
+        same('Bearer three', $t->sent[0]->header('Authorization'));
+    },
+    'body respects client and per-request content type' => function () use ($make) {
+        $t = (new FakeTransport())->queue()->queue();
+        $c = $make($t)->withHeaders(['content-type' => 'application/xml']);
+        $c->post('/', '<a/>');
+        $c->post('/', 'text', ['Content-Type' => 'text/plain']);
+        same('application/xml', $t->sent[0]->header('Content-Type'));
+        same('text/plain', $t->sent[1]->header('Content-Type'));
+    },
+    'query precedes fragment' => function () use ($make) {
+        $t = (new FakeTransport())->queue()->queue();
+        $make($t)->get('/items#top?x', ['page' => 2]);
+        $make($t)->get('/items?q=a#top', ['page' => 2]);
+        same('https://api.test/v1/items?page=2#top?x', $t->sent[0]->url);
+        same('https://api.test/v1/items?q=a&page=2#top', $t->sent[1]->url);
+    },
     'GET data goes to query string' => function () use ($make) {
         $t = (new FakeTransport())->queue();
         $make($t)->get('/users', ['a' => 1, 'q' => 'x y']);

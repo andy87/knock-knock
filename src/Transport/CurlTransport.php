@@ -41,7 +41,7 @@ final class CurlTransport implements Transport
                 } elseif (($pos = strpos($line, ':')) > 0) {
                     $name = strtolower(trim(substr($line, 0, $pos)));
                     $value = trim(substr($line, $pos + 1));
-                    $headers[$name] = isset($headers[$name]) ? "$headers[$name], $value" : $value;
+                    $headers[$name][] = $value;
                 }
 
                 return strlen($line);

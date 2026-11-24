@@ -10,13 +10,13 @@ use KnockKnock\Http\{Request, Response};
 /** In-memory transport for tests: queue canned responses, inspect what was sent. */
 final class FakeTransport implements Transport
 {
-    /** @var list<array{int, string, array<string, string>}> */
+    /** @var list<array{int, string, array<string, string|list<string>>}> */
     private array $queue = [];
 
     /** @var list<Request> */
     public array $sent = [];
 
-    /** @param array<string, string> $headers */
+    /** @param array<string, string|list<string>> $headers */
     public function queue(int $status = 200, string $body = '', array $headers = []): self
     {
         $this->queue[] = [$status, $body, array_change_key_case($headers)];

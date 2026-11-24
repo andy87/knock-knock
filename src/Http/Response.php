@@ -10,17 +10,45 @@ use KnockKnock\Exception\InvalidRequestException;
 /** Immutable HTTP response. */
 final readonly class Response
 {
+    /** @var array<string, string> Single-value view. Set-Cookie exposes the first cookie. */
+    public array $headers;
+
+    /** @var array<string, list<string>> Individual header fields in arrival order. */
+    private array $fields;
+
     /**
-     * @param array<string, string> $headers lower-cased name => value (repeated headers joined with ", ")
+     * @param array<string, string|list<string>> $headers response fields, including repeated values
      * @param array<string, mixed> $info transport diagnostics (timings, sizes, ...)
      */
     public function __construct(
         public int $status,
         public string $body,
         public Request $request,
-        public array $headers = [],
+        array $headers = [],
         public array $info = [],
     ) {
+        $fields = [];
+        foreach ($headers as $name => $values) {
+            foreach ((array) $values as $value) {
+                $fields[strtolower($name)][] = $value;
+            }
+        }
+        $this->fields = $fields;
+        $single = [];
+        foreach ($fields as $name => $values) {
+            $single[$name] = $name === 'set-cookie' ? $values[0] : implode(', ', $values);
+        }
+        $this->headers = $single;
+    }
+
+    /**
+     * Returns individual values in arrival order.
+     * @param string $name Case-insensitive field name.
+     * @return list<string> Empty when the header is absent.
+     */
+    public function headerValues(string $name): array
+    {
+        return $this->fields[strtolower($name)] ?? [];
     }
 
     public function header(string $name): ?string

@@ -44,8 +44,10 @@ final class Client
     /** @param array<string, string> $headers */
     public function withHeaders(array $headers): self
     {
-        // Request de-duplicates names case-insensitively, the later value wins.
-        return $this->copy(headers: array_merge($this->headers, $headers));
+        $replaced = array_change_key_case($headers);
+        $kept = array_filter($this->headers, static fn ($name) => !array_key_exists(strtolower($name), $replaced), ARRAY_FILTER_USE_KEY);
+
+        return $this->copy(headers: $kept + $headers);
     }
 
     public function withBearer(string $token): self
@@ -185,14 +187,18 @@ final class Client
 
         if ($hasData && $method->usesQuery()) {
             $query = is_array($data) ? http_build_query($data, '', '&', PHP_QUERY_RFC3986) : ltrim($data, '?&');
-            $url .= (str_contains($url, '?') ? '&' : '?') . $query;
+            [$target, $fragment] = array_pad(explode('#', $url, 2), 2, null);
+            $url = $target . (str_contains($target, '?') ? '&' : '?') . $query;
+            if ($fragment !== null) {
+                $url .= '#' . $fragment;
+            }
         } elseif ($hasData) {
             try {
                 $body = $this->contentType->encode($data);
             } catch (\JsonException | \InvalidArgumentException $e) {
                 throw new InvalidRequestException($e->getMessage(), 0, $e);
             }
-            $headers = $this->hasHeader($headers, 'content-type')
+            $headers = ($this->hasHeader($headers, 'content-type') || $this->hasHeader($this->headers, 'content-type'))
                 ? $headers
                 : $headers + ['Content-Type' => $this->contentType->value];
         }
